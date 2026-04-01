@@ -68,6 +68,15 @@ target_include_directories(benchmark_mesa
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_library(benchmark_android_shell STATIC
+    Platform/android/native_entry.cpp
+)
+
+target_include_directories(benchmark_android_shell
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_library(benchmark_runner STATIC
     Runner/benchmark_runner.cpp
 )
@@ -132,3 +141,15 @@ add_executable(mesa_trace_parser_test
 target_link_libraries(mesa_trace_parser_test PRIVATE benchmark_mesa)
 
 add_test(NAME mesa_trace_parser_test COMMAND mesa_trace_parser_test)
+
+add_executable(android_mode_bridge_test
+    Platform/android/tests/android_mode_bridge_test.cpp
+)
+
+target_link_libraries(android_mode_bridge_test
+    PRIVATE
+        benchmark_android_shell
+        benchmark_runner
+)
+
+add_test(NAME android_mode_bridge_test COMMAND android_mode_bridge_test)

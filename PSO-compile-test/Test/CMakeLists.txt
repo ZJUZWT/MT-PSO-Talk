@@ -19,6 +19,16 @@ target_include_directories(benchmark_results
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_library(benchmark_manifests STATIC
+    Shaders/manifests/shader_workload.cpp
+    Compression/baseline_manifest.cpp
+)
+
+target_include_directories(benchmark_manifests
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_executable(result_json_test
     Results/tests/result_json_test.cpp
 )
@@ -26,3 +36,19 @@ add_executable(result_json_test
 target_link_libraries(result_json_test PRIVATE benchmark_results)
 
 add_test(NAME result_json_test COMMAND result_json_test)
+
+add_executable(shader_workload_test
+    Shaders/tests/shader_workload_test.cpp
+)
+
+target_link_libraries(shader_workload_test PRIVATE benchmark_manifests)
+
+add_test(NAME shader_workload_test COMMAND shader_workload_test)
+
+add_executable(baseline_manifest_test
+    Compression/tests/baseline_manifest_test.cpp
+)
+
+target_link_libraries(baseline_manifest_test PRIVATE benchmark_manifests)
+
+add_test(NAME baseline_manifest_test COMMAND baseline_manifest_test)

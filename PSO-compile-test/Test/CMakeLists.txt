@@ -29,6 +29,15 @@ target_include_directories(benchmark_manifests
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_library(benchmark_runner STATIC
+    Runner/benchmark_runner.cpp
+)
+
+target_include_directories(benchmark_runner
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_executable(result_json_test
     Results/tests/result_json_test.cpp
 )
@@ -52,3 +61,11 @@ add_executable(baseline_manifest_test
 target_link_libraries(baseline_manifest_test PRIVATE benchmark_manifests)
 
 add_test(NAME baseline_manifest_test COMMAND baseline_manifest_test)
+
+add_executable(benchmark_runner_test
+    Runner/tests/benchmark_runner_test.cpp
+)
+
+target_link_libraries(benchmark_runner_test PRIVATE benchmark_runner)
+
+add_test(NAME benchmark_runner_test COMMAND benchmark_runner_test)

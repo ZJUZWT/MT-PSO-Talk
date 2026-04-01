@@ -29,6 +29,22 @@ target_include_directories(benchmark_manifests
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_library(benchmark_compression STATIC
+    Compression/compression_job.cpp
+    Compression/decompression_replay.cpp
+)
+
+target_include_directories(benchmark_compression
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(benchmark_compression
+    PUBLIC
+        benchmark_manifests
+        benchmark_results
+)
+
 add_library(benchmark_runner STATIC
     Runner/benchmark_runner.cpp
 )
@@ -61,6 +77,14 @@ add_executable(baseline_manifest_test
 target_link_libraries(baseline_manifest_test PRIVATE benchmark_manifests)
 
 add_test(NAME baseline_manifest_test COMMAND baseline_manifest_test)
+
+add_executable(decompression_replay_test
+    Compression/tests/decompression_replay_test.cpp
+)
+
+target_link_libraries(decompression_replay_test PRIVATE benchmark_compression)
+
+add_test(NAME decompression_replay_test COMMAND decompression_replay_test)
 
 add_executable(benchmark_runner_test
     Runner/tests/benchmark_runner_test.cpp

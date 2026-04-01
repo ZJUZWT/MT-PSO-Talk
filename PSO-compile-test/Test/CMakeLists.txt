@@ -59,6 +59,15 @@ target_link_libraries(benchmark_graphics
         benchmark_results
 )
 
+add_library(benchmark_mesa STATIC
+    Mesa/adapters/mesa_trace_parser.cpp
+)
+
+target_include_directories(benchmark_mesa
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_library(benchmark_runner STATIC
     Runner/benchmark_runner.cpp
 )
@@ -115,3 +124,11 @@ add_executable(graphics_backend_test
 target_link_libraries(graphics_backend_test PRIVATE benchmark_graphics)
 
 add_test(NAME graphics_backend_test COMMAND graphics_backend_test)
+
+add_executable(mesa_trace_parser_test
+    Mesa/tests/mesa_trace_parser_test.cpp
+)
+
+target_link_libraries(mesa_trace_parser_test PRIVATE benchmark_mesa)
+
+add_test(NAME mesa_trace_parser_test COMMAND mesa_trace_parser_test)

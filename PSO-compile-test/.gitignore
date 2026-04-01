@@ -1,0 +1,38 @@
+﻿# Build directories
+build/
+bin/
+lib/
+out/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.suo
+*.user
+*.sln.docstates
+
+# Compiled files
+*.obj
+*.exe
+*.dll
+*.lib
+*.o
+*.a
+
+# External libraries (clone separately)
+libs/graphics/mesa/
+libs/graphics/SPIRV-Cross/
+libs/compression/zstd/
+libs/compression/lz4/
+libs/compression/zlib/
+libs/compression/brotli/
+libs/compression/snappy/
+libs/compression/smol-v/
+libs/compression/oodle/
+libs/benchmark/google-benchmark/
+libs/benchmark/Catch2/
+
+# Temporary files
+*.tmp
+*.temp
+*.log

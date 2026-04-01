@@ -77,6 +77,21 @@ target_include_directories(benchmark_android_shell
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_library(benchmark_ios_shell STATIC
+    Platform/ios/native_entry.mm
+)
+
+set_source_files_properties(
+    Platform/ios/native_entry.mm
+    PROPERTIES
+        LANGUAGE CXX
+)
+
+target_include_directories(benchmark_ios_shell
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_library(benchmark_runner STATIC
     Runner/benchmark_runner.cpp
 )
@@ -153,3 +168,15 @@ target_link_libraries(android_mode_bridge_test
 )
 
 add_test(NAME android_mode_bridge_test COMMAND android_mode_bridge_test)
+
+add_executable(ios_mode_bridge_test
+    Platform/ios/tests/ios_mode_bridge_test.cpp
+)
+
+target_link_libraries(ios_mode_bridge_test
+    PRIVATE
+        benchmark_ios_shell
+        benchmark_runner
+)
+
+add_test(NAME ios_mode_bridge_test COMMAND ios_mode_bridge_test)

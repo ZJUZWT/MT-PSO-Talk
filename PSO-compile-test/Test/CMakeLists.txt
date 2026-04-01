@@ -45,6 +45,20 @@ target_link_libraries(benchmark_compression
         benchmark_results
 )
 
+add_library(benchmark_graphics STATIC
+    Graphics/native/native_backend_stub.cpp
+)
+
+target_include_directories(benchmark_graphics
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(benchmark_graphics
+    PUBLIC
+        benchmark_results
+)
+
 add_library(benchmark_runner STATIC
     Runner/benchmark_runner.cpp
 )
@@ -93,3 +107,11 @@ add_executable(benchmark_runner_test
 target_link_libraries(benchmark_runner_test PRIVATE benchmark_runner)
 
 add_test(NAME benchmark_runner_test COMMAND benchmark_runner_test)
+
+add_executable(graphics_backend_test
+    Graphics/tests/graphics_backend_test.cpp
+)
+
+target_link_libraries(graphics_backend_test PRIVATE benchmark_graphics)
+
+add_test(NAME graphics_backend_test COMMAND graphics_backend_test)

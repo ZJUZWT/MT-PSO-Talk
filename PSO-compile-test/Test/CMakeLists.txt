@@ -92,6 +92,21 @@ target_include_directories(benchmark_ios_shell
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+add_library(benchmark_exporters STATIC
+    Results/exporters/json_exporter.cpp
+    Results/exporters/csv_exporter.cpp
+)
+
+target_include_directories(benchmark_exporters
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(benchmark_exporters
+    PUBLIC
+        benchmark_results
+)
+
 add_library(benchmark_runner STATIC
     Runner/benchmark_runner.cpp
 )
@@ -180,3 +195,11 @@ target_link_libraries(ios_mode_bridge_test
 )
 
 add_test(NAME ios_mode_bridge_test COMMAND ios_mode_bridge_test)
+
+add_executable(exporter_test
+    Results/tests/exporter_test.cpp
+)
+
+target_link_libraries(exporter_test PRIVATE benchmark_exporters)
+
+add_test(NAME exporter_test COMMAND exporter_test)

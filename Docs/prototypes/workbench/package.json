@@ -10,8 +10,10 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@remotion/player": "^4.0.443",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "remotion": "^4.0.443"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",

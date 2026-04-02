@@ -1,0 +1,324 @@
+:root {
+  color-scheme: light;
+  font-family: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(214, 126, 75, 0.12), transparent 34%),
+    linear-gradient(180deg, #fcf9f3 0%, #f4efe5 100%);
+  color: #1f2a35;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.workbench-shell {
+  --page: #f7f2e9;
+  --page-alt: #f2ece0;
+  --surface: rgba(255, 251, 246, 0.82);
+  --surface-strong: rgba(255, 252, 248, 0.95);
+  --line: rgba(76, 90, 102, 0.16);
+  --line-strong: rgba(76, 90, 102, 0.28);
+  --ink: #22303d;
+  --muted: #647180;
+  --accent: #c66f4c;
+  --accent-soft: rgba(198, 111, 76, 0.14);
+  position: relative;
+  min-height: 100vh;
+  padding: 28px clamp(18px, 3vw, 44px) 24px;
+  overflow: hidden;
+  color: var(--ink);
+}
+
+.workbench-glow {
+  position: absolute;
+  width: 26rem;
+  height: 26rem;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(28px);
+}
+
+.workbench-glow-left {
+  top: -8rem;
+  left: -10rem;
+  background: rgba(198, 111, 76, 0.08);
+}
+
+.workbench-glow-right {
+  right: -8rem;
+  bottom: -10rem;
+  background: rgba(74, 110, 139, 0.08);
+}
+
+.control-bar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.control-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 14px 40px rgba(54, 47, 38, 0.06);
+}
+
+.control-card label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.control-card select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 252, 248, 0.92);
+  color: var(--ink);
+  padding: 10px 12px;
+  outline: none;
+}
+
+.workbench-main {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(18rem, 26rem) minmax(0, 1fr);
+  gap: clamp(18px, 3vw, 28px);
+  align-items: stretch;
+}
+
+.notes-panel,
+.stage-frame {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--surface-strong);
+  box-shadow: 0 20px 60px rgba(54, 47, 38, 0.08);
+}
+
+.notes-panel {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 28px;
+}
+
+.notes-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.notes-title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+}
+
+.notes-caption {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.notes-callout {
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.notes-callout-label {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.notes-callout-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.stage-frame {
+  position: relative;
+  padding: clamp(18px, 2.4vw, 24px);
+  min-height: 38rem;
+  overflow: hidden;
+}
+
+.stage-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(76, 90, 102, 0.05) 100%),
+    linear-gradient(180deg, transparent 0, transparent calc(100% - 1px), rgba(76, 90, 102, 0.05) 100%);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.36), transparent 85%);
+  pointer-events: none;
+}
+
+.stage-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.stage-chip {
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 252, 248, 0.88);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.stage-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: min(100%, 860px);
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  border-radius: 32px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.98) 0%, rgba(251, 245, 237, 0.98) 100%);
+  border: 1px solid rgba(76, 90, 102, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 18px 48px rgba(54, 47, 38, 0.08);
+}
+
+.stage-card-inner {
+  display: grid;
+  gap: 18px;
+  width: min(100%, 28rem);
+  text-align: center;
+}
+
+.stage-card-title {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.9rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+
+.stage-card-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.progress-bubbles {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px 0 0;
+  margin: 18px 0 0;
+  list-style: none;
+}
+
+.progress-bubble {
+  min-height: 74px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: rgba(255, 251, 246, 0.56);
+  color: var(--muted);
+  backdrop-filter: blur(10px);
+  transition:
+    transform 220ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.progress-bubble[data-state="past"] {
+  background: rgba(255, 251, 246, 0.82);
+  color: var(--ink);
+}
+
+.progress-bubble[data-state="current"] {
+  background: rgba(247, 228, 214, 0.88);
+  border-color: rgba(198, 111, 76, 0.26);
+  color: var(--ink);
+  box-shadow: 0 16px 36px rgba(198, 111, 76, 0.14);
+  transform: translateY(-2px);
+}
+
+.progress-step-index {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.progress-step-label {
+  display: block;
+  font-size: 0.94rem;
+  line-height: 1.3;
+}
+
+@media (max-width: 980px) {
+  .control-bar,
+  .workbench-main,
+  .progress-bubbles {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-frame {
+    min-height: auto;
+  }
+}

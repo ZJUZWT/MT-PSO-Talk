@@ -1,33 +1,13 @@
 import {Player, Stage, Vector2} from "@motion-canvas/core";
 import type {Project} from "@motion-canvas/core";
-import project from "./project";
-import type {
-  StoryStepId,
-  VariantId,
-} from "../../shared/pso-workbench-types";
-import {
-  MOTION_CANVAS_PLAYER_CONFIG,
-  resolveMotionCanvasStepFrame,
-} from "./embed-config";
+import project from "./project?project";
+import {MOTION_CANVAS_PLAYER_CONFIG} from "./embed-config";
+import {resolveMotionCanvasEmbedState} from "./embed-state";
 
 const STAGE_SIZE = new Vector2(
   MOTION_CANVAS_PLAYER_CONFIG.width,
   MOTION_CANVAS_PLAYER_CONFIG.height,
 );
-
-function readSelectionFromLocation(): {
-  stepId: StoryStepId;
-  variantId: VariantId;
-} {
-  const params = new URLSearchParams(window.location.search);
-  const requestedStep = params.get("step") as StoryStepId | null;
-  const requestedVariant = params.get("variant") as VariantId | null;
-
-  return {
-    stepId: requestedStep ?? "base_formula",
-    variantId: requestedVariant ?? "bus-clean",
-  };
-}
 
 async function bootstrap() {
   const container = document.getElementById("player-root");
@@ -35,6 +15,8 @@ async function bootstrap() {
   if (!container) {
     throw new Error("Missing #player-root container for Motion Canvas embed");
   }
+
+  const initialSelection = resolveMotionCanvasEmbedState(window.location.search);
 
   const stage = new Stage();
   stage.configure({
@@ -62,20 +44,22 @@ async function bootstrap() {
       paused: true,
       volume: 0,
     },
+    initialSelection.initialFrame,
   );
 
   player.onRender.subscribe(async () => {
     await stage.render(player.playback.currentScene, player.playback.previousScene);
   });
 
+  player.setVariables({variant: initialSelection.variantId});
+
   const applySelection = () => {
-    const selection = readSelectionFromLocation();
+    const selection = resolveMotionCanvasEmbedState(window.location.search);
     player.setVariables({variant: selection.variantId});
-    player.requestSeek(resolveMotionCanvasStepFrame(selection.stepId));
+    player.requestSeek(selection.initialFrame);
     player.requestRender();
   };
 
-  applySelection();
   window.addEventListener("popstate", applySelection);
 }
 

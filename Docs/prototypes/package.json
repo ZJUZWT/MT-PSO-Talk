@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently -k -n workbench,motion -c blue,magenta \"npm --prefix workbench run dev\" \"npm --prefix motion-canvas-demo run start -- --host 127.0.0.1 --port 4175\"",
     "build": "npm --prefix workbench run build && npm --prefix motion-canvas-demo run build",
-    "test": "npm --prefix workbench run test -- motionCanvasAdapter remotionAdapter App registry pso-storyboard"
+    "test": "npm --prefix workbench run test"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

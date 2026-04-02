@@ -16,9 +16,9 @@ describe("resolveLibraryState", () => {
     const resolved = resolveLibraryState({
       libraryId: "manim",
       variantId: "reference",
-      stepId: "open_fx",
+      stepId: "inline_material",
     });
 
-    expect(resolved.stepId).toBe("base_formula");
+    expect(resolved.stepId).toBe("shared_code");
   });
 });

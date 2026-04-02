@@ -1,17 +1,4 @@
-import type {LibraryId, Storyboard, VariantId} from "./pso-workbench-types";
-
-export const libraryOptions: Array<{id: LibraryId; label: string}> = [
-  {id: "remotion", label: "Remotion"},
-  {id: "motion-canvas", label: "Motion Canvas"},
-  {id: "manim", label: "Manim"},
-];
-
-export const variantOptions: Array<{id: VariantId; label: string}> = [
-  {id: "bus-clean", label: "Bus Clean"},
-  {id: "bus-wide", label: "Bus Wide"},
-  {id: "shared-focus", label: "Shared Focus"},
-  {id: "reference", label: "Reference"},
-];
+import type {Storyboard} from "./pso-workbench-types";
 
 export const masterStoryboard: Storyboard = {
   storyId: "pso-concept",

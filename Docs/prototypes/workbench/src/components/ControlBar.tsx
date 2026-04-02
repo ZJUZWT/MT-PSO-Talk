@@ -46,7 +46,11 @@ export function ControlBar({state}: ControlBarProps) {
         <label htmlFor="step">Step</label>
         <select id="step" value={state.stepId} onChange={handleStepChange}>
           {state.steps.map((step) => (
-            <option key={step.id} value={step.id}>
+            <option
+              key={step.id}
+              value={step.id}
+              disabled={!state.supportedStepIds.includes(step.id)}
+            >
               {step.label}
             </option>
           ))}

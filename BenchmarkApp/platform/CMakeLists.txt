@@ -1,3 +1,11 @@
+# Platform-specific builds
+if(ANDROID)
+    add_subdirectory(android)
+elseif(IOS OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    add_subdirectory(ios)
+endif()
+
+# Shell libraries for desktop builds (testing and development)
 add_library(benchmark_android_shell STATIC
     android/native_entry.cpp
 )

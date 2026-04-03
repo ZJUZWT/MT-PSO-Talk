@@ -11,6 +11,7 @@ struct GraphicsBenchmarkConfig {
     int iterations_per_case = 3;
     bool run_cold_cache = true;
     bool run_warm_cache = true;
+    bool use_real_backends = false;  // Try real GPU contexts; fall back to simulation
 };
 
 class GraphicsBenchmark {

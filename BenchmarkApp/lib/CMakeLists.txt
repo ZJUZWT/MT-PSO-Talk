@@ -58,16 +58,48 @@ target_link_libraries(benchmark_compression
         tp_oodle
 )
 
+# Real GPU backend sources (all compile on all platforms via #if guards)
+set(VULKAN_BACKEND_SRC
+    driver/vulkan/vulkan_context.cpp
+    driver/vulkan/vulkan_pipeline.cpp
+    driver/vulkan/vulkan_backend.cpp
+)
+
+set(OPENGL_BACKEND_SRC
+    driver/opengl/egl_context.cpp
+    driver/opengl/gl_program.cpp
+    driver/opengl/opengl_backend.cpp
+)
+
+set(METAL_BACKEND_SRC
+    driver/metal/metal_context.mm
+    driver/metal/metal_pipeline.mm
+    driver/metal/metal_backend.mm
+)
+
+# Mark .mm files as ObjC++
+set_source_files_properties(
+    driver/metal/metal_context.mm
+    driver/metal/metal_pipeline.mm
+    driver/metal/metal_backend.mm
+    PROPERTIES LANGUAGE OBJCXX
+)
+
 add_library(benchmark_graphics STATIC
     driver/native/native_backend_stub.cpp
     driver/common/timing_model.cpp
     driver/common/backend_factory.cpp
+    driver/common/device_info.cpp
     driver/mesa/mesa_opengl_backend.cpp
     driver/mesa/mesa_vulkan_backend.cpp
+    driver/mesa/mesa_env_setup.cpp
     driver/native/native_opengl_backend.cpp
     driver/native/native_vulkan_backend.cpp
     driver/native/metal_backend.cpp
     driver/graphics_benchmark.cpp
+    ${VULKAN_BACKEND_SRC}
+    ${OPENGL_BACKEND_SRC}
+    ${METAL_BACKEND_SRC}
 )
 
 target_include_directories(benchmark_graphics

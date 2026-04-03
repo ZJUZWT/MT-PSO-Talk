@@ -37,7 +37,6 @@ add_library(benchmark_compression STATIC
     compression/algorithms/zlib_algorithm.cpp
     compression/algorithms/snappy_algorithm.cpp
     compression/algorithms/brotli_algorithm.cpp
-    compression/algorithms/lzma_algorithm.cpp
     compression/algorithms/oodle_algorithm.cpp
 )
 
@@ -58,19 +57,6 @@ target_link_libraries(benchmark_compression
         tp_brotli
         tp_oodle
 )
-
-# --- lzma (optional, system only) ---
-find_package(PkgConfig QUIET)
-if(PkgConfig_FOUND)
-    pkg_check_modules(LZMA QUIET IMPORTED_TARGET liblzma)
-endif()
-if(LZMA_FOUND)
-    target_link_libraries(benchmark_compression PRIVATE PkgConfig::LZMA)
-    target_compile_definitions(benchmark_compression PUBLIC HAVE_LZMA=1)
-    message(STATUS "LZMA found - lzma compression enabled")
-else()
-    message(STATUS "LZMA not found - lzma compression disabled")
-endif()
 
 add_library(benchmark_graphics STATIC
     driver/native/native_backend_stub.cpp

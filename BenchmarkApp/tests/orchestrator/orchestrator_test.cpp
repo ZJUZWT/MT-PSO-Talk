@@ -31,7 +31,6 @@ int main() {
         test_support::expect_true(algo_names.count("zlib") > 0, "compression has zlib");
         test_support::expect_true(algo_names.count("snappy") > 0, "compression has snappy");
         test_support::expect_true(algo_names.count("brotli") > 0, "compression has brotli");
-        test_support::expect_true(algo_names.count("lzma") > 0, "compression has lzma");
         test_support::expect_true(algo_names.count("oodle_kraken") > 0, "compression has oodle_kraken");
         test_support::expect_true(algo_names.count("oodle_leviathan") > 0, "compression has oodle_leviathan");
         test_support::expect_true(algo_names.count("oodle_mermaid") > 0, "compression has oodle_mermaid");
@@ -81,7 +80,6 @@ int main() {
     test_support::expect_contains(report.compression_matrix_text, "zlib", "comp matrix has zlib");
     test_support::expect_contains(report.compression_matrix_text, "snappy", "comp matrix has snappy");
     test_support::expect_contains(report.compression_matrix_text, "brotli", "comp matrix has brotli");
-    test_support::expect_contains(report.compression_matrix_text, "lzma", "comp matrix has lzma");
     test_support::expect_contains(report.compression_matrix_text, "Ratio", "comp matrix has Ratio");
 
     // Verify summary_text contains key stats

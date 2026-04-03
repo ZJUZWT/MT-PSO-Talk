@@ -40,7 +40,9 @@ std::unique_ptr<CompressionAlgorithm> make_lz4_algorithm();
 std::unique_ptr<CompressionAlgorithm> make_zlib_algorithm();
 std::unique_ptr<CompressionAlgorithm> make_snappy_algorithm();
 std::unique_ptr<CompressionAlgorithm> make_brotli_algorithm();
+#ifdef HAVE_LZMA
 std::unique_ptr<CompressionAlgorithm> make_lzma_algorithm();
+#endif
 
 // Oodle algorithms (from UE SDK)
 std::unique_ptr<CompressionAlgorithm> make_oodle_kraken_algorithm();

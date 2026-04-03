@@ -194,7 +194,8 @@ int main() {
         test_support::expect_true(c11.data.size() <= c1.data.size(), "brotli-11 <= brotli-1 size");
     }
 
-    // Test lzma
+    // Test lzma (optional)
+#ifdef HAVE_LZMA
     {
         auto algo = benchmark::make_lzma_algorithm();
         test_support::expect_true(algo->name() == "lzma", "lzma name");
@@ -208,6 +209,7 @@ int main() {
         test_support::expect_true(c1.data.size() < pso_payload.size(), "lzma-1 compresses");
         test_support::expect_true(c6.data.size() <= c1.data.size(), "lzma-6 <= lzma-1 size");
     }
+#endif
 
     // ===== Oodle compression tests =====
     // Test oodle_kraken
@@ -308,8 +310,10 @@ int main() {
         test_algo("snappy", *snappy);
         auto brotli = benchmark::make_brotli_algorithm();
         test_algo("brotli", *brotli);
+#ifdef HAVE_LZMA
         auto lzma = benchmark::make_lzma_algorithm();
         test_algo("lzma", *lzma);
+#endif
         auto kraken = benchmark::make_oodle_kraken_algorithm();
         test_algo("oodle_kraken", *kraken);
         auto leviathan = benchmark::make_oodle_leviathan_algorithm();

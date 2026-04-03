@@ -1,5 +1,7 @@
 #include "compression/algorithms/compression_algorithm.h"
 
+#ifdef HAVE_LZMA
+
 #include <cstring>
 #include <stdexcept>
 #include <lzma.h>
@@ -84,3 +86,5 @@ std::unique_ptr<CompressionAlgorithm> make_lzma_algorithm() {
 }
 
 }  // namespace benchmark
+
+#endif  // HAVE_LZMA

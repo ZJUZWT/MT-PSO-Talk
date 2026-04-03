@@ -21,15 +21,11 @@ out/
 # External libraries (clone separately)
 libs/graphics/mesa/
 libs/graphics/SPIRV-Cross/
-libs/compression/zstd/
-libs/compression/lz4/
-libs/compression/zlib/
-libs/compression/brotli/
-libs/compression/snappy/
-libs/compression/smol-v/
-libs/compression/oodle/
 libs/benchmark/google-benchmark/
 libs/benchmark/Catch2/
+
+# Oodle precompiled library (proprietary, do not distribute)
+third_party/oodle/
 
 # Temporary files
 *.tmp

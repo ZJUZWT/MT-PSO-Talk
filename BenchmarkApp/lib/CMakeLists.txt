@@ -1,24 +1,3 @@
-# --- Find compression libraries ---
-find_package(PkgConfig REQUIRED)
-
-pkg_check_modules(ZSTD REQUIRED IMPORTED_TARGET libzstd)
-pkg_check_modules(LZ4 REQUIRED IMPORTED_TARGET liblz4)
-pkg_check_modules(BROTLI_ENC REQUIRED IMPORTED_TARGET libbrotlienc)
-pkg_check_modules(BROTLI_DEC REQUIRED IMPORTED_TARGET libbrotlidec)
-pkg_check_modules(LZMA REQUIRED IMPORTED_TARGET liblzma)
-
-# snappy - no pkg-config, use find_path/find_library
-find_path(SNAPPY_INCLUDE_DIR snappy.h HINTS /opt/homebrew/opt/snappy/include)
-find_library(SNAPPY_LIBRARY snappy HINTS /opt/homebrew/opt/snappy/lib)
-
-# zlib - system provided
-find_package(ZLIB REQUIRED)
-
-# Oodle Data Compression (from UE SDK)
-set(OODLE_SDK_DIR "/Users/swannzhang/Workspace/CppProjects/UnrealEngine/Engine/Source/Runtime/OodleDataCompression/Sdks/2.9.8")
-set(OODLE_INCLUDE_DIR "${OODLE_SDK_DIR}/include")
-set(OODLE_LIBRARY "${OODLE_SDK_DIR}/lib/Mac/liboo2coremac64.a")
-
 # ============================================================
 # Library targets
 # ============================================================
@@ -65,9 +44,6 @@ add_library(benchmark_compression STATIC
 target_include_directories(benchmark_compression
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
-    PRIVATE
-        ${SNAPPY_INCLUDE_DIR}
-        ${OODLE_INCLUDE_DIR}
 )
 
 target_link_libraries(benchmark_compression
@@ -75,15 +51,26 @@ target_link_libraries(benchmark_compression
         benchmark_manifests
         benchmark_results
     PRIVATE
-        PkgConfig::ZSTD
-        PkgConfig::LZ4
-        PkgConfig::BROTLI_ENC
-        PkgConfig::BROTLI_DEC
-        PkgConfig::LZMA
-        ${SNAPPY_LIBRARY}
-        ZLIB::ZLIB
-        ${OODLE_LIBRARY}
+        tp_zstd
+        tp_lz4
+        tp_zlib
+        tp_snappy
+        tp_brotli
+        tp_oodle
 )
+
+# --- lzma (optional, system only) ---
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(LZMA QUIET IMPORTED_TARGET liblzma)
+endif()
+if(LZMA_FOUND)
+    target_link_libraries(benchmark_compression PRIVATE PkgConfig::LZMA)
+    target_compile_definitions(benchmark_compression PUBLIC HAVE_LZMA=1)
+    message(STATUS "LZMA found - lzma compression enabled")
+else()
+    message(STATUS "LZMA not found - lzma compression disabled")
+endif()
 
 add_library(benchmark_graphics STATIC
     driver/native/native_backend_stub.cpp

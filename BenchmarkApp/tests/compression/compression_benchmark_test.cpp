@@ -53,8 +53,13 @@ int main() {
 
         auto results = bench.run_all("IterPlatform", config);
 
-        // Expected: 25 algo/level combos * 1 size * 3 iterations = 75
+        // Expected: algo/level combos * 1 size * 3 iterations
+        // With lzma (HAVE_LZMA): 25 combos; without: 22 combos
+#ifdef HAVE_LZMA
         size_t expected_count = 75;
+#else
+        size_t expected_count = 66;
+#endif
         test_support::expect_equal(results.size(), expected_count,
             "iterations=3 result count");
     }
@@ -68,10 +73,14 @@ int main() {
         auto results = bench.run_all("BenchPlatform", config);
 
         // Expected entries:
-        // noop(1) + zstd(4) + lz4(2) + zlib(3) + snappy(1) + brotli(3) + lzma(3)
-        // + oodle_kraken(2) + oodle_leviathan(2) + oodle_mermaid(2) + oodle_selkie(2) = 25
-        // 25 algos * 1 size * 1 iteration = 25
+        // noop(1) + zstd(4) + lz4(2) + zlib(3) + snappy(1) + brotli(3)
+        // + oodle_kraken(2) + oodle_leviathan(2) + oodle_mermaid(2) + oodle_selkie(2) = 22
+        // With lzma (+3): 25
+#ifdef HAVE_LZMA
         size_t expected_count = 25;
+#else
+        size_t expected_count = 22;
+#endif
         test_support::expect_equal(results.size(), expected_count,
             "run_all result count");
 
@@ -81,19 +90,23 @@ int main() {
                 "status for " + r.algorithm + " level=" + r.level);
         }
 
-        // Check that we have all 11 algorithm names
+        // Check that we have all algorithm names
         std::set<std::string> algo_names;
         for (const auto& r : results) {
             algo_names.insert(r.algorithm);
         }
+#ifdef HAVE_LZMA
         test_support::expect_equal(algo_names.size(), static_cast<size_t>(11), "11 unique algorithms");
+        test_support::expect_true(algo_names.count("lzma") > 0, "has lzma results");
+#else
+        test_support::expect_equal(algo_names.size(), static_cast<size_t>(10), "10 unique algorithms");
+#endif
         test_support::expect_true(algo_names.count("noop") > 0, "has noop results");
         test_support::expect_true(algo_names.count("zstd") > 0, "has zstd results");
         test_support::expect_true(algo_names.count("lz4") > 0, "has lz4 results");
         test_support::expect_true(algo_names.count("zlib") > 0, "has zlib results");
         test_support::expect_true(algo_names.count("snappy") > 0, "has snappy results");
         test_support::expect_true(algo_names.count("brotli") > 0, "has brotli results");
-        test_support::expect_true(algo_names.count("lzma") > 0, "has lzma results");
         test_support::expect_true(algo_names.count("oodle_kraken") > 0, "has oodle_kraken results");
         test_support::expect_true(algo_names.count("oodle_leviathan") > 0, "has oodle_leviathan results");
         test_support::expect_true(algo_names.count("oodle_mermaid") > 0, "has oodle_mermaid results");

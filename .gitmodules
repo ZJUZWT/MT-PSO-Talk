@@ -1,3 +1,6 @@
 [submodule "SlideApp"]
 	path = SlideApp
 	url = https://github.com/ZJUZWT/MT-PSO-Talk-SlideApp.git
+[submodule "BenchmarkApp/third_party/mesa"]
+	path = BenchmarkApp/third_party/mesa
+	url = https://gitlab.freedesktop.org/mesa/mesa.git

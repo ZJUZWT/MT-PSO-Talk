@@ -18,14 +18,11 @@ out/
 *.o
 *.a
 
-# External libraries (clone separately)
-libs/graphics/mesa/
-libs/graphics/SPIRV-Cross/
-libs/benchmark/google-benchmark/
-libs/benchmark/Catch2/
-
-# Oodle precompiled library (proprietary, do not distribute)
+# Proprietary libraries (do not distribute)
 third_party/oodle/
+
+# Mesa build output (source is a submodule)
+third_party/mesa/build/
 
 # Temporary files
 *.tmp

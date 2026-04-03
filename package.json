@@ -1,0 +1,12 @@
+{
+  "name": "mt-pso-talk",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "slide:dev": "npm --prefix SlideApp run dev",
+    "slide:test": "npm --prefix SlideApp run test",
+    "slide:build": "npm --prefix SlideApp run build",
+    "slide:build:pages": "npm --prefix SlideApp run build:pages",
+    "benchmark:configure": "cmake -S BenchmarkApp -B build/BenchmarkApp"
+  }
+}

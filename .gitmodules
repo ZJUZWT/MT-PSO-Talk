@@ -1,0 +1,3 @@
+[submodule "SlideApp"]
+	path = SlideApp
+	url = https://github.com/ZJUZWT/MT-PSO-Talk-SlideApp.git

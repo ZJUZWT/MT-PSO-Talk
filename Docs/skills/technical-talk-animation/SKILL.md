@@ -39,6 +39,31 @@ In practice, that means:
 - change one idea at a time
 - let the audience preserve their mental map across the whole sequence
 
+## Node / Edge Correspondence First
+
+Before animating any multi-page technical diagram, explicitly map:
+
+- which nodes are still the same object across pages
+- which edges are still the same relationship across pages
+- which objects are truly new
+- which objects must go off-stage
+
+If a node or edge is semantically continuous, prefer:
+
+- position shifts
+- resizing
+- label rewrites
+- color emphasis changes
+- attached-source reveal
+
+Do not default to fade-out / fade-in for semantically continuous objects.
+
+Treat pure fades as a last resort for:
+
+- genuinely deleted objects
+- genuinely new objects with no predecessor
+- low-importance support detail
+
 ## Layout Rules
 
 - Reserve a text-safe area for slide copy before drawing the animation
@@ -64,6 +89,10 @@ In practice, that means:
   content as well as the shell; shrinking only the outer width reads like a cut
 - Start transition state before the first painted frame whenever possible; one
   idle frame between pages is visible in a talk setting
+- Preserve the inherited skeleton before introducing the new layer
+- When semantics continue, morph or hand off; do not swap whole groups by opacity
+- Keep receiver planes such as `GPU` / `PSO` on a stable axis unless the move is
+  itself the point of the page
 
 ## Arrow Rules
 
@@ -73,6 +102,11 @@ In practice, that means:
   while the layout is still moving
 - If an arrow endpoint would cause overlap or visual noise, delay the arrow
   fade-in until the target state is stable
+- Keep arrow width language stable across neighboring pages
+- Keep entry side conventions stable for the same semantic edge
+- Preserve optical gaps between box edges, bends, and arrowheads; “close” is not
+  the same as touching
+- If a line becomes ugly, move the node group first before adding more bends
 
 ## Visual Rules
 
@@ -81,6 +115,10 @@ In practice, that means:
 - Use rounded boxes, but keep the style technical and restrained
 - Shadows should be soft and subtle; if the shadow is noticeable, it is usually
   too strong
+- Stable inherited skeleton should usually stay neutral; reserve the emphasis
+  color for the current page's new action
+- Decorative inner chrome is only acceptable if it teaches structure; never use
+  it on asset nodes just to make boxes feel less empty
 
 ## Failure Modes
 
@@ -96,11 +134,12 @@ These are strong warning signs:
 ## Recommended Workflow
 
 1. Define the final paused diagram first.
-2. Place every major node on a stable skeleton.
-3. Define the intermediate keyframes without overlap.
-4. Add emphasis scaling only after the keyframes read clearly.
-5. Add arrows last, and make them orthogonal.
-6. Export both a master clip and per-beat clips for slide embedding.
+2. Write down node / edge correspondence between neighboring pages.
+3. Place every major node on a stable skeleton.
+4. Define the intermediate keyframes without overlap.
+5. Add emphasis scaling only after the keyframes read clearly.
+6. Add arrows last, and make them orthogonal.
+7. Export both a master clip and per-beat clips for slide embedding.
 
 ## PPT Embedding Guidance
 
@@ -118,5 +157,7 @@ Before calling the animation ready, confirm:
 - the background works on a normal PPT slide
 - no keyframe has overlap
 - arrows are orthogonal and stable
+- node / edge correspondence is explicit for each page transition
+- stable axes and receiver planes do not drift without narrative reason
 - only one concept is visually dominant at a time
 - the final frame is presentation-worthy on its own

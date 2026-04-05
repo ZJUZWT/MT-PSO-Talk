@@ -15,10 +15,11 @@
 - 第 01 页：[`01-第一页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/01-第一页.md)
 - 第 02 页：[`02-第二页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/02-第二页.md)
 - 第 03 页：[`03-第三页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/03-第三页.md)
+- 第 04 页：[`04-第四页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/04-第四页.md)
 
 ## 当前状态
 
 - 旧剧本已从 live 路径移除
 - 旧 `draw.io` 已从 live 路径移除
-- `SlideApp` 当前 live 到第 03 页
-- live 页包括：`01-第一页.md`、`02-第二页.md`、`03-第三页.md`
+- `SlideApp` 当前 live 到第 04 页
+- live 页包括：`01-第一页.md`、`02-第二页.md`、`03-第三页.md`、`04-第四页.md`

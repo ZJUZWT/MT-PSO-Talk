@@ -8,6 +8,7 @@ coverage/
 .cache/
 __pycache__/
 *.py[cod]
+.generated/
 Docs/PSO-video-demo.mp4
 Docs/PSO-video-demo.gif
 Docs/PSO-video-demo-contact-sheet.png
@@ -17,3 +18,10 @@ Docs/PSO-video-demo-frames/
 Docs/PSO-video-demo-segments/
 Docs/PSO-animation-demo*
 Docs/_anim_test.pptx
+Docs/剧本/.generated-previews/
+Docs/.archive/
+.codex-preview/
+.superpowers/
+.claude/
+test-results/
+Docs/superpowers/

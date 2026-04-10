@@ -14,6 +14,7 @@ It composes:
 - latest-only screenshot capture
 - fact-bound geometry metrics
 - two blind critics
+- lesson harvesting when durable workflow rules or user preferences emerge
 
 Use this skill for slide geometry work, not for general UI review.
 
@@ -55,7 +56,8 @@ Do not use this skill for:
    - `Art Critic`
    - `Geometry Critic`
 8. Merge both reviews into one next-step verdict.
-9. Stop after at most 3 automatic rounds, or earlier if the stop rule passes.
+9. If the user explicitly asks to remember, persist, or write the lesson into skill or memory, invoke `conversation-lesson-harvester` before closing the task.
+10. Stop after at most 3 automatic rounds, or earlier if the stop rule passes.
 
 ## Capture Rule
 

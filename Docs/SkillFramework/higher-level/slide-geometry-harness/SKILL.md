@@ -10,6 +10,7 @@ It is a higher-level skill, not a disguised `drawio` review loop.
 
 It composes:
 
+- textual geometry contract drafting
 - browser-runnable sketch generation
 - latest-only screenshot capture
 - fact-bound geometry metrics
@@ -44,20 +45,34 @@ Do not use this skill for:
 ## Required Workflow
 
 1. If a finished slide already exists, mirror that slide's real structure into the sketch first. Do not start from an abstract demo surrogate.
-2. Convert the current page into a short page contract after the mirror pass, not before it.
-3. Build or revise a sketch under `SlideApp/src/harness/slide-geometry/`.
-4. Expose the sketch through the existing `SlideApp` port with a concrete URL.
-5. Capture the latest rendered result using the SlideApp browser export path first:
+2. Before rendering anything, write a full page contract with `write-slide-geometry-contract`.
+3. The contract must enumerate every node, every edge, every line label, the angle family, the spatial alignments, and the numbered acceptance checklist.
+4. If the page contract is stored as a markdown script file, keep it under `Docs/剧本/`. If it is a sketch mirror, mark the filename with `草图镜像-<sketch-id>`. That file must also include the latest screenshot, a three-layer review summary, and auditable node and edge review tables.
+5. The three-layer review summary must score:
+   - `整体布局 Review`
+   - `模块空间结构 Review`
+   - `单节点与单边 Review`
+6. The node and edge review tables must contain Chinese script descriptions when feasible, followed by review viewpoint and review score columns.
+7. Only after the contract is explicit may you build or revise a sketch under `SlideApp/src/harness/slide-geometry/`.
+8. Expose the sketch through the existing `SlideApp` port with a concrete URL.
+9. Capture the latest rendered result using the SlideApp browser export path first:
    - primary automation path: `browser-api` capture of the real SlideApp page or stage
    - manual reality check: current front browser window capture when you need to compare against what the user literally sees on screen
    - fallback: `surface=stage` headless screenshot only when browser export is unavailable
-6. Extract facts and metrics before any score is allowed.
-7. Send the latest artifact bundle to two blind critics in parallel:
+10. Update the page script markdown screenshot, the three-layer review summary, and both review tables after capture, before critic merge.
+10.5. Keep each page script responsible only for its own scores and review facts. Do not auto-propagate numeric judgments from one page into another page's ledger.
+11. Extract facts and metrics before any score is allowed.
+12. Send the latest artifact bundle to two blind critics in parallel:
    - `Art Critic`
    - `Geometry Critic`
-8. Merge both reviews into one next-step verdict.
-9. If the user explicitly asks to remember, persist, or write the lesson into skill or memory, invoke `conversation-lesson-harvester` before closing the task.
-10. Stop after at most 3 automatic rounds, or earlier if the stop rule passes.
+13. Critics see the latest screenshot plus the contract. They do not see builder self-justification.
+14. Critics must score the three review layers separately before any merged verdict:
+   - `整体布局 Review`
+   - `模块空间结构 Review`
+   - `单节点与单边 Review`
+15. Merge both reviews into one next-step verdict.
+16. If the user explicitly asks to remember, persist, or write the lesson into skill or memory, invoke `conversation-lesson-harvester` before closing the task.
+17. Stop after at most 3 automatic rounds, or earlier if the stop rule passes.
 
 ## Capture Rule
 
@@ -89,12 +104,15 @@ Recommended fallback:
 
 Every completed round must include:
 
+- `Element contract`
+- `Page script markdown`
 - `URL`
 - `Latest screenshot`
 - `Capture provenance`
 - `Capture size`
 - `Facts`
 - `Metrics`
+- `Three-layer review summary`
 - `Art critic verdict`
 - `Geometry critic verdict`
 - `Top 3 fixes`
@@ -105,6 +123,12 @@ Every completed round must include:
 - Do not let critics read the builder's self-justification.
 - Do not review an old screenshot when a newer one exists.
 - Do not start from a fake generic diagram when the real slide already exists.
+- Do not treat a vague sketch as a substitute for a node/edge contract.
+- Do not render before nodes, edges, line labels, and alignments are enumerated.
+- Do not keep screenshot, node tables, and edge tables in different sources of truth.
+- Do not keep screenshot, three-layer review summary, node tables, and edge tables in different sources of truth.
+- Do not write a page script markdown file that has edges reviewed in prose but nodes reviewed in tables; keep the format symmetric and auditable.
+- Do not skip the `整体布局 Review` score just because the local routing looks correct.
 - Do not keep using screen-region capture when browser-native export already works.
 - Do not omit capture bounds or browser-chrome status when reporting provenance.
 - Do not emit side-by-side comparison renders by default.

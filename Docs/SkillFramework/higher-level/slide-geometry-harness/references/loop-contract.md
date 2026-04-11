@@ -4,6 +4,8 @@
 
 Every loop iteration should produce one latest-only artifact bundle:
 
+- `element_contract`
+- `page_script_markdown`
 - `url`
 - `screenshot_path`
 - `capture_mode`
@@ -16,6 +18,44 @@ Every loop iteration should produce one latest-only artifact bundle:
 - `metrics`
 
 The bundle is the only thing sent to critics.
+
+## Contract-First Rule
+
+Before any rendering pass, the builder must write a text contract that fully enumerates:
+
+- nodes
+- edges
+- line labels
+- junction points
+- spatial alignments
+- element styles
+- acceptance checklist
+
+If any of those are missing, the page is still in specification mode and should not be graded as a visual draft.
+
+The default contract writer for this step is `write-slide-geometry-contract`.
+
+The contract is not allowed to say only "roughly here" or "similar to the sketch". It must describe anchor regions and routing language explicitly enough that another agent could place the same topology.
+
+When a page-local markdown script file exists, it must be updated in the same loop with:
+
+- the latest screenshot
+- a three-layer review summary
+- a node review table
+- an edge review table
+
+The three-layer review summary must always include:
+
+- `整体布局 Review` with a numeric score
+- `模块空间结构 Review` with a numeric score
+- `单节点与单边 Review` with a numeric score
+
+Both tables must expose, per row:
+
+- the element id
+- a Chinese script description when feasible
+- the current review viewpoint
+- the current review score
 
 ## Source-of-Truth Rule
 
@@ -86,6 +126,12 @@ For page09 specifically:
 - `Geometry Critic`: judges crossings, bends, straightness, and primary-line clarity
 - `Loop Controller`: merges verdicts and decides whether to continue
 
+Both critics must score the page at 3 nested layers before final verdict:
+
+1. `整体布局 Review`
+2. `模块空间结构 Review`
+3. `单节点与单边 Review`
+
 ## Capture Order
 
 1. Export the page or stage through `capture_review_png.sh --mode browser-api`.
@@ -112,3 +158,23 @@ The loop must stop after 3 rounds even if it does not converge. When that happen
 - If their recommendations conflict, prefer the interpretation that best matches the page contract.
 
 If both critics independently describe the same issue as "cramped", "too tight", or "not enough breathing room", treat that as a real layout blocker even when there is no overflow.
+
+## Contract Review Rule
+
+Critics must compare the screenshot against the contract, not against the builder's intent summary.
+
+They should explicitly flag:
+
+- missing nodes
+- missing or merged branches
+- lost line labels
+- broken baseline or band constraints
+- violations of the declared angle family
+- branches whose bend count exceeds the contract
+
+If a page script markdown file exists, critics should also verify:
+
+- the three-layer review summary exists and matches the latest screenshot
+- every visible node appears in the node review table
+- every visible edge appears in the edge review table
+- the latest screenshot in the markdown matches the latest reviewed artifact

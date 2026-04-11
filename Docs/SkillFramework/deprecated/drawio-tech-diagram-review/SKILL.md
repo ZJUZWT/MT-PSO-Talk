@@ -3,11 +3,15 @@ name: drawio-tech-diagram-review
 description: Use when editing or reviewing draw.io diagrams, remotion slide graphics, storyboard visuals, or other technical narrative diagrams where routing, spacing, symmetry, and cross-page evolution must remain consistent.
 ---
 
+> Deprecated: this legacy skill is archived for reference only and is no longer part of the live SkillFramework workflow for this project.
+
 # Draw.io Tech Diagram Review
 
 Use this skill for draw.io diagrams, remotion slide graphics, and other visuals that explain a technical story, not just isolated boxes and arrows. The goal is to stop "locally fixed, globally broken" edits by forcing narrative checks before layout changes and a rendered second review after edits.
 
 This skill treats `draw.io` as a structural understanding draft. It is not a requirement that the draft already look like the final Remotion/Web scene. The draft exists to prove that the diagram logic, spatial hierarchy, and page-to-page evolution are understood correctly.
+
+However, a draft still needs to clear a minimum visual sanity bar before it is shown as a proposed page direction. "Structural draft" is not a free pass for obviously ugly balance, misleading emphasis, or cramped receiver planes.
 
 ## Read First
 
@@ -40,12 +44,43 @@ Before discussing macro composition or narrative polish, run a blunt rendered-im
 
 - box-box overlap
 - text clipping or cropped labels
+- text that is technically visible but too small to read in a classroom / PPT context
 - line running through a node body by mistake
 - nodes touching with no intentional optical gap
 - elements pushed outside the frame or uncomfortably hugging the frame edge
 - accidental occlusion caused by a local move
 
 If any blocker exists, fix it first. Do not praise the macro structure while a basic physical error is still on screen.
+
+## Step 0.25: Check PPT Readability Floors
+
+For slide decks that will be projected, do not rely on "it technically fits." Validate rendered font sizes against a readability floor and enlarge the receiver plane or card before shrinking text.
+
+Use these default floors for a 1280x720 stage unless the project already established a stricter rule:
+
+- primary node / receiver titles: `>= 20`
+- secondary node titles and important chip labels: `>= 17`
+- pills, table values, code tags, and formula rows: `>= 15`
+- explanatory copy or routing labels: `>= 14.5`, and only when they are not the page's main teaching point
+
+If the page is intended for PPT or classroom use, add or update automated checks for the critical text on that page. Do not accept "looks okay on my monitor" as evidence.
+
+## Step 0.5: Reject Misleading Drafts Before They Reach The User
+
+Even when the draft is only meant to validate structure, do not show it as a candidate page direction if any of these are true:
+
+- the visual weight is obviously shoved to one side without intentional counter-balance
+- the receiver plane is too small to plausibly carry the page's concept
+- the highlight color is fighting with 2 or more other emphasis systems
+- the primary line is not readable within 2 seconds
+- the draft would make a reasonable viewer think the final page direction is cramped, chaotic, or incoherent
+
+If the draft is structurally useful but visually misleading, either:
+
+1. revise it once before showing it, or
+2. label it explicitly as `contract-only` and state that it is not yet a composition candidate
+
+Do not silently present a contract-only draft as if it were already a directional layout proposal.
 
 ## Step 1: Define The Page Contract
 
@@ -164,6 +199,33 @@ After every meaningful edit:
 
 If any answer fails, revise before claiming the page is improved.
 
+Before presenting a rough draft or a finished visual update to the user, also record the mandatory four-dimension self-review:
+
+| 维度 | 关注点 | 分数 |
+| --- | --- | --- |
+| `空间美感` | left/right balance, margin symmetry, density rhythm, receiver-plane centering | `0-10` |
+| `线条美感` | line cleanliness, bend quality, orthogonality, overlap avoidance, entry-side discipline | `0-10` |
+| `表意强度` | page contract clarity, focus strength, page-to-page continuity, semantic readability | `0-10` |
+| `演讲适配度` | PPT readability, classroom visibility, narration support, glance comprehension | `0-10` |
+
+For each dimension, add one short reason and one next-fix note. If any score is below `7`, explicitly call out the weakness instead of framing the page as already polished. If any score is below `5`, revise once before showing it unless the user asked to inspect the current broken version.
+
+## Browser Review Loop
+
+For code-rendered slides or Web / Remotion diagrams, a browser render review is mandatory before you call the page done:
+
+1. Jump directly to the target page instead of arrowing through the whole deck.
+2. Capture a rendered screenshot from the browser. Prefer the stage-only surface when the shell chrome would distract from the actual diagram judgment.
+3. Score the rendered frame on four axes:
+   - `Blocker`: overlap, clipping, collisions, accidental occlusion
+   - `Routing`: line cleanliness, bend quality, entry-side correctness
+   - `Balance`: left/right weight, receiver-plane centering, margin symmetry
+   - `Focus`: whether the page-level emphasis is visually obvious
+   - `Readability`: whether the projected text sizes still meet the PPT floor in the rendered frame
+4. Compute or note the score before claiming success.
+5. If any blocker exists, or the page still scores below a convincing threshold, revise first and re-run the screenshot loop.
+
+Do not stop at "the XML looks cleaner" or "the JSX coordinates seem right." The rendered browser frame is the acceptance surface.
 ## Project Hooks
 
 - If `Docs/线条排版评估Benchmark.md` exists, treat it as an acceptance gate, not inspiration.

@@ -3,6 +3,8 @@ name: technical-talk-animation
 description: Use when designing concept animations for technical talks, especially when the result must embed cleanly into PPT or Keynote without looking noisy, overly cinematic, or hard to explain live.
 ---
 
+> Deprecated: this legacy skill is archived for reference only and is no longer part of the live SkillFramework workflow for this project.
+
 # Technical Talk Animation
 
 ## Overview

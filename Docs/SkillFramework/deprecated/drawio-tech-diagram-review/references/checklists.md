@@ -59,6 +59,22 @@ If any answer is no, stop and read the docs again.
 - Did I keep the draft schematic enough that it still reads as a reasoning surface rather than a fake finished stage?
 - If I inserted a new layer like `PSO`, did I keep older stable skeleton lines identifiable instead of pretending the new layer now owns them?
 
+## Mandatory Self-Review Output
+
+Before reporting back, write these four scores explicitly:
+
+- `空间美感`: Does the frame feel balanced, centered, and intentionally spaced?
+- `线条美感`: Do the lines feel clean, disciplined, and visually elegant?
+- `表意强度`: Can the audience understand the point from the diagram itself?
+- `演讲适配度`: Will this still read clearly on a PPT screen during a talk?
+
+Use `0-10` for each. For every score, add:
+
+- one short reason
+- one likely next fix
+
+If any score is below `7`, do not describe the page as polished. If any score is below `5`, revise before presenting unless the human explicitly asked to inspect the bad version.
+
 ## Rationalizations To Reject
 
 - "The macro got better, so this overlap is acceptable for now."

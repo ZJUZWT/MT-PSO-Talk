@@ -47,12 +47,17 @@ Do not use this skill for:
 1. If a finished slide already exists, mirror that slide's real structure into the sketch first. Do not start from an abstract demo surrogate.
 2. Before rendering anything, write a full page contract with `write-slide-geometry-contract`.
 3. The contract must enumerate every node, every edge, every line label, the angle family, the spatial alignments, and the numbered acceptance checklist.
-4. If the page contract is stored as a markdown script file, keep it under `Docs/剧本/`. If it is a sketch mirror, mark the filename with `草图镜像-<sketch-id>`. That file must also include the latest screenshot, a three-layer review summary, and auditable node and edge review tables.
+4. If the page contract is stored as a markdown script file, keep it under `Docs/剧本/`. If it is a sketch mirror, mark the filename with `草图镜像-<sketch-id>`. Formal animation pages and sketch mirrors both use the same review ledger structure. That file must also include the latest screenshot, a three-layer review summary, and auditable node and edge review tables.
 5. The three-layer review summary must score:
    - `整体布局 Review`
    - `模块空间结构 Review`
    - `单节点与单边 Review`
-6. The node and edge review tables must contain Chinese script descriptions when feasible, followed by review viewpoint and review score columns.
+6. The node and edge review tables must contain Chinese script descriptions when feasible, followed by continuity review, current render carrier, review viewpoint, and review score columns.
+6.5. Before any visual score is accepted, run a continuity audit against the previous page:
+   - identify every node with continuous semantics
+   - identify every edge with continuous semantics
+   - record whether each one must reuse the same render element / shared-element carrier
+   - if continuity exists, treat duplicate re-creation as a blocker unless the contract explicitly allows a break
 7. Only after the contract is explicit may you build or revise a sketch under `SlideApp/src/harness/slide-geometry/`.
 8. Expose the sketch through the existing `SlideApp` port with a concrete URL.
 9. Capture the latest rendered result using the SlideApp browser export path first:
@@ -62,6 +67,16 @@ Do not use this skill for:
 10. Update the page script markdown screenshot, the three-layer review summary, and both review tables after capture, before critic merge.
 10.5. Keep each page script responsible only for its own scores and review facts. Do not auto-propagate numeric judgments from one page into another page's ledger.
 11. Extract facts and metrics before any score is allowed.
+11.5. Line scoring must not stop at raw bend count. The fact layer must also audit, at minimum:
+   - whether a line stayed bent when it could have been materially straighter
+   - whether exits and arrivals are reasonably centered on their entry side when layout allows it
+   - whether the route introduces short hooks, redundant detours, edge-on-edge overlap, or other visually twisted segments
+   - whether any non-centered anchor is justified by the surrounding layout rather than being a lazy corner stab
+11.6. Treat these routing rules as nuanced penalties, not blind absolutes:
+   - if a line can be fully straight with no meaningful layout cost, prefer straight and penalize avoidable bending
+   - if a line can stay near the side center with no meaningful layout cost, prefer centered anchors
+   - if preserving global composition requires a controlled bend or offset anchor, allow it
+   - never allow obviously awkward twists, hook turns, or line lanes piled on top of each other
 12. Send the latest artifact bundle to two blind critics in parallel:
    - `Art Critic`
    - `Geometry Critic`
@@ -112,6 +127,7 @@ Every completed round must include:
 - `Capture size`
 - `Facts`
 - `Metrics`
+- `Continuity facts`
 - `Three-layer review summary`
 - `Art critic verdict`
 - `Geometry critic verdict`
@@ -133,6 +149,9 @@ Every completed round must include:
 - Do not omit capture bounds or browser-chrome status when reporting provenance.
 - Do not emit side-by-side comparison renders by default.
 - Do not use freeform scores with no fact layer.
+- Do not give a high line score merely because crossings are zero; awkward hooks, redundant detours, line-on-line coverage, and lazy off-center anchors must still be penalized.
+- Do not keep formal animation pages on an older page template while only sketch mirror pages get the new review ledger.
+- Do not let a semantically continuous node or edge switch to an unrelated duplicate render carrier without flagging it as a continuity failure.
 
 ## Reference
 

@@ -72,10 +72,16 @@ Every node must specify:
 - anchor region on the page
 - emphasis level
 - required alignments or shared baselines
+- whether it has continuity with the previous page
+- the required render carrier when continuity exists
 
 If the contract is written as a page script markdown file, each node must also appear in the node review table with:
 
 - Chinese script description when possible
+- previous-page continuity note
+- current render carrier / shared-element carrier
+- continuity review viewpoint
+- continuity review score
 - current review viewpoint
 - current review score
 
@@ -91,14 +97,37 @@ Every edge must specify:
 - label placement if a segment carries text
 - arrow style
 - symmetry or sibling relationship when relevant
+- whether it has continuity with the previous page
+- the required render carrier when continuity exists
 
 If the contract is written as a page script markdown file, each edge must also appear in the edge review table with:
 
 - Chinese script description when possible
+- previous-page continuity note
+- current render carrier / shared-element carrier
+- continuity review viewpoint
+- continuity review score
 - current review viewpoint
 - current review score
 
 Treat line text like `cook` or `expand` as segment labels, not fake nodes, unless the user explicitly wants a node.
+
+### Continuity Semantics Rule
+
+If a node or edge carries continuous semantics from the previous page, the contract must say so explicitly.
+
+That continuity record must include:
+
+- the previous-page counterpart
+- whether the current page must reuse the same render element / shared element carrier
+- which properties may change during the transition, such as position, scale, label, or emphasis
+
+If the semantics are continuous, the default rule is:
+
+- use the same render element carrier
+- do not replace it with a visually similar duplicate that only fades in or out
+
+Only break the same-element rule when the contract explicitly documents why continuity is intentionally broken.
 
 ### Three-Layer Review Rule
 
@@ -154,6 +183,13 @@ When the contract lives in a page script markdown file, treat it as the single p
 The screenshot, the three-layer review summary, and both tables must be updated together. Do not let the page image drift away from the written review.
 Each page script manages only its own facts and scores. Do not silently carry scores forward from another page.
 
+This rule applies to both:
+
+- sketch mirror pages
+- formal animation pages
+
+Formal pages are not exempt from screenshot, three-layer review, node tables, edge tables, or continuity review.
+
 ## Hard Bans
 
 - Do not start drawing before all required nodes and edges are enumerated.
@@ -166,6 +202,8 @@ Each page script manages only its own facts and scores. Do not silently carry sc
 - Do not omit the current screenshot from the page script markdown once visual iteration has started.
 - Do not leave a node or edge out of the review tables just because it currently looks bad.
 - Do not skip the `整体布局 Review` score just because node and edge scores already exist.
+- Do not score only sketch mirror pages while leaving formal animation pages on an older template.
+- Do not mark a node or edge as semantically continuous and then re-create it as an unrelated duplicate render carrier without documenting that break.
 
 ## Reference
 

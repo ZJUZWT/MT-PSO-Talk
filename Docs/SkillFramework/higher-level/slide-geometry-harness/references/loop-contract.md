@@ -19,6 +19,10 @@ Every loop iteration should produce one latest-only artifact bundle:
 
 The bundle is the only thing sent to critics.
 
+Add one more required field when the page has a previous-page transition:
+
+- `continuity_facts`
+
 ## Contract-First Rule
 
 Before any rendering pass, the builder must write a text contract that fully enumerates:
@@ -54,6 +58,10 @@ Both tables must expose, per row:
 
 - the element id
 - a Chinese script description when feasible
+- previous-page continuity note
+- current render carrier
+- continuity review viewpoint
+- continuity review score
 - the current review viewpoint
 - the current review score
 
@@ -62,6 +70,15 @@ Both tables must expose, per row:
 If the slide already exists in the real browser shell, mirror that page before simplifying geometry.
 
 If the formal page inherits a semantic lane, table, or field band from an earlier page, the sketch must mirror that inherited structure before any cleanup pass.
+
+If the formal page and previous page share a continuous semantic actor or route, the contract must say whether the same render carrier is required.
+
+Default rule:
+
+- semantically continuous node -> same render carrier
+- semantically continuous edge -> same render carrier
+
+Do not silently downgrade that into "looks similar enough".
 
 Do not replace a meaningful inherited lane with an empty placeholder bar. If the formal page still shows fields, labels, or branch semantics, the sketch must keep them.
 
@@ -177,4 +194,6 @@ If a page script markdown file exists, critics should also verify:
 - the three-layer review summary exists and matches the latest screenshot
 - every visible node appears in the node review table
 - every visible edge appears in the edge review table
+- every semantically continuous node records its continuity score and render carrier
+- every semantically continuous edge records its continuity score and render carrier
 - the latest screenshot in the markdown matches the latest reviewed artifact

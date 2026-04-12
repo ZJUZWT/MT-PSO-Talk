@@ -1,8 +1,13 @@
 # 第 XX 页
 
-## 页面目标
+> 文件类型：`正式动画页` / `草图镜像页`
+> Step / Sketch：`page_xx` / `pagexx-r1`
+> 上一页：`page_(x-1)`
 
-一句话写清这页要讲什么。
+## Page goal
+
+- 一句话写清这页要讲什么。
+- 一句话写清主角、配角和这页真正要解释的关系。
 
 ## 页面改动表
 
@@ -18,6 +23,34 @@
 | 需要强调的元素 |  |
 | 暂不实现 / 暂不出现 |  |
 
+## Node inventory
+
+| id | text | semantic role | visual kind | anchor region | emphasis | alignment constraints | 与上一页连续语义 | 同元素承载要求 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |  |  |  |
+
+## Edge inventory
+
+| id | from | to | meaning | route grammar | max bends | segment label | arrow style | sibling / symmetry note | 与上一页连续语义 | 同元素承载要求 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |  |  |  |  |  |
+
+## Spatial constraints
+
+- 
+
+## Element styles
+
+- 
+
+## Assembly order
+
+1. 
+
+## Acceptance checklist
+
+1. 
+
 ## 动画剧本
 
 | Beat | 时间 | 画面变化 | 屏幕元素 | 讲述词 / 备注 |
@@ -32,18 +65,37 @@
 | --- | --- |
 | 需要新增的节点 / 元素 |  |
 | 需要复用的元素 |  |
-| 是否需要 draw.io 草稿 |  |
+| 当前共享元素 / 连续语义 carrier |  |
 | 是否需要镜头推进 / 缩放 |  |
 | 是否需要逐步显隐 |  |
 | 风险点 |  |
 
-## 当前页面评分
+## Current screenshot
 
-| 维度 | 分数 | 备注 |
-| --- | --- | --- |
-| `整体布局 Review` |  |  |
-| `模块空间结构 Review` |  |  |
-| `单节点与单边 Review` |  |  |
+![Current screenshot](/absolute/path/to/current-screenshot.png)
+
+- 当前 URL：`http://127.0.0.1:4173/?step=page_xx`
+- 捕获方式：`browser-api page` / `browser-api stage` / `front-window`
+
+## 三层 Review 总表
+
+| Review 层级 | Art Critic | Geometry Critic | 综合判断 | 综合分数 |
+| --- | --- | --- | --- | --- |
+| `整体布局 Review` |  |  |  |  |
+| `模块空间结构 Review` |  |  |  |  |
+| `单节点与单边 Review` |  |  |  |  |
+
+## 节点剧本与 Review 表
+
+| 节点 | 中文剧本描述 | 与上一页连续语义 | 当前渲染载体 | 连续语义 Review | 连续语义分数 | 几何 / 美感 Review | 综合分数 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |  |  |
+
+## 边剧本与 Review 表
+
+| 边 | 中文剧本描述 | 与上一页连续语义 | 当前渲染载体 | 连续语义 Review | 连续语义分数 | 几何 / 美感 Review | 综合分数 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |  |  |
 
 ## 审批状态
 

@@ -29,12 +29,22 @@
 - 第 02 页：[`02-第二页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/02-第二页.md)
 - 第 03 页：[`03-第三页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/03-第三页.md)
 - 第 04 页：[`04-第四页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/04-第四页.md)
+- 第 05 页：[`05-第五页.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/05-第五页.md)
 - 第 10 页正式动画：[`10-第十页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/10-第十页-正式动画.md)
 - 第 11 页正式动画：[`11-第十一页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/11-第十一页-正式动画.md)
 - 第 12 页正式动画：[`12-第十二页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/12-第十二页-正式动画.md)
 - 第 13 页正式动画：[`13-第十三页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/13-第十三页-正式动画.md)
 - 第 14 页正式动画：[`14-第十四页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/14-第十四页-正式动画.md)
 - 第 15 页正式动画：[`15-第十五页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/15-第十五页-正式动画.md)
+- 第 16 页正式动画：[`16-第十六页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/16-第十六页-正式动画.md)
+- 第 17 页正式动画：[`17-第十七页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/17-第十七页-正式动画.md)
+- 第 18 页正式动画：[`18-第十八页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/18-第十八页-正式动画.md)
+- 第 19 页正式动画：[`19-第十九页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/19-第十九页-正式动画.md)
+- 第 21 页正式动画：[`21-第二十一页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/21-第二十一页-正式动画.md)
+- 第 22 页正式动画：[`22-第二十二页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/22-第二十二页-正式动画.md)
+- 第 23 页正式动画：[`23-第二十三页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/23-第二十三页-正式动画.md)
+- 第 24 页正式动画：[`24-第二十四页-正式动画.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/24-第二十四页-正式动画.md)
+- 后续页优化备注草案：[`21-24页-后续优化方向备注草案.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/21-24页-后续优化方向备注草案.md)
 - 第 11 页草图镜像：[`11-第十一页-草图镜像-page11-r1.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/11-第十一页-草图镜像-page11-r1.md)
 - 第 12 页草图镜像：[`12-第十二页-草图镜像-page12-r1.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/12-第十二页-草图镜像-page12-r1.md)
 - 第 13 页草图镜像：[`13-第十三页-草图镜像-page13-r1.md`](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/Docs/剧本/13-第十三页-草图镜像-page13-r1.md)
@@ -45,7 +55,7 @@
 
 - 旧剧本已从 live 路径移除
 - 旧 `draw.io` 已从 live 路径移除
-- `SlideApp` 当前已经把正式故事推进到第 15 页
-- `Docs/剧本` 当前 live 的正式页包括：`10-第十页-正式动画.md`、`11-第十一页-正式动画.md`、`12-第十二页-正式动画.md`、`13-第十三页-正式动画.md`、`14-第十四页-正式动画.md`、`15-第十五页-正式动画.md`
+- `SlideApp` 当前已经把正式故事推进到第 24 页（`21-24` 为占位优化页）
+- `Docs/剧本` 当前 live 的正式页包括：`10-第十页-正式动画.md`、`11-第十一页-正式动画.md`、`12-第十二页-正式动画.md`、`13-第十三页-正式动画.md`、`14-第十四页-正式动画.md`、`15-第十五页-正式动画.md`、`16-第十六页-正式动画.md`、`17-第十七页-正式动画.md`、`18-第十八页-正式动画.md`、`19-第十九页-正式动画.md`、`21-第二十一页-正式动画.md`、`22-第二十二页-正式动画.md`、`23-第二十三页-正式动画.md`、`24-第二十四页-正式动画.md`
 - `11-15` 的草图镜像页继续保留为历史几何镜像与对照，不再充当正式评分台账
 - 草图镜像页和正式动画页共用同一个 `Docs/剧本/` 目录，只靠文件名区分

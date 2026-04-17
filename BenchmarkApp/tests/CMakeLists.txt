@@ -142,3 +142,22 @@ target_include_directories(orchestrator_test PRIVATE ${LIB_INCLUDE_DIR} ${TEST_I
 target_link_libraries(orchestrator_test PRIVATE benchmark_orchestrator)
 
 add_test(NAME orchestrator_test COMMAND orchestrator_test)
+
+if(UNIX)
+    add_test(
+        NAME android_ndk_utils_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/android_ndk_utils_test.sh
+    )
+    add_test(
+        NAME result_bundle_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/result_bundle_test.sh
+    )
+    add_test(
+        NAME ios_device_utils_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/ios_device_utils_test.sh
+    )
+    add_test(
+        NAME release_assembly_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/release_assembly_test.sh
+    )
+endif()

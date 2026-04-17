@@ -9,14 +9,16 @@
 namespace benchmark {
 
 struct OrchestratorConfig {
+    bool enable_graphics = false;
+    bool enable_compression = true;
     int graphics_iterations = 2;
     bool graphics_cold_cache = true;
     bool graphics_warm_cache = true;
     int compression_iterations = 3;
     std::vector<int64_t> compression_payload_sizes = {256 * 1024};  // 256KB default
-    std::string device_model = "Simulated";
-    std::string soc = "Simulated";
-    std::string os_version = "Simulated";
+    std::string device_model;
+    std::string soc;
+    std::string os_version;
 };
 
 struct BenchmarkReport {

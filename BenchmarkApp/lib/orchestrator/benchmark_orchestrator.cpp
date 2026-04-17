@@ -1,24 +1,105 @@
 #include "orchestrator/benchmark_orchestrator.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <iomanip>
 #include <map>
 #include <numeric>
 #include <sstream>
 #include <set>
 
+#include "driver/common/device_info.h"
 #include "driver/graphics_benchmark.h"
 #include "compression/compression_benchmark.h"
 #include "results/exporters/json_exporter.h"
 #include "results/exporters/csv_exporter.h"
 
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
+
 namespace benchmark {
+namespace {
+
+std::string detect_platform_name() {
+#if defined(__ANDROID__)
+    return "Android";
+#elif defined(_WIN32)
+    return "Windows";
+#elif defined(__APPLE__) && TARGET_OS_IPHONE
+    return "iOS";
+#elif defined(__APPLE__)
+    return "macOS";
+#elif defined(__linux__)
+    return "Linux";
+#else
+    return "Unknown";
+#endif
+}
+
+DeviceInfo resolve_device_info(const OrchestratorConfig& config) {
+    DeviceInfo info = query_device_info();
+
+    if (!config.device_model.empty()) {
+        info.device_model = config.device_model;
+    }
+    if (!config.soc.empty()) {
+        info.soc = config.soc;
+    }
+    if (!config.os_version.empty()) {
+        info.os_version = config.os_version;
+    }
+
+    if (info.device_model.empty()) {
+        info.device_model = "Unknown Device";
+    }
+    if (info.soc.empty()) {
+        info.soc = "Unknown SoC";
+    }
+    if (info.os_version.empty()) {
+        info.os_version = detect_platform_name();
+    }
+
+    return info;
+}
+
+void apply_device_info(std::vector<GraphicsResult>& results, const DeviceInfo& info) {
+    for (auto& result : results) {
+        result.device_model = info.device_model;
+        result.soc = info.soc;
+        result.os_version = info.os_version;
+    }
+}
+
+void apply_device_info(std::vector<CompressionResult>& results, const DeviceInfo& info) {
+    for (auto& result : results) {
+        result.device_model = info.device_model;
+        result.soc = info.soc;
+        result.os_version = info.os_version;
+    }
+}
+
+template <typename T>
+const T* first_result(const std::vector<T>& results) {
+    return results.empty() ? nullptr : &results.front();
+}
+
+const CompressionResult* first_compression_result(const BenchmarkReport& report) {
+    return first_result(report.compression_results);
+}
+
+const GraphicsResult* first_graphics_result(const BenchmarkReport& report) {
+    return first_result(report.graphics_results);
+}
+
+}  // namespace
 
 BenchmarkReport BenchmarkOrchestrator::run(const OrchestratorConfig& config) {
     BenchmarkReport report;
+    const auto device_info = resolve_device_info(config);
+    const auto platform_name = detect_platform_name();
 
-    // 1. Run graphics benchmarks
-    {
+    if (config.enable_graphics) {
         GraphicsBenchmarkConfig gcfg;
         gcfg.iterations_per_case = config.graphics_iterations;
         gcfg.run_cold_cache = config.graphics_cold_cache;
@@ -28,43 +109,31 @@ BenchmarkReport BenchmarkOrchestrator::run(const OrchestratorConfig& config) {
         report.graphics_results = gb.run_all(gcfg);
     }
 
-    // 2. Run compression benchmarks
-    {
+    if (config.enable_compression) {
         CompressionBenchmarkConfig ccfg;
         ccfg.iterations = config.compression_iterations;
         ccfg.payload_sizes = config.compression_payload_sizes;
 
         CompressionBenchmark cb;
-        report.compression_results = cb.run_all("Simulated", ccfg);
+        report.compression_results = cb.run_all(platform_name, ccfg);
     }
 
-    // 3. Set device info on all results
-    for (auto& r : report.graphics_results) {
-        r.device_model = config.device_model;
-        r.soc = config.soc;
-        r.os_version = config.os_version;
-    }
-    for (auto& r : report.compression_results) {
-        r.device_model = config.device_model;
-        r.soc = config.soc;
-        r.os_version = config.os_version;
-    }
+    apply_device_info(report.graphics_results, device_info);
+    apply_device_info(report.compression_results, device_info);
 
-    // 4. Generate formatted outputs
     report.graphics_matrix_text = format_graphics_matrix(report.graphics_results);
     report.compression_matrix_text = format_compression_matrix(report.compression_results);
     report.full_json = format_full_json(report);
     report.summary_text = format_summary(report);
 
-    // CSV
-    {
+    if (!report.graphics_results.empty()) {
         std::string csv = graphics_csv_header() + "\n";
         for (const auto& r : report.graphics_results) {
             csv += export_graphics_csv_row(r) + "\n";
         }
         report.graphics_csv = csv;
     }
-    {
+    if (!report.compression_results.empty()) {
         std::string csv = compression_csv_header() + "\n";
         for (const auto& r : report.compression_results) {
             csv += export_compression_csv_row(r) + "\n";
@@ -82,7 +151,7 @@ BenchmarkReport BenchmarkOrchestrator::run(const OrchestratorConfig& config) {
 std::string BenchmarkOrchestrator::format_graphics_matrix(
     const std::vector<GraphicsResult>& results) {
 
-    if (results.empty()) return "(no graphics results)\n";
+    if (results.empty()) return {};
 
     // Collect unique backends (driver_mode + " " + api) and case names, preserving order
     std::vector<std::string> backends_ordered;
@@ -211,7 +280,7 @@ std::string BenchmarkOrchestrator::format_graphics_matrix(
 std::string BenchmarkOrchestrator::format_compression_matrix(
     const std::vector<CompressionResult>& results) {
 
-    if (results.empty()) return "(no compression results)\n";
+    if (results.empty()) return {};
 
     // Use the first payload size found
     int64_t target_size = results.front().input_size;
@@ -263,7 +332,7 @@ std::string BenchmarkOrchestrator::format_compression_matrix(
 
     std::ostringstream out;
     int64_t payload_kb = target_size / 1024;
-    out << "PSO Cache Compression Benchmark (" << payload_kb << "KB payload)\n";
+    out << "Compression Benchmark (" << payload_kb << "KB payload)\n";
 
     // Column widths
     const int algo_w = 12;
@@ -329,25 +398,28 @@ std::string BenchmarkOrchestrator::format_compression_matrix(
 
 std::string BenchmarkOrchestrator::format_summary(const BenchmarkReport& report) {
     std::ostringstream out;
-    out << "PSO Benchmark Summary\n";
+    out << "Compression Benchmark Summary\n";
     out << "\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90"
            "\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90"
            "\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90"
            "\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90\xe2\x95\x90"
            "\xe2\x95\x90\n";
 
-    // Device info from first result
-    std::string dev = "Simulated", soc_str = "Simulated", os = "Simulated";
-    if (!report.graphics_results.empty()) {
-        dev = report.graphics_results[0].device_model;
-        soc_str = report.graphics_results[0].soc;
-        os = report.graphics_results[0].os_version;
+    std::string dev = "Unknown Device";
+    std::string soc_str = "Unknown SoC";
+    std::string os = "Unknown OS";
+    if (const auto* graphics = first_graphics_result(report)) {
+        dev = graphics->device_model;
+        soc_str = graphics->soc;
+        os = graphics->os_version;
+    } else if (const auto* compression = first_compression_result(report)) {
+        dev = compression->device_model;
+        soc_str = compression->soc;
+        os = compression->os_version;
     }
     out << "Platform: " << os << " | Device: " << dev << " | SoC: " << soc_str << "\n\n";
 
-    // Graphics summary
     if (!report.graphics_results.empty()) {
-        // Count unique backends, cases, cache modes
         std::set<std::string> backends, cases;
         bool has_cold = false, has_warm = false;
         for (const auto& r : report.graphics_results) {
@@ -382,11 +454,9 @@ std::string BenchmarkOrchestrator::format_summary(const BenchmarkReport& report)
 
         out << "  Fastest (warm): " << fastest_name << " \xe2\x80\x94 " << fastest_warm << " \xce\xbcs\n";
         out << "  Slowest (cold): " << slowest_name << " \xe2\x80\x94 " << slowest_cold << " \xce\xbcs\n";
+        out << "\n";
     }
 
-    out << "\n";
-
-    // Compression summary
     if (!report.compression_results.empty()) {
         std::set<std::string> algos;
         std::set<int64_t> sizes;
@@ -399,13 +469,15 @@ std::string BenchmarkOrchestrator::format_summary(const BenchmarkReport& report)
             << sizes.size() << " payload size(s) = "
             << report.compression_results.size() << " results\n";
 
-        // Best ratio
         double best_ratio = 0;
         std::string best_ratio_algo;
         int64_t fastest_decomp = INT64_MAX;
         std::string fastest_decomp_algo;
 
         for (const auto& r : report.compression_results) {
+            if (r.status != "passed") {
+                continue;
+            }
             if (r.compression_ratio > best_ratio) {
                 best_ratio = r.compression_ratio;
                 best_ratio_algo = r.algorithm;
@@ -419,8 +491,10 @@ std::string BenchmarkOrchestrator::format_summary(const BenchmarkReport& report)
         std::ostringstream ratio_ss;
         ratio_ss << std::fixed << std::setprecision(2) << best_ratio << "x";
         out << "  Best ratio: " << best_ratio_algo << " \xe2\x80\x94 " << ratio_ss.str() << "\n";
-        out << "  Fastest decompress: " << fastest_decomp_algo
-            << " \xe2\x80\x94 " << fastest_decomp << " \xce\xbcs\n";
+        if (!fastest_decomp_algo.empty()) {
+            out << "  Fastest decompress: " << fastest_decomp_algo
+                << " \xe2\x80\x94 " << fastest_decomp << " \xce\xbcs\n";
+        }
     }
 
     return out.str();
@@ -431,15 +505,21 @@ std::string BenchmarkOrchestrator::format_summary(const BenchmarkReport& report)
 // ──────────────────────────────────────────────────────────────────────────────
 
 std::string BenchmarkOrchestrator::format_full_json(const BenchmarkReport& report) {
-    std::string dev = "Simulated", soc_str = "Simulated", os = "Simulated";
-    if (!report.graphics_results.empty()) {
-        dev = report.graphics_results[0].device_model;
-        soc_str = report.graphics_results[0].soc;
-        os = report.graphics_results[0].os_version;
+    std::string dev = "Unknown Device";
+    std::string soc_str = "Unknown SoC";
+    std::string os = "Unknown OS";
+    if (const auto* graphics = first_graphics_result(report)) {
+        dev = graphics->device_model;
+        soc_str = graphics->soc;
+        os = graphics->os_version;
+    } else if (const auto* compression = first_compression_result(report)) {
+        dev = compression->device_model;
+        soc_str = compression->soc;
+        os = compression->os_version;
     }
 
     std::string json = "{";
-    json += "\"benchmark\":\"PSO Compilation Benchmark\",";
+    json += "\"benchmark\":\"Compression Benchmark\",";
     json += "\"device\":{";
     json += "\"model\":\"" + dev + "\",";
     json += "\"soc\":\"" + soc_str + "\",";

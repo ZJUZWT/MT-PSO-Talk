@@ -8,15 +8,14 @@
 int main() {
     // Run orchestrator once with known config for all tests
     benchmark::OrchestratorConfig config;
-    config.graphics_iterations = 2;
     config.compression_iterations = 1;
 
     benchmark::BenchmarkOrchestrator orchestrator;
     auto report = orchestrator.run(config);
 
-    // Verify graphics_results.size() == 5 backends * 4 tiers * 2 cache * 2 iterations = 80
-    test_support::expect_equal(report.graphics_results.size(), static_cast<size_t>(80),
-        "graphics_results count (5*4*2*2=80)");
+    // Product default is now compression-only.
+    test_support::expect_true(report.graphics_results.empty(),
+        "graphics results disabled by default");
 
     // Verify compression_results is non-empty and has all algorithm names
     test_support::expect_true(!report.compression_results.empty(), "compression results non-empty");
@@ -31,30 +30,12 @@ int main() {
         test_support::expect_true(algo_names.count("zlib") > 0, "compression has zlib");
         test_support::expect_true(algo_names.count("snappy") > 0, "compression has snappy");
         test_support::expect_true(algo_names.count("brotli") > 0, "compression has brotli");
+#if BENCHMARK_HAS_OODLE
         test_support::expect_true(algo_names.count("oodle_kraken") > 0, "compression has oodle_kraken");
         test_support::expect_true(algo_names.count("oodle_leviathan") > 0, "compression has oodle_leviathan");
         test_support::expect_true(algo_names.count("oodle_mermaid") > 0, "compression has oodle_mermaid");
         test_support::expect_true(algo_names.count("oodle_selkie") > 0, "compression has oodle_selkie");
-    }
-
-    // Verify all 5 backends present in graphics results
-    {
-        std::set<std::string> backends;
-        for (const auto& r : report.graphics_results) {
-            backends.insert(r.platform + " " + r.driver_mode + " " + r.api);
-        }
-        test_support::expect_equal(backends.size(), static_cast<size_t>(5), "5 unique backends");
-        test_support::expect_true(backends.count("Android Mesa OpenGL") == 1, "has Mesa OpenGL");
-        test_support::expect_true(backends.count("Android Mesa Vulkan") == 1, "has Mesa Vulkan");
-        test_support::expect_true(backends.count("Android Native OpenGL") == 1, "has Native OpenGL");
-        test_support::expect_true(backends.count("Android Native Vulkan") == 1, "has Native Vulkan");
-        test_support::expect_true(backends.count("iOS Native Metal") == 1, "has Metal");
-    }
-
-    // Verify all graphics results have status == "passed"
-    for (const auto& r : report.graphics_results) {
-        test_support::expect_equal(r.status, std::string("passed"),
-            "graphics " + r.api + " " + r.driver_mode + " status");
+#endif
     }
 
     // Verify all compression results have status == "passed"
@@ -63,15 +44,8 @@ int main() {
             "compression " + r.algorithm + " status");
     }
 
-    // Verify graphics_matrix_text contains all 5 backend names
-    test_support::expect_true(!report.graphics_matrix_text.empty(), "graphics matrix non-empty");
-    test_support::expect_contains(report.graphics_matrix_text, "Mesa OpenGL", "matrix has Mesa OpenGL");
-    test_support::expect_contains(report.graphics_matrix_text, "Mesa Vulkan", "matrix has Mesa Vulkan");
-    test_support::expect_contains(report.graphics_matrix_text, "Native OpenGL", "matrix has Native OpenGL");
-    test_support::expect_contains(report.graphics_matrix_text, "Native Vulkan", "matrix has Native Vulkan");
-    test_support::expect_contains(report.graphics_matrix_text, "Metal", "matrix has Metal");
-    test_support::expect_contains(report.graphics_matrix_text, "Cold", "matrix has Cold");
-    test_support::expect_contains(report.graphics_matrix_text, "Warm", "matrix has Warm");
+    // Default product output should not include graphics tables.
+    test_support::expect_true(report.graphics_matrix_text.empty(), "graphics matrix empty by default");
 
     // Verify compression_matrix_text contains all algorithm names
     test_support::expect_true(!report.compression_matrix_text.empty(), "compression matrix non-empty");
@@ -82,13 +56,13 @@ int main() {
     test_support::expect_contains(report.compression_matrix_text, "brotli", "comp matrix has brotli");
     test_support::expect_contains(report.compression_matrix_text, "Ratio", "comp matrix has Ratio");
 
-    // Verify summary_text contains key stats
+    // Verify summary_text contains key stats and is compression-only by default.
     test_support::expect_true(!report.summary_text.empty(), "summary non-empty");
-    test_support::expect_contains(report.summary_text, "Fastest", "summary has Fastest");
-    test_support::expect_contains(report.summary_text, "Slowest", "summary has Slowest");
+    test_support::expect_not_contains(report.summary_text, "Graphics:", "summary omits graphics section");
     test_support::expect_contains(report.summary_text, "Best ratio", "summary has Best ratio");
+    test_support::expect_contains(report.summary_text, "Fastest decompress", "summary has Fastest decompress");
 
-    // Verify full_json contains "benchmark" and all algorithm names
+    // Verify full_json contains "benchmark" and all algorithm names.
     test_support::expect_true(!report.full_json.empty(), "full json non-empty");
     test_support::expect_contains(report.full_json, "\"benchmark\"", "json has benchmark");
     test_support::expect_contains(report.full_json, "\"graphics\"", "json has graphics");
@@ -99,9 +73,8 @@ int main() {
     test_support::expect_contains(report.full_json, "snappy", "json has snappy");
 
     // Verify CSV output
-    test_support::expect_true(!report.graphics_csv.empty(), "graphics csv non-empty");
+    test_support::expect_true(report.graphics_csv.empty(), "graphics csv empty by default");
     test_support::expect_true(!report.compression_csv.empty(), "compression csv non-empty");
-    test_support::expect_contains(report.graphics_csv, "platform,api", "graphics csv header");
     test_support::expect_contains(report.compression_csv, "platform,algorithm", "compression csv header");
 
     std::cout << "orchestrator_test: all checks completed\n";

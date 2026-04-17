@@ -3,6 +3,8 @@ if(ANDROID)
     add_subdirectory(android)
 elseif(IOS OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     add_subdirectory(ios)
+elseif(WIN32)
+    add_subdirectory(windows)
 endif()
 
 # Shell libraries for desktop builds (testing and development)

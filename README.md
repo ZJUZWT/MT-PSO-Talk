@@ -3,7 +3,7 @@
 This repository now has two product-facing roots and one documentation root:
 
 - `SlideApp/`: the interactive slide experience for the PSO talk. It now lives in the public repository `ZJUZWT/MT-PSO-Talk-SlideApp` and is mounted here as a git submodule at the same path.
-- `BenchmarkApp/`: the benchmark harness for compression, Mesa/native graphics API timing, and platform runners.
+- `BenchmarkApp/`: the compression benchmark harness for macOS, Windows, Android, and iOS. It measures real compression and decompression timings across all bundled algorithms, including Oodle where supported.
 - `Docs/`: talk notes, PPT material, plans, and durable reference assets.
 
 ## Quick Start
@@ -43,3 +43,25 @@ For GitHub Pages builds in the public repo, the workflow sets `BASE_PATH` automa
 ```bash
 npm run benchmark:configure
 ```
+
+## BenchmarkApp Run Smoke Test
+
+```bash
+cmake -S BenchmarkApp -B build/benchmark
+cmake --build build/benchmark -j4
+BenchmarkApp/platform/macos/run_benchmark.sh ./build/benchmark/lib/benchmark_main
+```
+
+Result bundles are stored under `benchmark_results/<platform>/<timestamp>/` with:
+
+- `benchmark_report.json`
+- `compression_results.csv`
+- `run_info.txt`
+
+To gather the current benchmark packages and one-command runner scripts into a fixed repository-level `release/` directory, run:
+
+```bash
+BenchmarkApp/platform/release/assemble_release.sh
+```
+
+The assembled `release/scripts/` directory now includes both shell and PowerShell launchers for Android and iOS. Android can be driven from any machine with `pwsh` and `adb`; iOS still requires macOS because the runner depends on Xcode's `xcrun devicectl`.

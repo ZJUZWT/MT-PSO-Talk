@@ -59,9 +59,44 @@ target_include_directories(tp_brotli PUBLIC ${THIRD_PARTY_DIR}/brotli/include)
 target_include_directories(tp_brotli PRIVATE ${THIRD_PARTY_DIR}/brotli)
 target_compile_options(tp_brotli PRIVATE -w)
 
-# --- oodle (Proprietary, precompiled from UE SDK) ---
-add_library(tp_oodle STATIC IMPORTED GLOBAL)
-set_target_properties(tp_oodle PROPERTIES
-    IMPORTED_LOCATION ${THIRD_PARTY_DIR}/oodle/lib/Mac/liboo2coremac64.a
-    INTERFACE_INCLUDE_DIRECTORIES ${THIRD_PARTY_DIR}/oodle/include
-)
+# --- oodle (Proprietary, precompiled from UE OodleDataCompression SDK) ---
+set(OODLE_ROOT_DIR ${THIRD_PARTY_DIR}/oodle/2.9.12)
+set(OODLE_INCLUDE_DIR ${OODLE_ROOT_DIR}/include)
+set(OODLE_LIBRARY_PATH "")
+
+if(ANDROID)
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/Android/${ANDROID_ABI}/liboo2coreandroid.a
+    )
+elseif(IOS OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    set(OODLE_IOS_VARIANT liboo2coreios.a)
+    if(CMAKE_OSX_SYSROOT MATCHES "iphonesimulator")
+        set(OODLE_IOS_VARIANT liboo2coreios.sim.a)
+    endif()
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/IOS/${OODLE_IOS_VARIANT}
+    )
+elseif(APPLE)
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/Mac/liboo2coremac64.a
+    )
+elseif(WIN32)
+    set(OODLE_WINDOWS_DIR Win64)
+    set(OODLE_WINDOWS_LIB oo2core_win64.lib)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|arm64|aarch64"
+       OR CMAKE_VS_PLATFORM_NAME MATCHES "ARM64")
+        set(OODLE_WINDOWS_DIR WinArm64)
+        set(OODLE_WINDOWS_LIB oo2core_winuwparm64.lib)
+    endif()
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/${OODLE_WINDOWS_DIR}/${OODLE_WINDOWS_LIB}
+    )
+endif()
+
+if(OODLE_LIBRARY_PATH AND EXISTS ${OODLE_LIBRARY_PATH} AND EXISTS ${OODLE_INCLUDE_DIR})
+    add_library(tp_oodle STATIC IMPORTED GLOBAL)
+    set_target_properties(tp_oodle PROPERTIES
+        IMPORTED_LOCATION ${OODLE_LIBRARY_PATH}
+        INTERFACE_INCLUDE_DIRECTORIES ${OODLE_INCLUDE_DIR}
+    )
+endif()

@@ -54,8 +54,10 @@ int main() {
         auto results = bench.run_all("IterPlatform", config);
 
         // Expected: algo/level combos * 1 size * 3 iterations
-        // 22 combos * 3 iterations = 66
-        size_t expected_count = 66;
+        size_t expected_count = 42;
+#if BENCHMARK_HAS_OODLE
+        expected_count = 66;
+#endif
         test_support::expect_equal(results.size(), expected_count,
             "iterations=3 result count");
     }
@@ -70,8 +72,11 @@ int main() {
 
         // Expected entries:
         // noop(1) + zstd(4) + lz4(2) + zlib(3) + snappy(1) + brotli(3)
+        size_t expected_count = 14;
+#if BENCHMARK_HAS_OODLE
         // + oodle_kraken(2) + oodle_leviathan(2) + oodle_mermaid(2) + oodle_selkie(2) = 22
-        size_t expected_count = 22;
+        expected_count = 22;
+#endif
         test_support::expect_equal(results.size(), expected_count,
             "run_all result count");
 
@@ -86,17 +91,23 @@ int main() {
         for (const auto& r : results) {
             algo_names.insert(r.algorithm);
         }
-        test_support::expect_equal(algo_names.size(), static_cast<size_t>(10), "10 unique algorithms");
+        size_t expected_algorithms = 6;
+#if BENCHMARK_HAS_OODLE
+        expected_algorithms = 10;
+#endif
+        test_support::expect_equal(algo_names.size(), expected_algorithms, "unique algorithms");
         test_support::expect_true(algo_names.count("noop") > 0, "has noop results");
         test_support::expect_true(algo_names.count("zstd") > 0, "has zstd results");
         test_support::expect_true(algo_names.count("lz4") > 0, "has lz4 results");
         test_support::expect_true(algo_names.count("zlib") > 0, "has zlib results");
         test_support::expect_true(algo_names.count("snappy") > 0, "has snappy results");
         test_support::expect_true(algo_names.count("brotli") > 0, "has brotli results");
+#if BENCHMARK_HAS_OODLE
         test_support::expect_true(algo_names.count("oodle_kraken") > 0, "has oodle_kraken results");
         test_support::expect_true(algo_names.count("oodle_leviathan") > 0, "has oodle_leviathan results");
         test_support::expect_true(algo_names.count("oodle_mermaid") > 0, "has oodle_mermaid results");
         test_support::expect_true(algo_names.count("oodle_selkie") > 0, "has oodle_selkie results");
+#endif
 
         // Check that all results have valid fields and real algos compress
         for (const auto& r : results) {

@@ -47,7 +47,7 @@ DeviceInfo query_device_info() {
 
 DeviceInfo query_device_info() {
     DeviceInfo info;
-    info.device_model = "iPhone";
+    info.device_model = "iOS Device";
     info.soc = "Apple Silicon";
     info.os_version = "iOS";
     info.gpu_name = "Apple GPU";
@@ -55,15 +55,50 @@ DeviceInfo query_device_info() {
     return info;
 }
 
-#else
+#elif defined(_WIN32)
 
-// Mac / desktop stub
+DeviceInfo query_device_info() {
+    DeviceInfo info;
+    info.device_model = "Windows PC";
+    info.soc = "Unknown";
+    info.os_version = "Windows";
+    info.gpu_name = "Unknown";
+    info.driver_version = "N/A";
+    return info;
+}
+
+#elif defined(__APPLE__)
+
 DeviceInfo query_device_info() {
     DeviceInfo info;
     info.device_model = "Mac";
     info.soc = "Apple Silicon";
     info.os_version = "macOS";
-    info.gpu_name = "Simulated";
+    info.gpu_name = "Apple GPU";
+    info.driver_version = "N/A";
+    return info;
+}
+
+#elif defined(__linux__)
+
+DeviceInfo query_device_info() {
+    DeviceInfo info;
+    info.device_model = "Linux Device";
+    info.soc = "Unknown";
+    info.os_version = "Linux";
+    info.gpu_name = "Unknown";
+    info.driver_version = "N/A";
+    return info;
+}
+
+#else
+
+DeviceInfo query_device_info() {
+    DeviceInfo info;
+    info.device_model = "Desktop Device";
+    info.soc = "Unknown";
+    info.os_version = "Unknown OS";
+    info.gpu_name = "Unknown";
     info.driver_version = "N/A";
     return info;
 }

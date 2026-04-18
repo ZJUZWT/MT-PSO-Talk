@@ -1,6 +1,8 @@
 .worktrees/
 .DS_Store
 .impeccable.md
+agent.md
+CLAUDE.md
 node_modules/
 dist/
 build/
@@ -9,6 +11,8 @@ coverage/
 __pycache__/
 *.py[cod]
 .generated/
+generated/
+benchmark_results/
 ignore/
 Docs/PSO-video-demo.mp4
 Docs/PSO-video-demo.gif
@@ -20,6 +24,7 @@ Docs/PSO-video-demo-segments/
 Docs/PSO-animation-demo*
 Docs/_anim_test.pptx
 Docs/剧本/.generated-previews/
+Docs/剧本/.snapshots/
 Docs/.archive/
 .codex-preview/
 .superpowers/

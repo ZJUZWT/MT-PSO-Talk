@@ -22,6 +22,13 @@ The bundle is the only thing sent to critics.
 Add one more required field when the page has a previous-page transition:
 
 - `continuity_facts`
+- `transition_timing_report`
+- `timing_standard_plan`
+- `timing_standard_verdict`
+- `timing_standard_phase_timeline`
+- `timing_standard_action_table`
+- `transition_checkpoint_script`
+- `animation_review_verdict`
 
 ## Contract-First Rule
 
@@ -39,6 +46,10 @@ If any of those are missing, the page is still in specification mode and should 
 
 The default contract writer for this step is `write-slide-geometry-contract`.
 
+All harness formulas (geometry scoring + typography + timing) use one canonical table:
+
+- `references/harness-formula-registry.md`
+
 The contract is not allowed to say only "roughly here" or "similar to the sketch". It must describe anchor regions and routing language explicitly enough that another agent could place the same topology.
 
 When a page-local markdown script file exists, it must be updated in the same loop with:
@@ -47,6 +58,14 @@ When a page-local markdown script file exists, it must be updated in the same lo
 - a three-layer review summary
 - a node review table
 - an edge review table
+- a transition timing section (when the page has a previous-step transition)
+- a timing-standard section (formula version, phase timeline, action timing table)
+
+When transition timing is generated, prefer formula-driven timing:
+
+- provide a `workload-json` that enumerates transition actions (`node_move`, `edge_grow`, `fade_in`, `fade_out`)
+- use `probe_transition_timeline.py --workload-json ...` to compute per-action duration and phase schedule
+- do not accept "looks fine" timing without computed action metrics
 
 The three-layer review summary must always include:
 
@@ -163,6 +182,8 @@ The loop stops early only when:
 - `crossing_count = 0`
 - `text_overflow_count = 0`
 - the primary route is clean enough to explain at a glance
+- transition duration verdict is not `too_short` / `too_long`
+- timing standard verdict is not `too_short` / `too_long`
 - both critics rate the page above the target threshold
 
 The loop must stop after 3 rounds even if it does not converge. When that happens, report the unsolved blockers explicitly.

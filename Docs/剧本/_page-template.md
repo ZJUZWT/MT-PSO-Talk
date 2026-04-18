@@ -1,8 +1,26 @@
 # 第 XX 页
 
 > 文件类型：`正式动画页` / `草图镜像页`
-> Step / Sketch：`page_xx` / `pagexx-r1`
-> 上一页：`page_(x-1)`
+> Step / Sketch：`x` / `pagexx-r1`
+> 上一页：`x-1`（插页可写 `4_data` / `13_img`）
+
+
+## Harness 公式快照
+
+- 公式版本：`Harness Registry v1.0`
+- 统一总表：`Docs/SkillFramework/higher-level/slide-geometry-harness/references/harness-formula-registry.md`
+- 几何硬门槛：`overlap=0`、`crossing=0`、`nodePierce=0`、`textOverflow=0`
+- 动画标准：`node_move / edge_grow / fade` + phase `hold_before -> fade_out -> node_motion -> edge_motion -> fade_in -> hold_after`
+- 时长判定：`allowedMinSec = requiredSec`，`allowedMaxSec = requiredSec * 1.35`
+
+## 页面评估看板（四项）
+
+| 指标 | 分数 | 说明 |
+| --- | --- | --- |
+| 布局分数 | `待评估` | 当前页缺少 `整体布局 Review` 数值行（待补） |
+| Node 分数 | `待评估` | 当前页缺少节点评估表或无可解析数值（待补） |
+| Edge 分数 | `待评估` | 当前页缺少边评估表或无可解析数值（待补） |
+| 动画分数 | `待评估` | 已存在动画剧本，但缺少可解析 verdict（待补） |
 
 ## Page goal
 

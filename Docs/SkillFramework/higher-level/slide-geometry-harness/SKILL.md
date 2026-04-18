@@ -14,6 +14,7 @@ It composes:
 - browser-runnable sketch generation
 - latest-only screenshot capture
 - fact-bound geometry metrics
+- transition timing probe and checkpoint script extraction
 - two blind critics
 - lesson harvesting when durable workflow rules or user preferences emerge
 
@@ -58,6 +59,13 @@ Do not use this skill for:
    - identify every edge with continuous semantics
    - record whether each one must reuse the same render element / shared-element carrier
    - if continuity exists, treat duplicate re-creation as a blocker unless the contract explicitly allows a break
+6.6. For every page transition, extract timing facts before final scoring:
+   - run `python3 scripts/slide-geometry-harness/probe_transition_timeline.py --from-step <prev_step> --to-step <current_step> --workload-json <workload-json> --emit-markdown`
+   - the workload JSON must enumerate node/edge/fade action items so timing is formula-driven instead of ad-hoc
+   - store duration verdict, timing-standard verdict, phase timeline table, action timing table, and checkpoint table (time/frame/node action/edge action) in the current page markdown script
+6.7. If the timing probe says `too_short` or `too_long`, retime the transition by adjusting frame anchors in `SlideApp/src/remotion/embed.ts`, then update timeline/storyboard tests.
+6.8. If a pre-animation is inserted, preserve the original base animation duration; do not compress base motion to make room for the insertion unless the user explicitly requests a fixed total duration.
+6.9. Harness formulas are centralized in `harness-formula-registry.md`; timing formulas in `animation-timing-standard.md` are a focused subset and must stay consistent with the registry.
 7. Only after the contract is explicit may you build or revise a sketch under `SlideApp/src/harness/slide-geometry/`.
 8. Expose the sketch through the existing `SlideApp` port with a concrete URL.
 9. Capture the latest rendered result using the SlideApp browser export path first:
@@ -66,6 +74,7 @@ Do not use this skill for:
    - fallback: `surface=stage` headless screenshot only when browser export is unavailable
 10. Update the page script markdown screenshot, the three-layer review summary, and both review tables after capture, before critic merge.
 10.5. Keep each page script responsible only for its own scores and review facts. Do not auto-propagate numeric judgments from one page into another page's ledger.
+10.6. After page edits, rerun transition timing probe and append an animation review verdict for the edited transition.
 11. Extract facts and metrics before any score is allowed.
 11.5. Line scoring must not stop at raw bend count. The fact layer must also audit, at minimum:
    - whether a line stayed bent when it could have been materially straighter
@@ -77,6 +86,14 @@ Do not use this skill for:
    - if a line can stay near the side center with no meaningful layout cost, prefer centered anchors
    - if preserving global composition requires a controlled bend or offset anchor, allow it
    - never allow obviously awkward twists, hook turns, or line lanes piled on top of each other
+11.7. Collision and penetration gates are hard-fail checks unless the contract explicitly whitelists them:
+   - any node-node overlap area greater than `0` is a blocker unless it is declared container membership
+   - any edge-edge crossing is a blocker unless the crossing is a declared junction node
+   - any edge that penetrates the interior of an unrelated node/pill/label is a blocker
+   - any long edge-on-edge co-lane overlap is a blocker unless it is a declared split/merge handoff
+11.8. If any gate in `11.7` fails:
+   - cap `单节点与单边 Review` at `4.0`
+   - mark the page `not approved` until geometry is corrected
 12. Send the latest artifact bundle to two blind critics in parallel:
    - `Art Critic`
    - `Geometry Critic`
@@ -128,7 +145,14 @@ Every completed round must include:
 - `Facts`
 - `Metrics`
 - `Continuity facts`
+- `Transition timing report`
+- `Timing standard plan`
+- `Timing standard verdict`
+- `Timing standard phase timeline`
+- `Timing standard action table`
+- `Transition checkpoint script`
 - `Three-layer review summary`
+- `Animation review verdict`
 - `Art critic verdict`
 - `Geometry critic verdict`
 - `Top 3 fixes`
@@ -150,9 +174,16 @@ Every completed round must include:
 - Do not emit side-by-side comparison renders by default.
 - Do not use freeform scores with no fact layer.
 - Do not give a high line score merely because crossings are zero; awkward hooks, redundant detours, line-on-line coverage, and lazy off-center anchors must still be penalized.
+- Do not pass review when node-node overlap exists unless that overlap is explicitly whitelisted as container membership.
+- Do not pass review when edge-edge crossing exists unless the crossing is an explicitly declared junction.
+- Do not pass review when a line penetrates the interior of an unrelated node, pill, or label.
+- Do not pass review when long line-on-line overlay exists unless it is an explicitly declared split/merge handoff.
 - Do not keep formal animation pages on an older page template while only sketch mirror pages get the new review ledger.
 - Do not let a semantically continuous node or edge switch to an unrelated duplicate render carrier without flagging it as a continuity failure.
+- Do not finalize a page without a transition timing section in the page markdown when the page has a previous-page transition.
+- Do not leave checkpoint node/edge action rows as unresolved TODOs in final output.
+- Do not compress original base animation duration when adding pre/mid animation unless the user explicitly asks for fixed total duration.
 
 ## Reference
 
-See [references/loop-contract.md](references/loop-contract.md) for the control loop and [references/critic-prompts.md](references/critic-prompts.md) for the two blind critic roles.
+See [references/harness-formula-registry.md](references/harness-formula-registry.md) for the unified formula table, [references/loop-contract.md](references/loop-contract.md) for the control loop, [references/animation-timing-standard.md](references/animation-timing-standard.md) for timing-focused details, and [references/critic-prompts.md](references/critic-prompts.md) for the two blind critic roles.

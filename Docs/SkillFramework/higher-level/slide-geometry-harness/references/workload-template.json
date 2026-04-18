@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "n_move_main",
+      "kind": "node_move",
+      "distancePx": 280,
+      "description": "主节点位移"
+    },
+    {
+      "id": "e_extend_main",
+      "kind": "edge_grow",
+      "lengthPx": 420,
+      "description": "主链路延伸"
+    },
+    {
+      "id": "n_fade_in_new",
+      "kind": "fade_in",
+      "description": "新节点/标签显现"
+    },
+    {
+      "id": "n_fade_out_old",
+      "kind": "fade_out",
+      "description": "旧节点/标签退场"
+    }
+  ]
+}

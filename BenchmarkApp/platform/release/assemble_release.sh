@@ -3,9 +3,12 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 APP_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+source "$APP_ROOT/platform/common/build_settings.sh"
 
-BUILD_ROOT="${BUILD_ROOT:-$APP_ROOT/../build/BenchmarkApp}"
+BUILD_ROOT=$(benchmark_build_root "$APP_ROOT")
 RELEASE_ROOT="${RELEASE_ROOT:-$APP_ROOT/../release}"
+APPLE_CONFIGURATION=$(benchmark_apple_configuration)
+WINDOWS_CONFIGURATION=$(benchmark_windows_configuration)
 
 PACKAGES_DIR="$RELEASE_ROOT/packages"
 SCRIPTS_DIR="$RELEASE_ROOT/scripts"
@@ -44,6 +47,9 @@ chmod +x "$SCRIPTS_DIR/common/result_bundle.sh" "$SCRIPTS_DIR/ios/ios_device_uti
 {
   echo "Release Root: $RELEASE_ROOT"
   echo "Build Root: $BUILD_ROOT"
+  echo "Build Type: $(benchmark_build_type)"
+  echo "Apple Configuration: $APPLE_CONFIGURATION"
+  echo "Windows Configuration: $WINDOWS_CONFIGURATION"
 } > "$MANIFEST_PATH"
 
 if copy_if_present "$BUILD_ROOT/macos/lib/benchmark_main" "$PACKAGES_DIR/macos/benchmark_main"; then
@@ -60,7 +66,7 @@ else
   write_manifest_line "android" "missing"
 fi
 
-if copy_if_present "$BUILD_ROOT/ios-device/platform/ios/Release-iphoneos/PSOBenchmarkApp.app" "$PACKAGES_DIR/ios/PSOBenchmarkApp.app"; then
+if copy_if_present "$(benchmark_ios_app_path "$APP_ROOT" device)" "$PACKAGES_DIR/ios/PSOBenchmarkApp.app"; then
   write_manifest_line "ios_app" "packages/ios/PSOBenchmarkApp.app"
 else
   write_manifest_line "ios_app" "missing"
@@ -72,7 +78,12 @@ else
   write_manifest_line "ios_ipa" "missing"
 fi
 
-if copy_if_present "$BUILD_ROOT/windows/platform/windows/compression_benchmark_cli.exe" "$PACKAGES_DIR/windows/compression_benchmark_cli.exe"; then
+windows_binary_candidates=()
+while IFS= read -r candidate; do
+  windows_binary_candidates+=("$candidate")
+done < <(benchmark_windows_binary_candidates "$BUILD_ROOT" "$WINDOWS_CONFIGURATION")
+if windows_binary_path=$(benchmark_first_existing_path "${windows_binary_candidates[@]}"); then
+  copy_if_present "$windows_binary_path" "$PACKAGES_DIR/windows/compression_benchmark_cli.exe" >/dev/null
   write_manifest_line "windows" "packages/windows/compression_benchmark_cli.exe"
 else
   write_manifest_line "windows" "missing"
@@ -183,7 +194,7 @@ source "$SCRIPT_DIR/ios/ios_device_utils.sh"
 APP_PATH="${1:-$SCRIPT_DIR/../packages/ios/PSOBenchmarkApp.app}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../results}"
 POLL_INTERVAL_SECONDS="${POLL_INTERVAL_SECONDS:-5}"
-POLL_TIMEOUT_SECONDS="${POLL_TIMEOUT_SECONDS:-300}"
+POLL_TIMEOUT_SECONDS="${POLL_TIMEOUT_SECONDS:-900}"
 DEVICE_OVERRIDE="${IOS_DEVICE:-}"
 
 if [[ ! -d "$APP_PATH" ]]; then

@@ -29,7 +29,11 @@ int main() {
 
     const auto ch = benchmark::compression_csv_header();
     test_support::expect_contains(ch, "algorithm", "compression csv header has algorithm");
+    test_support::expect_contains(ch, "payload_profile", "compression csv header has payload_profile");
+    test_support::expect_contains(ch, "iteration_index", "compression csv header has iteration_index");
+    test_support::expect_contains(ch, "input_hash", "compression csv header has input_hash");
     test_support::expect_contains(ch, "throughput_mbps", "compression csv header has throughput_mbps");
+    test_support::expect_contains(ch, "roundtrip_byte_match", "compression csv header has roundtrip_byte_match");
     test_support::expect_contains(ch, "status", "compression csv header has status");
 
     // --- CSV row with all fields + column count verification ---
@@ -68,9 +72,18 @@ int main() {
     benchmark::CompressionResult cr{};
     cr.platform = "Linux";
     cr.algorithm = "zstd";
+    cr.payload_profile = "pso_like";
+    cr.iteration_index = 2;
+    cr.input_hash = "input123";
+    cr.compressed_output_hash = "abc123";
+    cr.decompressed_output_hash = "def456";
+    cr.roundtrip_hash_match = true;
+    cr.roundtrip_byte_match = true;
     cr.status = "passed";
     cr.input_size = 1024;
     const auto crow = benchmark::export_compression_csv_row(cr);
+    test_support::expect_contains(crow, "pso_like", "compression row has payload_profile");
+    test_support::expect_contains(crow, "input123", "compression row has input hash");
     int ch_commas = count_char(ch, ',');
     int crow_commas = count_char(crow, ',');
     test_support::expect_equal(ch_commas, crow_commas,

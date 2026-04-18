@@ -20,6 +20,7 @@ fi
 
 if [[ ! -x "$BINARY_PATH" ]]; then
   echo "macOS benchmark binary not found: $BINARY_PATH"
+  echo "Build a Release binary with: BenchmarkApp/platform/macos/build_macos.sh"
   exit 1
 fi
 

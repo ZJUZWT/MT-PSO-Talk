@@ -2,7 +2,7 @@ param(
     [string]$AppPath = "",
     [string]$OutputRoot = "",
     [int]$PollIntervalSeconds = 5,
-    [int]$PollTimeoutSeconds = 300,
+    [int]$PollTimeoutSeconds = 900,
     [string]$Device = ""
 )
 
@@ -43,13 +43,26 @@ $null = Get-Command xcrun -ErrorAction Stop
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $releaseApp = Join-Path $scriptDir "..\packages\ios\PSOBenchmarkApp.app"
+$buildConfiguration = if ($env:BENCHMARK_IOS_CONFIGURATION) {
+    $env:BENCHMARK_IOS_CONFIGURATION
+} elseif ($env:BENCHMARK_APPLE_CONFIGURATION) {
+    $env:BENCHMARK_APPLE_CONFIGURATION
+} elseif ($env:CONFIGURATION) {
+    $env:CONFIGURATION
+} elseif ($env:BENCHMARK_BUILD_TYPE) {
+    $env:BENCHMARK_BUILD_TYPE
+} elseif ($env:CMAKE_BUILD_TYPE) {
+    $env:CMAKE_BUILD_TYPE
+} else {
+    "Release"
+}
 
 if (-not $AppPath) {
     if (Test-Path $releaseApp) {
         $AppPath = $releaseApp
     } else {
         $appRoot = Resolve-Path (Join-Path $scriptDir "..\..")
-        $AppPath = Join-Path $appRoot "..\build\BenchmarkApp\ios-device\platform\ios\Release-iphoneos\PSOBenchmarkApp.app"
+        $AppPath = Join-Path $appRoot "..\build\BenchmarkApp\ios-device\platform\ios\$buildConfiguration-iphoneos\PSOBenchmarkApp.app"
     }
 }
 

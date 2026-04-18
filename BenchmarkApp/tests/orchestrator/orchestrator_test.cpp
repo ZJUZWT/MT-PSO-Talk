@@ -9,6 +9,9 @@ int main() {
     // Run orchestrator once with known config for all tests
     benchmark::OrchestratorConfig config;
     config.compression_iterations = 1;
+    config.compression_warmup_iterations = 0;
+    config.compression_payload_sizes = {4096};
+    config.compression_payload_profiles = {"pso_like", "high_compressibility", "low_compressibility"};
 
     benchmark::BenchmarkOrchestrator orchestrator;
     auto report = orchestrator.run(config);
@@ -42,6 +45,14 @@ int main() {
     for (const auto& r : report.compression_results) {
         test_support::expect_equal(r.status, std::string("passed"),
             "compression " + r.algorithm + " status");
+        test_support::expect_true(!r.payload_profile.empty(),
+            "compression " + r.algorithm + " payload profile");
+        test_support::expect_true(!r.input_hash.empty(),
+            "compression " + r.algorithm + " input hash");
+        test_support::expect_true(r.roundtrip_hash_match,
+            "compression " + r.algorithm + " roundtrip hash match");
+        test_support::expect_true(r.roundtrip_byte_match,
+            "compression " + r.algorithm + " roundtrip byte match");
     }
 
     // Default product output should not include graphics tables.
@@ -54,6 +65,9 @@ int main() {
     test_support::expect_contains(report.compression_matrix_text, "zlib", "comp matrix has zlib");
     test_support::expect_contains(report.compression_matrix_text, "snappy", "comp matrix has snappy");
     test_support::expect_contains(report.compression_matrix_text, "brotli", "comp matrix has brotli");
+    test_support::expect_contains(report.compression_matrix_text, "pso_like", "comp matrix has pso_like");
+    test_support::expect_contains(report.compression_matrix_text, "high_compressibility", "comp matrix has high profile");
+    test_support::expect_contains(report.compression_matrix_text, "low_compressibility", "comp matrix has low profile");
     test_support::expect_contains(report.compression_matrix_text, "Ratio", "comp matrix has Ratio");
 
     // Verify summary_text contains key stats and is compression-only by default.

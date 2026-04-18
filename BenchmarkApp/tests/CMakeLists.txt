@@ -145,6 +145,18 @@ add_test(NAME orchestrator_test COMMAND orchestrator_test)
 
 if(UNIX)
     add_test(
+        NAME cmake_default_build_type_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/cmake_default_build_type_test.sh
+    )
+    add_test(
+        NAME build_settings_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/build_settings_test.sh
+    )
+    add_test(
+        NAME macos_build_script_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/macos_build_script_test.sh
+    )
+    add_test(
         NAME android_ndk_utils_test
         COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/android_ndk_utils_test.sh
     )
@@ -157,7 +169,15 @@ if(UNIX)
         COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/ios_device_utils_test.sh
     )
     add_test(
+        NAME ios_configuration_path_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/ios_configuration_path_test.sh
+    )
+    add_test(
         NAME release_assembly_test
         COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/release_assembly_test.sh
+    )
+    add_test(
+        NAME release_assembly_windows_multiconfig_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/release_assembly_windows_multiconfig_test.sh
     )
 endif()

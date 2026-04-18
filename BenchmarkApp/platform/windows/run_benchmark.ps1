@@ -5,13 +5,39 @@ param(
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $appRoot = Resolve-Path (Join-Path $scriptDir "..\..")
+$buildConfiguration = if ($env:BENCHMARK_WINDOWS_CONFIGURATION) {
+    $env:BENCHMARK_WINDOWS_CONFIGURATION
+} elseif ($env:CONFIGURATION) {
+    $env:CONFIGURATION
+} elseif ($env:BENCHMARK_BUILD_TYPE) {
+    $env:BENCHMARK_BUILD_TYPE
+} elseif ($env:CMAKE_BUILD_TYPE) {
+    $env:CMAKE_BUILD_TYPE
+} else {
+    "Release"
+}
 
 if (-not $BinaryPath) {
-    $BinaryPath = Join-Path $appRoot "..\build\BenchmarkApp\windows\platform\windows\compression_benchmark_cli.exe"
+    $buildRoot = if ($env:BUILD_ROOT) {
+        $env:BUILD_ROOT
+    } else {
+        Join-Path $appRoot "..\build\BenchmarkApp"
+    }
+
+    $binaryCandidates = @(
+        (Join-Path $buildRoot "windows\platform\windows\compression_benchmark_cli.exe"),
+        (Join-Path $buildRoot "windows\platform\windows\$buildConfiguration\compression_benchmark_cli.exe"),
+        (Join-Path $buildRoot "windows\$buildConfiguration\platform\windows\compression_benchmark_cli.exe")
+    )
+
+    $BinaryPath = $binaryCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $BinaryPath) {
+        $BinaryPath = $binaryCandidates[0]
+    }
 }
 
 if (-not (Test-Path $BinaryPath)) {
-    throw "Windows benchmark binary not found: $BinaryPath"
+    throw "Windows benchmark binary not found: $BinaryPath`nBuild a $buildConfiguration binary with: BenchmarkApp\\platform\\windows\\build_windows.ps1"
 }
 
 if (-not $OutputRoot) {

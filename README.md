@@ -47,9 +47,8 @@ npm run benchmark:configure
 ## BenchmarkApp Run Smoke Test
 
 ```bash
-cmake -S BenchmarkApp -B build/benchmark
-cmake --build build/benchmark -j4
-BenchmarkApp/platform/macos/run_benchmark.sh ./build/benchmark/lib/benchmark_main
+BenchmarkApp/platform/macos/build_macos.sh
+BenchmarkApp/platform/macos/run_benchmark.sh
 ```
 
 Result bundles are stored under `benchmark_results/<platform>/<timestamp>/` with:
@@ -65,3 +64,17 @@ BenchmarkApp/platform/release/assemble_release.sh
 ```
 
 The assembled `release/scripts/` directory now includes both shell and PowerShell launchers for Android and iOS. Android can be driven from any machine with `pwsh` and `adb`; iOS still requires macOS because the runner depends on Xcode's `xcrun devicectl`.
+
+The compression benchmark now defaults to a heavier stress run:
+- `3` payload profiles: `pso_like`, `high_compressibility`, `low_compressibility`
+- `3` payload sizes: `64KB`, `256KB`, `1MB`
+- Explicit hash plus byte-for-byte roundtrip verification
+
+For cross-device comparisons, always use `Release` builds on every platform. The
+repository's benchmark-oriented build entry points now default to `Release` so a macOS
+desktop build cannot silently fall back to an unoptimized configuration.
+
+The shared benchmark build defaults are:
+- `BUILD_ROOT=build/BenchmarkApp`
+- `BENCHMARK_BUILD_TYPE=Release`
+- `BENCHMARK_BUILD_JOBS=4`

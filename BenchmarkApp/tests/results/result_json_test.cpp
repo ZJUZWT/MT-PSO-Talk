@@ -84,14 +84,19 @@ int main() {
     comp.os_version = "Ubuntu 24.04";
     comp.version = "1.5.6";
     comp.level = "3";
+    comp.payload_profile = "pso_like";
+    comp.iteration_index = 3;
     comp.input_size = 1024;
     comp.compressed_size = 512;
     comp.compression_ratio = 2.0;
     comp.compress_us = 500;
     comp.throughput_mbps = 100.5;
+    comp.input_hash = "input123";
     comp.compressed_output_hash = "abc123";
     comp.decompress_us = 250;
     comp.decompressed_output_hash = "def456";
+    comp.roundtrip_hash_match = true;
+    comp.roundtrip_byte_match = false;
     comp.status = "unsupported";
 
     const std::string cjson = benchmark::to_json(comp);
@@ -107,12 +112,17 @@ int main() {
     test_support::expect_contains(cjson, "\"os_version\":\"Ubuntu 24.04\"", "comp os_version");
     test_support::expect_contains(cjson, "\"version\":\"1.5.6\"", "comp version");
     test_support::expect_contains(cjson, "\"level\":\"3\"", "comp level");
+    test_support::expect_contains(cjson, "\"payload_profile\":\"pso_like\"", "comp payload_profile");
+    test_support::expect_contains(cjson, "\"iteration_index\":3", "comp iteration_index");
     test_support::expect_contains(cjson, "\"input_size\":1024", "comp input_size");
     test_support::expect_contains(cjson, "\"compressed_size\":512", "comp compressed_size");
     test_support::expect_contains(cjson, "\"compress_us\":500", "comp compress_us");
+    test_support::expect_contains(cjson, "\"input_hash\":\"input123\"", "comp input_hash");
     test_support::expect_contains(cjson, "\"compressed_output_hash\":\"abc123\"", "comp compressed_output_hash");
     test_support::expect_contains(cjson, "\"decompress_us\":250", "comp decompress_us");
     test_support::expect_contains(cjson, "\"decompressed_output_hash\":\"def456\"", "comp decompressed_output_hash");
+    test_support::expect_contains(cjson, "\"roundtrip_hash_match\":true", "comp roundtrip_hash_match");
+    test_support::expect_contains(cjson, "\"roundtrip_byte_match\":false", "comp roundtrip_byte_match");
     test_support::expect_contains(cjson, "\"status\":\"unsupported\"", "comp status");
 
     return test_support::finish();

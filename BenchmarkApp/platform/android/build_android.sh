@@ -4,10 +4,12 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 APP_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
 source "$SCRIPT_DIR/android_ndk_utils.sh"
+source "$APP_ROOT/platform/common/build_settings.sh"
 
-BUILD_ROOT="${BUILD_ROOT:-$APP_ROOT/../build/BenchmarkApp}"
+BUILD_ROOT=$(benchmark_build_root "$APP_ROOT")
 ABI="${ANDROID_ABI:-arm64-v8a}"
-BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}"
+BUILD_TYPE=$(benchmark_build_type)
+BUILD_JOBS=$(benchmark_build_jobs)
 ANDROID_SDK_ROOT_VALUE="${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}"
 
 find_java_home() {
@@ -102,6 +104,6 @@ cmake -S "$APP_ROOT" -B "$BUILD_DIR" \
   -DANDROID_PLATFORM="${ANDROID_PLATFORM:-android-24}" \
   -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 
-cmake --build "$BUILD_DIR" --target pso_benchmark -j4
+cmake --build "$BUILD_DIR" --target pso_benchmark -j"$BUILD_JOBS"
 
 echo "Android binary built at: $BUILD_DIR/platform/android/pso_benchmark"

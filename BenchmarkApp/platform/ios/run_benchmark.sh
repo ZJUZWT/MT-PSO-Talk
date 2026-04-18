@@ -4,12 +4,13 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 APP_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
 source "$APP_ROOT/platform/common/result_bundle.sh"
+source "$APP_ROOT/platform/common/build_settings.sh"
 source "$SCRIPT_DIR/ios_device_utils.sh"
 
-APP_PATH="${1:-$APP_ROOT/../build/BenchmarkApp/ios-device/platform/ios/Release-iphoneos/PSOBenchmarkApp.app}"
+APP_PATH="${1:-$(benchmark_ios_app_path "$APP_ROOT" device)}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../benchmark_results}"
 POLL_INTERVAL_SECONDS="${POLL_INTERVAL_SECONDS:-5}"
-POLL_TIMEOUT_SECONDS="${POLL_TIMEOUT_SECONDS:-300}"
+POLL_TIMEOUT_SECONDS="${POLL_TIMEOUT_SECONDS:-900}"
 DEVICE_OVERRIDE="${IOS_DEVICE:-}"
 
 if [[ ! -d "$APP_PATH" ]]; then

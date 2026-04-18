@@ -7,6 +7,7 @@
 #include <numeric>
 #include <sstream>
 #include <set>
+#include <tuple>
 
 #include "driver/common/device_info.h"
 #include "driver/graphics_benchmark.h"
@@ -111,8 +112,10 @@ BenchmarkReport BenchmarkOrchestrator::run(const OrchestratorConfig& config) {
 
     if (config.enable_compression) {
         CompressionBenchmarkConfig ccfg;
+        ccfg.warmup_iterations = config.compression_warmup_iterations;
         ccfg.iterations = config.compression_iterations;
         ccfg.payload_sizes = config.compression_payload_sizes;
+        ccfg.payload_profiles = config.compression_payload_profiles;
 
         CompressionBenchmark cb;
         report.compression_results = cb.run_all(platform_name, ccfg);
@@ -282,12 +285,9 @@ std::string BenchmarkOrchestrator::format_compression_matrix(
 
     if (results.empty()) return {};
 
-    // Use the first payload size found
-    int64_t target_size = results.front().input_size;
-
-    // Average by algorithm for the target payload size
     struct AlgoStats {
         std::string algorithm;
+        std::string payload_profile;
         int64_t input_size = 0;
         double compressed_size_avg = 0;
         double ratio_avg = 0;
@@ -297,19 +297,33 @@ std::string BenchmarkOrchestrator::format_compression_matrix(
         int count = 0;
     };
 
-    // Preserve order of algorithms
-    std::vector<std::string> algo_order;
-    std::set<std::string> algo_seen;
-    std::map<std::string, AlgoStats> stats;
+    struct GroupKey {
+        std::string payload_profile;
+        int64_t input_size = 0;
+
+        bool operator<(const GroupKey& other) const {
+            return std::tie(payload_profile, input_size) <
+                   std::tie(other.payload_profile, other.input_size);
+        }
+    };
+
+    std::vector<GroupKey> group_order;
+    std::set<GroupKey> group_seen;
+    std::map<GroupKey, std::vector<std::string>> algo_order_by_group;
+    std::map<GroupKey, std::set<std::string>> algo_seen_by_group;
+    std::map<GroupKey, std::map<std::string, AlgoStats>> stats_by_group;
 
     for (const auto& r : results) {
-        if (r.input_size != target_size) continue;
-
-        if (algo_seen.insert(r.algorithm).second) {
-            algo_order.push_back(r.algorithm);
+        GroupKey group{r.payload_profile, r.input_size};
+        if (group_seen.insert(group).second) {
+            group_order.push_back(group);
         }
-        auto& s = stats[r.algorithm];
+        if (algo_seen_by_group[group].insert(r.algorithm).second) {
+            algo_order_by_group[group].push_back(r.algorithm);
+        }
+        auto& s = stats_by_group[group][r.algorithm];
         s.algorithm = r.algorithm;
+        s.payload_profile = r.payload_profile;
         s.input_size = r.input_size;
         s.compressed_size_avg += static_cast<double>(r.compressed_size);
         s.ratio_avg += r.compression_ratio;
@@ -319,20 +333,21 @@ std::string BenchmarkOrchestrator::format_compression_matrix(
         s.count++;
     }
 
-    for (auto& kv : stats) {
-        auto& s = kv.second;
-        if (s.count > 0) {
-            s.compressed_size_avg /= s.count;
-            s.ratio_avg /= s.count;
-            s.compress_us_avg /= s.count;
-            s.decompress_us_avg /= s.count;
-            s.throughput_avg /= s.count;
+    for (auto& group_entry : stats_by_group) {
+        for (auto& algo_entry : group_entry.second) {
+            auto& s = algo_entry.second;
+            if (s.count > 0) {
+                s.compressed_size_avg /= s.count;
+                s.ratio_avg /= s.count;
+                s.compress_us_avg /= s.count;
+                s.decompress_us_avg /= s.count;
+                s.throughput_avg /= s.count;
+            }
         }
     }
 
     std::ostringstream out;
-    int64_t payload_kb = target_size / 1024;
-    out << "Compression Benchmark (" << payload_kb << "KB payload)\n";
+    out << "Compression Benchmark\n";
 
     // Column widths
     const int algo_w = 12;
@@ -352,42 +367,51 @@ std::string BenchmarkOrchestrator::format_compression_matrix(
         out << "\n";
     };
 
-    // Header
-    heavy_line();
-    out << " " << std::left << std::setw(algo_w) << "Algorithm"
-        << " \xe2\x94\x82 " << std::right << std::setw(comp_w) << "Compressed"
-        << " \xe2\x94\x82 " << std::right << std::setw(ratio_w) << "Ratio"
-        << " \xe2\x94\x82 " << std::right << std::setw(ctime_w) << "Compress(\xce\xbcs)"
-        << " \xe2\x94\x82 " << std::right << std::setw(dtime_w) << "Decompress(\xce\xbcs)"
-        << " \xe2\x94\x82 " << std::right << std::setw(thru_w) << "Throughput"
-        << " \xe2\x94\x82\n";
-    heavy_line();
+    for (std::size_t group_index = 0; group_index < group_order.size(); ++group_index) {
+        const auto& group = group_order[group_index];
+        int64_t payload_kb = group.input_size / 1024;
+        out << "Payload Profile: " << group.payload_profile
+            << " | Payload Size: " << payload_kb << "KB\n";
 
-    for (const auto& algo_name : algo_order) {
-        const auto& s = stats.at(algo_name);
-
-        int64_t comp_kb = static_cast<int64_t>(s.compressed_size_avg / 1024.0 + 0.5);
-        std::string comp_str = std::to_string(comp_kb) + " KB";
-
-        std::ostringstream ratio_ss;
-        ratio_ss << std::fixed << std::setprecision(2) << s.ratio_avg << "x";
-
-        int64_t compress_us = static_cast<int64_t>(s.compress_us_avg + 0.5);
-        int64_t decompress_us = static_cast<int64_t>(s.decompress_us_avg + 0.5);
-
-        std::ostringstream thru_ss;
-        thru_ss << std::fixed << std::setprecision(0) << s.throughput_avg << " MB/s";
-
-        out << " " << std::left << std::setw(algo_w) << s.algorithm
-            << " \xe2\x94\x82 " << std::right << std::setw(comp_w) << comp_str
-            << " \xe2\x94\x82 " << std::right << std::setw(ratio_w) << ratio_ss.str()
-            << " \xe2\x94\x82 " << std::right << std::setw(ctime_w) << compress_us
-            << " \xe2\x94\x82 " << std::right << std::setw(dtime_w) << decompress_us
-            << " \xe2\x94\x82 " << std::right << std::setw(thru_w) << thru_ss.str()
+        heavy_line();
+        out << " " << std::left << std::setw(algo_w) << "Algorithm"
+            << " \xe2\x94\x82 " << std::right << std::setw(comp_w) << "Compressed"
+            << " \xe2\x94\x82 " << std::right << std::setw(ratio_w) << "Ratio"
+            << " \xe2\x94\x82 " << std::right << std::setw(ctime_w) << "Compress(\xce\xbcs)"
+            << " \xe2\x94\x82 " << std::right << std::setw(dtime_w) << "Decompress(\xce\xbcs)"
+            << " \xe2\x94\x82 " << std::right << std::setw(thru_w) << "Throughput"
             << " \xe2\x94\x82\n";
-    }
+        heavy_line();
 
-    heavy_line();
+        for (const auto& algo_name : algo_order_by_group.at(group)) {
+            const auto& s = stats_by_group.at(group).at(algo_name);
+
+            int64_t comp_kb = static_cast<int64_t>(s.compressed_size_avg / 1024.0 + 0.5);
+            std::string comp_str = std::to_string(comp_kb) + " KB";
+
+            std::ostringstream ratio_ss;
+            ratio_ss << std::fixed << std::setprecision(2) << s.ratio_avg << "x";
+
+            int64_t compress_us = static_cast<int64_t>(s.compress_us_avg + 0.5);
+            int64_t decompress_us = static_cast<int64_t>(s.decompress_us_avg + 0.5);
+
+            std::ostringstream thru_ss;
+            thru_ss << std::fixed << std::setprecision(0) << s.throughput_avg << " MB/s";
+
+            out << " " << std::left << std::setw(algo_w) << s.algorithm
+                << " \xe2\x94\x82 " << std::right << std::setw(comp_w) << comp_str
+                << " \xe2\x94\x82 " << std::right << std::setw(ratio_w) << ratio_ss.str()
+                << " \xe2\x94\x82 " << std::right << std::setw(ctime_w) << compress_us
+                << " \xe2\x94\x82 " << std::right << std::setw(dtime_w) << decompress_us
+                << " \xe2\x94\x82 " << std::right << std::setw(thru_w) << thru_ss.str()
+                << " \xe2\x94\x82\n";
+        }
+
+        heavy_line();
+        if (group_index + 1 < group_order.size()) {
+            out << "\n";
+        }
+    }
 
     return out.str();
 }
@@ -460,13 +484,21 @@ std::string BenchmarkOrchestrator::format_summary(const BenchmarkReport& report)
     if (!report.compression_results.empty()) {
         std::set<std::string> algos;
         std::set<int64_t> sizes;
+        std::set<std::string> profiles;
+        std::set<int> iterations;
         for (const auto& r : report.compression_results) {
             algos.insert(r.algorithm);
             sizes.insert(r.input_size);
+            profiles.insert(r.payload_profile);
+            if (r.iteration_index >= 0) {
+                iterations.insert(r.iteration_index);
+            }
         }
 
         out << "Compression: " << algos.size() << " algorithms \xc3\x97 "
-            << sizes.size() << " payload size(s) = "
+            << profiles.size() << " payload profile(s) \xc3\x97 "
+            << sizes.size() << " payload size(s) \xc3\x97 "
+            << iterations.size() << " iteration(s) = "
             << report.compression_results.size() << " results\n";
 
         double best_ratio = 0;

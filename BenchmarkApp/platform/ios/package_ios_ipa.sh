@@ -3,9 +3,11 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 APP_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+source "$APP_ROOT/platform/common/build_settings.sh"
 
-APP_PATH="${1:-$APP_ROOT/../build/BenchmarkApp/ios-device/platform/ios/Release-iphoneos/PSOBenchmarkApp.app}"
-IPA_PATH="${2:-$APP_ROOT/../build/BenchmarkApp/ios-device/PSOBenchmarkApp.ipa}"
+BUILD_ROOT=$(benchmark_build_root "$APP_ROOT")
+APP_PATH="${1:-$(benchmark_ios_app_path "$APP_ROOT" device)}"
+IPA_PATH="${2:-$BUILD_ROOT/ios-device/PSOBenchmarkApp.ipa}"
 
 if [[ ! -d "$APP_PATH" ]]; then
   echo "iOS app bundle not found: $APP_PATH"

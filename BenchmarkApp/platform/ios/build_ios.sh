@@ -3,9 +3,12 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 APP_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
-BUILD_ROOT="${BUILD_ROOT:-$APP_ROOT/../build/BenchmarkApp}"
+source "$APP_ROOT/platform/common/build_settings.sh"
+
+BUILD_ROOT=$(benchmark_build_root "$APP_ROOT")
 MODE="${1:-device}"
-CONFIGURATION="${CONFIGURATION:-Release}"
+CONFIGURATION=$(benchmark_apple_configuration)
+BUILD_JOBS=$(benchmark_build_jobs)
 TARGET_NAME="PSOBenchmarkApp"
 
 case "$MODE" in
@@ -51,6 +54,7 @@ XCODE_ARGS=(
   -target "$TARGET_NAME"
   -configuration "$CONFIGURATION"
   -sdk "$SDK"
+  -jobs "$BUILD_JOBS"
 )
 
 if [[ "$MODE" == "device" ]]; then

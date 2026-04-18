@@ -26,6 +26,7 @@ fi
 
 DEVICE_NAME=$(scutil --get ComputerName 2>/dev/null || hostname)
 DEVICE_ID=$(sysctl -n hw.model 2>/dev/null || echo "mac-host")
+SOC_NAME=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo "unknown")
 OS_VERSION=$(sw_vers -productVersion 2>/dev/null || echo "unknown")
 STARTED_AT=$(benchmark_now_iso_utc)
 RESULT_DIR=$(benchmark_create_result_dir "$OUTPUT_ROOT" "macos")
@@ -47,5 +48,7 @@ benchmark_write_run_info \
   "benchmark_report.json" \
   "compression_results.csv"
 echo "OS Version: macOS $OS_VERSION" >> "$RESULT_DIR/run_info.txt"
+echo "Model Identifier: $DEVICE_ID" >> "$RESULT_DIR/run_info.txt"
+echo "SoC: $SOC_NAME" >> "$RESULT_DIR/run_info.txt"
 
 benchmark_print_run_summary "macos" "$DEVICE_NAME" "$STARTED_AT" "$FINISHED_AT" "$RESULT_DIR"

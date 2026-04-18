@@ -36,6 +36,9 @@ fi
 
 DEVICE_NAME=$(benchmark_ios_lookup_device_name "$DEVICE_JSON" "$DEVICE_IDENTIFIER" 2>/dev/null || echo "$DEVICE_IDENTIFIER")
 DEVICE_UDID=$(benchmark_ios_lookup_device_udid "$DEVICE_JSON" "$DEVICE_IDENTIFIER" 2>/dev/null || echo "")
+MARKETING_NAME=$(benchmark_ios_lookup_marketing_name "$DEVICE_JSON" "$DEVICE_IDENTIFIER" 2>/dev/null || echo "")
+PRODUCT_TYPE=$(benchmark_ios_lookup_product_type "$DEVICE_JSON" "$DEVICE_IDENTIFIER" 2>/dev/null || echo "")
+HARDWARE_MODEL=$(benchmark_ios_lookup_hardware_model "$DEVICE_JSON" "$DEVICE_IDENTIFIER" 2>/dev/null || echo "")
 STARTED_AT=$(benchmark_now_iso_utc)
 RESULT_DIR=$(benchmark_create_result_dir "$OUTPUT_ROOT" "ios")
 LOG_PATH="$RESULT_DIR/console.log"
@@ -114,5 +117,14 @@ benchmark_write_run_info \
   "compression_results.csv"
 echo "Bundle Identifier: $BUNDLE_ID" >> "$RESULT_DIR/run_info.txt"
 echo "Device Identifier: $DEVICE_IDENTIFIER" >> "$RESULT_DIR/run_info.txt"
+if [[ -n "$MARKETING_NAME" ]]; then
+  echo "Marketing Name: $MARKETING_NAME" >> "$RESULT_DIR/run_info.txt"
+fi
+if [[ -n "$PRODUCT_TYPE" ]]; then
+  echo "Product Type: $PRODUCT_TYPE" >> "$RESULT_DIR/run_info.txt"
+fi
+if [[ -n "$HARDWARE_MODEL" ]]; then
+  echo "Hardware Model: $HARDWARE_MODEL" >> "$RESULT_DIR/run_info.txt"
+fi
 
 benchmark_print_run_summary "ios" "$DEVICE_NAME" "$STARTED_AT" "$FINISHED_AT" "$RESULT_DIR"

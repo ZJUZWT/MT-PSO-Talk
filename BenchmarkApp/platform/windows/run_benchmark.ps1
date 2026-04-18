@@ -4,6 +4,7 @@ param(
 )
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$releaseBinary = Join-Path $scriptDir "..\packages\windows\compression_benchmark_cli.exe"
 $appRoot = Resolve-Path (Join-Path $scriptDir "..\..")
 $buildConfiguration = if ($env:BENCHMARK_WINDOWS_CONFIGURATION) {
     $env:BENCHMARK_WINDOWS_CONFIGURATION
@@ -18,21 +19,25 @@ $buildConfiguration = if ($env:BENCHMARK_WINDOWS_CONFIGURATION) {
 }
 
 if (-not $BinaryPath) {
-    $buildRoot = if ($env:BUILD_ROOT) {
-        $env:BUILD_ROOT
+    if (Test-Path $releaseBinary) {
+        $BinaryPath = $releaseBinary
     } else {
-        Join-Path $appRoot "..\build\BenchmarkApp"
-    }
+        $buildRoot = if ($env:BUILD_ROOT) {
+            $env:BUILD_ROOT
+        } else {
+            Join-Path $appRoot "..\build\BenchmarkApp"
+        }
 
-    $binaryCandidates = @(
-        (Join-Path $buildRoot "windows\platform\windows\compression_benchmark_cli.exe"),
-        (Join-Path $buildRoot "windows\platform\windows\$buildConfiguration\compression_benchmark_cli.exe"),
-        (Join-Path $buildRoot "windows\$buildConfiguration\platform\windows\compression_benchmark_cli.exe")
-    )
+        $binaryCandidates = @(
+            (Join-Path $buildRoot "windows\platform\windows\compression_benchmark_cli.exe"),
+            (Join-Path $buildRoot "windows\platform\windows\$buildConfiguration\compression_benchmark_cli.exe"),
+            (Join-Path $buildRoot "windows\$buildConfiguration\platform\windows\compression_benchmark_cli.exe")
+        )
 
-    $BinaryPath = $binaryCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
-    if (-not $BinaryPath) {
-        $BinaryPath = $binaryCandidates[0]
+        $BinaryPath = $binaryCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+        if (-not $BinaryPath) {
+            $BinaryPath = $binaryCandidates[0]
+        }
     }
 }
 
@@ -41,7 +46,11 @@ if (-not (Test-Path $BinaryPath)) {
 }
 
 if (-not $OutputRoot) {
-    $OutputRoot = Join-Path $appRoot "..\benchmark_results"
+    if (Test-Path $releaseBinary) {
+        $OutputRoot = Join-Path $scriptDir "..\..\benchmark_results"
+    } else {
+        $OutputRoot = Join-Path $appRoot "..\benchmark_results"
+    }
 }
 
 $startedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")

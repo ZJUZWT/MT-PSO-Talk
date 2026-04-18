@@ -11,6 +11,8 @@
 @interface BenchmarkViewController : UIViewController
 @property (nonatomic, strong) UITextView* textView;
 @property (nonatomic, strong) UIButton* runButton;
+@property (nonatomic, assign) BOOL benchmarkRunning;
+@property (nonatomic, assign) BOOL didAutoStartBenchmark;
 @end
 
 @implementation BenchmarkViewController
@@ -30,11 +32,25 @@
         self.view.bounds.size.width - 40, self.view.bounds.size.height - 140)];
     self.textView.font = [UIFont fontWithName:@"Menlo" size:10];
     self.textView.editable = NO;
-    self.textView.text = @"Tap 'Run' to start compression and decompression benchmarks...";
+    self.textView.text = @"Preparing compression and decompression benchmarks...";
     [self.view addSubview:self.textView];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    if (!self.didAutoStartBenchmark) {
+        self.didAutoStartBenchmark = YES;
+        [self runBenchmark];
+    }
+}
+
 - (void)runBenchmark {
+    if (self.benchmarkRunning) {
+        return;
+    }
+
+    self.benchmarkRunning = YES;
     self.textView.text = @"Running benchmark...\n";
     [self.runButton setEnabled:NO];
 
@@ -71,6 +87,7 @@
 
         dispatch_async(dispatch_get_main_queue(), ^{
             self.textView.text = resultText;
+            self.benchmarkRunning = NO;
             [self.runButton setEnabled:YES];
         });
     });

@@ -53,3 +53,26 @@ if ! rg -q '^ios_ipa: packages/ios/PSOBenchmarkApp.ipa$' "$RELEASE_ROOT/manifest
   echo "Expected iOS IPA entry in manifest"
   exit 1
 fi
+
+if [[ -d "$RELEASE_ROOT/results" ]]; then
+  echo "Release assembly should not create a volatile results directory inside release/"
+  exit 1
+fi
+
+for runner in \
+  "$RELEASE_ROOT/scripts/run_macos.sh" \
+  "$RELEASE_ROOT/scripts/run_android.sh" \
+  "$RELEASE_ROOT/scripts/run_android.ps1" \
+  "$RELEASE_ROOT/scripts/run_ios.sh" \
+  "$RELEASE_ROOT/scripts/run_ios.ps1" \
+  "$RELEASE_ROOT/scripts/run_windows.ps1"; do
+  if ! rg -q 'benchmark_results' "$runner"; then
+    echo "Expected runner to default to benchmark_results outside release/: $runner"
+    exit 1
+  fi
+
+  if rg -q '\.\./results|\\results' "$runner"; then
+    echo "Runner should not default to release/results: $runner"
+    exit 1
+  fi
+done

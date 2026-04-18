@@ -72,7 +72,7 @@ if (-not (Test-Path $AppPath)) {
 
 if (-not $OutputRoot) {
     if (Test-Path $releaseApp) {
-        $OutputRoot = Join-Path $scriptDir "..\results"
+        $OutputRoot = Join-Path $scriptDir "..\..\benchmark_results"
     } else {
         $appRoot = Resolve-Path (Join-Path $scriptDir "..\..")
         $OutputRoot = Join-Path $appRoot "..\benchmark_results"
@@ -117,6 +117,9 @@ try {
     $deviceIdentifier = $selectedDevice.identifier
     $deviceName = $selectedDevice.deviceProperties.name
     $deviceUdid = $selectedDevice.hardwareProperties.udid
+    $marketingName = $selectedDevice.hardwareProperties.marketingName
+    $productType = $selectedDevice.hardwareProperties.productType
+    $hardwareModel = $selectedDevice.hardwareProperties.hardwareModel
 
     $startedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
     $dirTimestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
@@ -193,6 +196,9 @@ try {
         "CSV: compression_results.csv"
         "Bundle Identifier: $bundleId"
         "Device Identifier: $deviceIdentifier"
+        $(if ($marketingName) { "Marketing Name: $marketingName" })
+        $(if ($productType) { "Product Type: $productType" })
+        $(if ($hardwareModel) { "Hardware Model: $hardwareModel" })
     ) | Set-Content -Path $runInfoPath
 
     Write-Host "=== Benchmark Complete ==="

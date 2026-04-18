@@ -14,7 +14,7 @@ if (-not (Test-Path $BinaryPath)) {
 }
 
 if (-not $OutputRoot) {
-    $OutputRoot = Join-Path $scriptDir "..\results"
+    $OutputRoot = Join-Path $scriptDir "..\..\benchmark_results"
 }
 
 $startedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")

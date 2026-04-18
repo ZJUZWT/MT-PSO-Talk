@@ -12,7 +12,6 @@ WINDOWS_CONFIGURATION=$(benchmark_windows_configuration)
 
 PACKAGES_DIR="$RELEASE_ROOT/packages"
 SCRIPTS_DIR="$RELEASE_ROOT/scripts"
-RESULTS_DIR="$RELEASE_ROOT/results"
 MANIFEST_PATH="$RELEASE_ROOT/manifest.txt"
 
 copy_if_present() {
@@ -36,7 +35,7 @@ write_manifest_line() {
 
 rm -rf "$RELEASE_ROOT"
 mkdir -p "$PACKAGES_DIR/macos" "$PACKAGES_DIR/android" "$PACKAGES_DIR/ios" "$PACKAGES_DIR/windows"
-mkdir -p "$SCRIPTS_DIR/common" "$SCRIPTS_DIR/ios" "$RESULTS_DIR"
+mkdir -p "$SCRIPTS_DIR/common" "$SCRIPTS_DIR/ios"
 
 cp "$APP_ROOT/platform/common/result_bundle.sh" "$SCRIPTS_DIR/common/result_bundle.sh"
 cp "$APP_ROOT/platform/ios/ios_device_utils.sh" "$SCRIPTS_DIR/ios/ios_device_utils.sh"
@@ -97,7 +96,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 source "$SCRIPT_DIR/common/result_bundle.sh"
 
 BINARY_PATH="${1:-$SCRIPT_DIR/../packages/macos/benchmark_main}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../../benchmark_results}"
 
 if [[ ! -x "$BINARY_PATH" ]]; then
   echo "macOS benchmark binary not found: $BINARY_PATH"
@@ -139,7 +138,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 source "$SCRIPT_DIR/common/result_bundle.sh"
 
 BINARY_PATH="${1:-$SCRIPT_DIR/../packages/android/pso_benchmark}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../../benchmark_results}"
 DEVICE_DIR="${ANDROID_DEVICE_DIR:-/data/local/tmp/pso_benchmark}"
 
 if [[ ! -f "$BINARY_PATH" ]]; then
@@ -192,7 +191,7 @@ source "$SCRIPT_DIR/common/result_bundle.sh"
 source "$SCRIPT_DIR/ios/ios_device_utils.sh"
 
 APP_PATH="${1:-$SCRIPT_DIR/../packages/ios/PSOBenchmarkApp.app}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../../benchmark_results}"
 POLL_INTERVAL_SECONDS="${POLL_INTERVAL_SECONDS:-5}"
 POLL_TIMEOUT_SECONDS="${POLL_TIMEOUT_SECONDS:-900}"
 DEVICE_OVERRIDE="${IOS_DEVICE:-}"
@@ -300,7 +299,7 @@ if (-not (Test-Path $BinaryPath)) {
 }
 
 if (-not $OutputRoot) {
-    $OutputRoot = Join-Path $scriptDir "..\results"
+    $OutputRoot = Join-Path $scriptDir "..\..\benchmark_results"
 }
 
 $startedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")

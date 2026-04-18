@@ -102,6 +102,7 @@ else()
 endif()
 
 add_library(benchmark_graphics STATIC
+    driver/common/apple_device_lookup.cpp
     driver/native/native_backend_stub.cpp
     driver/common/timing_model.cpp
     driver/common/backend_factory.cpp

@@ -5,7 +5,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 source "$SCRIPT_DIR/common/result_bundle.sh"
 
 BINARY_PATH="${1:-$SCRIPT_DIR/../packages/macos/benchmark_main}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../../benchmark_results}"
 
 if [[ ! -x "$BINARY_PATH" ]]; then
   echo "macOS benchmark binary not found: $BINARY_PATH"

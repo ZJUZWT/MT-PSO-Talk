@@ -72,7 +72,7 @@ if (-not (Test-Path $AppPath)) {
 
 if (-not $OutputRoot) {
     if (Test-Path $releaseApp) {
-        $OutputRoot = Join-Path $scriptDir "..\results"
+        $OutputRoot = Join-Path $scriptDir "..\..\benchmark_results"
     } else {
         $appRoot = Resolve-Path (Join-Path $scriptDir "..\..")
         $OutputRoot = Join-Path $appRoot "..\benchmark_results"

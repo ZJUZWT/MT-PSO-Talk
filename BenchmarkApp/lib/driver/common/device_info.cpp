@@ -1,3 +1,4 @@
+#include "driver/common/apple_device_lookup.h"
 #include "driver/common/device_info.h"
 
 #include <string>
@@ -10,9 +11,72 @@
 
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
+#include <sys/sysctl.h>
+#include <sys/utsname.h>
 #endif
 
 namespace benchmark {
+
+#if defined(__APPLE__)
+namespace {
+
+std::string read_sysctl_string(const char* name) {
+    size_t size = 0;
+    if (sysctlbyname(name, nullptr, &size, nullptr, 0) != 0 || size == 0) {
+        return {};
+    }
+
+    std::string value(size, '\0');
+    if (sysctlbyname(name, value.data(), &size, nullptr, 0) != 0 || size == 0) {
+        return {};
+    }
+
+    value.resize(size);
+    while (!value.empty() && (value.back() == '\0' || value.back() == '\n')) {
+        value.pop_back();
+    }
+    return value;
+}
+
+std::string read_uname_field_machine() {
+    utsname system_info{};
+    if (uname(&system_info) != 0) {
+        return {};
+    }
+    return std::string(system_info.machine);
+}
+
+std::string read_uname_field_release() {
+    utsname system_info{};
+    if (uname(&system_info) != 0) {
+        return {};
+    }
+    return std::string(system_info.release);
+}
+
+std::string build_os_version_label(const char* platform_label) {
+    std::string version = read_sysctl_string("kern.osproductversion");
+    if (version.empty()) {
+        version = read_uname_field_release();
+    }
+    if (version.empty()) {
+        return std::string(platform_label);
+    }
+    return std::string(platform_label) + " " + version;
+}
+
+std::string format_apple_device_model(const std::string& identifier, const AppleProductInfo& info) {
+    if (identifier.empty()) {
+        return info.marketing_name;
+    }
+    if (info.marketing_name.empty()) {
+        return identifier;
+    }
+    return info.marketing_name + " [" + identifier + "]";
+}
+
+}  // namespace
+#endif
 
 #if defined(__ANDROID__)
 
@@ -47,9 +111,43 @@ DeviceInfo query_device_info() {
 
 DeviceInfo query_device_info() {
     DeviceInfo info;
-    info.device_model = "iOS Device";
-    info.soc = "Apple Silicon";
-    info.os_version = "iOS";
+    std::string identifier = read_sysctl_string("hw.machine");
+    if (identifier.empty()) {
+        identifier = read_uname_field_machine();
+    }
+
+#if TARGET_OS_SIMULATOR
+    if (identifier.empty()) {
+        info.device_model = "iOS Simulator";
+    } else {
+        info.device_model = "iOS Simulator [" + identifier + "]";
+    }
+
+    info.soc = read_sysctl_string("machdep.cpu.brand_string");
+    if (info.soc.empty()) {
+        info.soc = identifier.empty() ? "Simulator CPU" : identifier;
+    }
+    info.os_version = build_os_version_label("iOS Simulator");
+#else
+    const AppleProductInfo product_info = lookup_apple_product_info(identifier);
+    info.device_model = format_apple_device_model(identifier, product_info);
+    if (info.device_model.empty()) {
+        info.device_model = "iOS Device";
+    }
+
+    info.soc = product_info.soc;
+    if (info.soc.empty()) {
+        std::string hardware_model = read_sysctl_string("hw.model");
+        if (!hardware_model.empty()) {
+            info.soc = "Unknown Apple SoC [" + hardware_model + "]";
+        } else if (!identifier.empty()) {
+            info.soc = "Unknown Apple SoC [" + identifier + "]";
+        } else {
+            info.soc = "Unknown Apple SoC";
+        }
+    }
+    info.os_version = build_os_version_label("iOS");
+#endif
     info.gpu_name = "Apple GPU";
     info.driver_version = "N/A";
     return info;
@@ -71,9 +169,20 @@ DeviceInfo query_device_info() {
 
 DeviceInfo query_device_info() {
     DeviceInfo info;
-    info.device_model = "Mac";
-    info.soc = "Apple Silicon";
-    info.os_version = "macOS";
+    info.device_model = read_sysctl_string("hw.model");
+    if (info.device_model.empty()) {
+        info.device_model = read_uname_field_machine();
+    }
+    if (info.device_model.empty()) {
+        info.device_model = "Mac";
+    }
+
+    info.soc = read_sysctl_string("machdep.cpu.brand_string");
+    if (info.soc.empty()) {
+        info.soc = "Unknown Apple CPU";
+    }
+
+    info.os_version = build_os_version_label("macOS");
     info.gpu_name = "Apple GPU";
     info.driver_version = "N/A";
     return info;

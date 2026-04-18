@@ -129,8 +129,43 @@ int main() {
     benchmark::GraphicsResult gr_special{};
     gr_special.platform = "Android";
     gr_special.device_model = "Pixel,8,Pro";
+    gr_special.soc = "Apple \"M1\" Pro";
     const auto special_json = benchmark::export_graphics_json(gr_special);
     test_support::expect_contains(special_json, "Pixel", "special json has device");
+
+    const auto special_graphics_csv = benchmark::export_graphics_csv_row(gr_special);
+    test_support::expect_contains(special_graphics_csv, "\"Pixel,8,Pro\"",
+                                  "graphics csv quotes device_model with commas");
+    test_support::expect_contains(special_graphics_csv, "\"Apple \"\"M1\"\" Pro\"",
+                                  "graphics csv escapes embedded quotes");
+
+    benchmark::CompressionResult cr_special{};
+    cr_special.platform = "macOS";
+    cr_special.algorithm = "zstd";
+    cr_special.baseline_package_id = "compression-bench-zstd";
+    cr_special.device_model = "MacBookPro18,1";
+    cr_special.soc = "Apple M1 Pro";
+    cr_special.os_version = "macOS 14.6.1";
+    cr_special.version = "1.5.6";
+    cr_special.level = "3";
+    cr_special.payload_profile = "pso_like";
+    cr_special.iteration_index = 0;
+    cr_special.input_size = 1024;
+    cr_special.compressed_size = 128;
+    cr_special.compression_ratio = 8.0;
+    cr_special.compress_us = 10;
+    cr_special.throughput_mbps = 100.0;
+    cr_special.input_hash = "input";
+    cr_special.compressed_output_hash = "compressed";
+    cr_special.decompress_us = 5;
+    cr_special.decompressed_output_hash = "roundtrip";
+    cr_special.roundtrip_hash_match = true;
+    cr_special.roundtrip_byte_match = true;
+    cr_special.status = "passed";
+
+    const auto special_compression_csv = benchmark::export_compression_csv_row(cr_special);
+    test_support::expect_contains(special_compression_csv, "\"MacBookPro18,1\"",
+                                  "compression csv quotes device_model with commas");
 
     return test_support::finish();
 }

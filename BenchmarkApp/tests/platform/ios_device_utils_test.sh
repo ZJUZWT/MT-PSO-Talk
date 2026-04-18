@@ -33,6 +33,9 @@ cat > "$TMP_DIR/devices.json" <<'EOF'
           "name" : "Bench iPhone"
         },
         "hardwareProperties" : {
+          "hardwareModel" : "D83AP",
+          "marketingName" : "Bench iPhone 15 Pro",
+          "productType" : "iPhone16,1",
           "udid" : "AVAILABLE-UDID"
         }
       }
@@ -56,6 +59,24 @@ fi
 selected_udid=$(benchmark_ios_lookup_device_udid "$TMP_DIR/devices.json" "AVAILABLE-DEVICE")
 if [[ "$selected_udid" != "AVAILABLE-UDID" ]]; then
   echo "Expected AVAILABLE-UDID, got: $selected_udid"
+  exit 1
+fi
+
+selected_marketing_name=$(benchmark_ios_lookup_marketing_name "$TMP_DIR/devices.json" "AVAILABLE-DEVICE")
+if [[ "$selected_marketing_name" != "Bench iPhone 15 Pro" ]]; then
+  echo "Expected Bench iPhone 15 Pro, got: $selected_marketing_name"
+  exit 1
+fi
+
+selected_product_type=$(benchmark_ios_lookup_product_type "$TMP_DIR/devices.json" "AVAILABLE-DEVICE")
+if [[ "$selected_product_type" != "iPhone16,1" ]]; then
+  echo "Expected iPhone16,1, got: $selected_product_type"
+  exit 1
+fi
+
+selected_hardware_model=$(benchmark_ios_lookup_hardware_model "$TMP_DIR/devices.json" "AVAILABLE-DEVICE")
+if [[ "$selected_hardware_model" != "D83AP" ]]; then
+  echo "Expected D83AP, got: $selected_hardware_model"
   exit 1
 fi
 

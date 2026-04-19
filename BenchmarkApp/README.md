@@ -4,7 +4,8 @@
 
 ## What It Runs
 
-- Built-in and vendored compression algorithms, including `noop`, `zstd`, `lz4`, `zlib`, `snappy`, `brotli`, and Oodle `kraken` / `leviathan` / `mermaid` / `selkie`
+- Built-in compression algorithms, including `noop`, `zstd`, `lz4`, `zlib`, `snappy`, and `brotli`
+- Optional Oodle `kraken` / `leviathan` / `mermaid` / `selkie` when a licensed Oodle SDK is supplied locally
 - End-to-end compression and decompression timing
 - JSON and CSV export for product benchmarking
 - Multi-profile stress coverage by default: `pso_like`, `high_compressibility`, and `low_compressibility`
@@ -15,10 +16,37 @@ Graphics benchmarking code is still present in the repo, but the product default
 
 ## Oodle SDK Layout
 
-The project vendors Unreal Engine `OodleDataCompression` SDK `2.9.12` under:
+This repository does not ship the proprietary Oodle SDK. To enable Oodle,
+provide a licensed Unreal Engine `OodleDataCompression` SDK `2.9.12` in one of
+these ways:
+
+- Copy it into the placeholder tree under:
 
 ```text
 BenchmarkApp/third_party/oodle/2.9.12
+```
+
+- Or point CMake at a private copy:
+
+```bash
+cmake -S BenchmarkApp -B build/benchmark \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBENCHMARK_OODLE_ROOT=/absolute/path/to/OodleDataCompression/Sdks/2.9.12
+```
+
+- Or set an environment variable before invoking any build script:
+
+```bash
+export BENCHMARK_OODLE_ROOT=/absolute/path/to/OodleDataCompression/Sdks/2.9.12
+```
+
+Expected layout:
+
+```text
+BenchmarkApp/third_party/oodle/2.9.12
+├── include/oodle2.h
+├── include/oodle2base.h
+└── lib/...
 ```
 
 Platform selection is automatic:
@@ -27,6 +55,9 @@ Platform selection is automatic:
 - Windows: `lib/Win64/oo2core_win64.lib`
 - Android: `lib/Android/<abi>/liboo2coreandroid.a`
 - iOS: `lib/IOS/liboo2coreios.a`
+
+If the SDK is missing, the project still builds, but Oodle algorithms are not
+compiled into the benchmark.
 
 ## Build
 
@@ -50,6 +81,15 @@ Manual desktop configure/build remains available:
 
 ```bash
 cmake -S BenchmarkApp -B build/benchmark -DCMAKE_BUILD_TYPE=Release
+cmake --build build/benchmark -j4
+```
+
+Desktop configure/build with a private Oodle SDK:
+
+```bash
+cmake -S BenchmarkApp -B build/benchmark \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBENCHMARK_OODLE_ROOT=/absolute/path/to/OodleDataCompression/Sdks/2.9.12
 cmake --build build/benchmark -j4
 ```
 
@@ -169,6 +209,7 @@ BenchmarkApp/platform/release/assemble_release.sh
 
 - Compression results use the active host platform label instead of the old `Simulated` placeholder.
 - On supported Apple and Android devices, the benchmark collects real timing data from the running device.
+- The committed `BenchmarkApp/third_party/oodle/` tree only contains placeholder docs and empty folders; actual Oodle SDK files remain gitignored and must be supplied locally.
 - Cross-device performance comparisons must use `Release` builds on every platform. An
   unoptimized desktop build can make macOS appear dramatically slower than Android even
   when the hardware is faster.

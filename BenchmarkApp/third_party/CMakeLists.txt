@@ -59,9 +59,20 @@ target_include_directories(tp_brotli PUBLIC ${THIRD_PARTY_DIR}/brotli/include)
 target_include_directories(tp_brotli PRIVATE ${THIRD_PARTY_DIR}/brotli)
 target_compile_options(tp_brotli PRIVATE -w)
 
-# --- oodle (Proprietary, precompiled from UE OodleDataCompression SDK) ---
-set(OODLE_ROOT_DIR ${THIRD_PARTY_DIR}/oodle/2.9.12)
-set(OODLE_INCLUDE_DIR ${OODLE_ROOT_DIR}/include)
+# --- oodle (Proprietary, locally supplied from a licensed UE OodleDataCompression SDK) ---
+set(BENCHMARK_OODLE_ROOT "" CACHE PATH
+    "Path to a licensed Oodle 2.9.12 SDK root that contains include/ and lib/")
+
+if(BENCHMARK_OODLE_ROOT)
+    set(_benchmark_oodle_root_hint "${BENCHMARK_OODLE_ROOT}")
+elseif(DEFINED ENV{BENCHMARK_OODLE_ROOT} AND NOT "$ENV{BENCHMARK_OODLE_ROOT}" STREQUAL "")
+    set(_benchmark_oodle_root_hint "$ENV{BENCHMARK_OODLE_ROOT}")
+else()
+    set(_benchmark_oodle_root_hint "${THIRD_PARTY_DIR}/oodle/2.9.12")
+endif()
+
+file(TO_CMAKE_PATH "${_benchmark_oodle_root_hint}" OODLE_ROOT_DIR)
+set(OODLE_INCLUDE_DIR "${OODLE_ROOT_DIR}/include")
 set(OODLE_LIBRARY_PATH "")
 
 if(ANDROID)
@@ -93,10 +104,19 @@ elseif(WIN32)
     )
 endif()
 
-if(OODLE_LIBRARY_PATH AND EXISTS ${OODLE_LIBRARY_PATH} AND EXISTS ${OODLE_INCLUDE_DIR})
+if(OODLE_LIBRARY_PATH
+   AND EXISTS "${OODLE_LIBRARY_PATH}"
+   AND EXISTS "${OODLE_INCLUDE_DIR}/oodle2.h"
+   AND EXISTS "${OODLE_INCLUDE_DIR}/oodle2base.h")
     add_library(tp_oodle STATIC IMPORTED GLOBAL)
     set_target_properties(tp_oodle PROPERTIES
-        IMPORTED_LOCATION ${OODLE_LIBRARY_PATH}
-        INTERFACE_INCLUDE_DIRECTORIES ${OODLE_INCLUDE_DIR}
+        IMPORTED_LOCATION "${OODLE_LIBRARY_PATH}"
+        INTERFACE_INCLUDE_DIRECTORIES "${OODLE_INCLUDE_DIR}"
     )
+    message(STATUS "BenchmarkApp: Oodle SDK enabled from ${OODLE_ROOT_DIR}")
+else()
+    message(STATUS
+        "BenchmarkApp: Oodle SDK not found for this platform. "
+        "Set BENCHMARK_OODLE_ROOT (or env BENCHMARK_OODLE_ROOT) to a licensed "
+        "Oodle 2.9.12 SDK root to enable Oodle algorithms.")
 endif()

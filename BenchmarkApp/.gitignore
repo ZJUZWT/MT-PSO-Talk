@@ -18,8 +18,18 @@ out/
 *.o
 *.a
 
-# Proprietary libraries (do not distribute)
-third_party/oodle/
+# Proprietary libraries (keep only placeholder docs in git)
+third_party/oodle/*
+!third_party/oodle/README.md
+!third_party/oodle/2.9.12/
+third_party/oodle/2.9.12/*
+!third_party/oodle/2.9.12/include/
+!third_party/oodle/2.9.12/lib/
+!third_party/oodle/2.9.12/README.md
+third_party/oodle/2.9.12/include/*
+third_party/oodle/2.9.12/lib/*
+!third_party/oodle/2.9.12/include/.gitkeep
+!third_party/oodle/2.9.12/lib/.gitkeep
 
 # Mesa build output (source is a submodule)
 third_party/mesa/build/

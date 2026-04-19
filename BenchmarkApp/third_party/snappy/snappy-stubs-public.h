@@ -6,7 +6,13 @@
 #include <cstdint>
 #include <string>
 
-#if defined(__has_include)
+#if defined(_WIN32)
+// Windows doesn't have sys/uio.h, define iovec manually
+struct iovec {
+  void* iov_base;
+  size_t iov_len;
+};
+#elif defined(__has_include)
 #if __has_include(<sys/uio.h>)
 #include <sys/uio.h>
 #endif

@@ -10,7 +10,11 @@ add_library(tp_lz4 STATIC
     ${THIRD_PARTY_DIR}/lz4/lz4hc.c
 )
 target_include_directories(tp_lz4 PUBLIC ${THIRD_PARTY_DIR}/lz4)
-target_compile_options(tp_lz4 PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_lz4 PRIVATE /W0)
+else()
+    target_compile_options(tp_lz4 PRIVATE -w)
+endif()
 
 # --- zstd (BSD-3-Clause) ---
 file(GLOB ZSTD_COMMON_SRC ${THIRD_PARTY_DIR}/zstd/common/*.c)
@@ -22,14 +26,27 @@ target_include_directories(tp_zstd
     PRIVATE ${THIRD_PARTY_DIR}/zstd/common
 )
 target_compile_definitions(tp_zstd PRIVATE ZSTD_MULTITHREAD=0 XXH_NAMESPACE=ZSTD_)
-target_compile_options(tp_zstd PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_zstd PRIVATE /W0)
+else()
+    target_compile_options(tp_zstd PRIVATE -w)
+endif()
 
 # --- zlib (Zlib License) ---
 file(GLOB ZLIB_SRC ${THIRD_PARTY_DIR}/zlib/*.c)
 add_library(tp_zlib STATIC ${ZLIB_SRC})
 target_include_directories(tp_zlib PUBLIC ${THIRD_PARTY_DIR}/zlib)
-target_compile_definitions(tp_zlib PRIVATE _LARGEFILE64_SOURCE=1 HAVE_UNISTD_H=1)
-target_compile_options(tp_zlib PRIVATE -w -Wno-error=implicit-function-declaration)
+if(WIN32)
+    # On Windows, don't define _LARGEFILE64_SOURCE to avoid including unistd.h
+    target_compile_definitions(tp_zlib PRIVATE HAVE_UNISTD_H=0)
+else()
+    target_compile_definitions(tp_zlib PRIVATE _LARGEFILE64_SOURCE=1 HAVE_UNISTD_H=1)
+endif()
+if(MSVC)
+    target_compile_options(tp_zlib PRIVATE /W0)
+else()
+    target_compile_options(tp_zlib PRIVATE -w -Wno-error=implicit-function-declaration)
+endif()
 
 # --- snappy (BSD-3-Clause) ---
 add_library(tp_snappy STATIC
@@ -47,7 +64,11 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
 else()
     target_compile_definitions(tp_snappy PRIVATE SNAPPY_HAVE_NEON=0 SNAPPY_HAVE_SSSE3=0)
 endif()
-target_compile_options(tp_snappy PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_snappy PRIVATE /W0)
+else()
+    target_compile_options(tp_snappy PRIVATE -w)
+endif()
 
 # --- brotli (MIT) ---
 file(GLOB BROTLI_COMMON_SRC ${THIRD_PARTY_DIR}/brotli/common/*.c)
@@ -57,7 +78,11 @@ add_library(tp_brotli STATIC ${BROTLI_COMMON_SRC} ${BROTLI_ENC_SRC} ${BROTLI_DEC
 target_include_directories(tp_brotli PUBLIC ${THIRD_PARTY_DIR}/brotli/include)
 # Brotli internal sources include relative paths like "../common/..."
 target_include_directories(tp_brotli PRIVATE ${THIRD_PARTY_DIR}/brotli)
-target_compile_options(tp_brotli PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_brotli PRIVATE /W0)
+else()
+    target_compile_options(tp_brotli PRIVATE -w)
+endif()
 
 # --- oodle (Proprietary, locally supplied from a licensed UE OodleDataCompression SDK) ---
 set(BENCHMARK_OODLE_ROOT "" CACHE PATH

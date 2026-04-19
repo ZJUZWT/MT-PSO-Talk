@@ -155,13 +155,65 @@ DeviceInfo query_device_info() {
 
 #elif defined(_WIN32)
 
+#include <windows.h>
+#include <intrin.h>
+
 DeviceInfo query_device_info() {
     DeviceInfo info;
     info.device_model = "Windows PC";
-    info.soc = "Unknown";
-    info.os_version = "Windows";
     info.gpu_name = "Unknown";
     info.driver_version = "N/A";
+    
+    // Get Windows version
+    OSVERSIONINFOEXA osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEXA));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXA);
+    #pragma warning(push)
+    #pragma warning(disable: 4996)
+    if (GetVersionExA((OSVERSIONINFOA*)&osvi)) {
+        info.os_version = "Windows " + std::to_string(osvi.dwMajorVersion) + "." + std::to_string(osvi.dwMinorVersion);
+    } else {
+        info.os_version = "Windows";
+    }
+    #pragma warning(pop)
+    
+    // Get CPU brand string using CPUID
+    int cpuInfo[4] = {-1};
+    char cpuBrandString[0x40] = {0};
+    
+    // Check if CPUID supports brand string
+    __cpuid(cpuInfo, 0x80000000);
+    unsigned int nExIds = cpuInfo[0];
+    
+    if (nExIds >= 0x80000004) {
+        // Get brand string (48 bytes across 3 CPUID calls)
+        __cpuid(cpuInfo, 0x80000002);
+        memcpy(cpuBrandString, cpuInfo, sizeof(cpuInfo));
+        __cpuid(cpuInfo, 0x80000003);
+        memcpy(cpuBrandString + 16, cpuInfo, sizeof(cpuInfo));
+        __cpuid(cpuInfo, 0x80000004);
+        memcpy(cpuBrandString + 32, cpuInfo, sizeof(cpuInfo));
+        
+        // Trim whitespace
+        std::string brand(cpuBrandString);
+        size_t start = brand.find_first_not_of(" \t\r\n");
+        size_t end = brand.find_last_not_of(" \t\r\n");
+        if (start != std::string::npos && end != std::string::npos) {
+            info.soc = brand.substr(start, end - start + 1);
+        } else {
+            info.soc = brand;
+        }
+    } else {
+        info.soc = "Unknown CPU";
+    }
+    
+    // Try to get computer name as device model
+    char computerName[MAX_COMPUTERNAME_LENGTH + 1];
+    DWORD size = sizeof(computerName);
+    if (GetComputerNameA(computerName, &size)) {
+        info.device_model = std::string(computerName);
+    }
+    
     return info;
 }
 

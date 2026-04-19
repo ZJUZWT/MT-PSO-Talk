@@ -31,3 +31,7 @@ Docs/.archive/
 .claude/
 test-results/
 Docs/superpowers/
+buildlog.txt
+scripts/check_*.py
+scripts/compare_*.py
+scripts/verify_*.py

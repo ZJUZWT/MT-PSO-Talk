@@ -1,0 +1,9 @@
+Platform: windows
+Device: MRKILL
+Started At (UTC): 2026-04-19T08:47:43Z
+Finished At (UTC): 2026-04-19T08:47:43Z
+Source Path: d:/Code/AIProjects/MT-PSO-Talk/build/BenchmarkApp/windows/platform/windows/Release/compression_benchmark_cli.exe
+JSON: benchmark_report.json
+CSV: compression_results.csv
+OS Version: Windows 11
+CPU: 13th Gen Intel(R) Core(TM) i7-13700F

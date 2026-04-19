@@ -1,9 +1,0 @@
-Platform: macos
-Device: SWANNZHANG-MB0
-Device ID: MacBookPro18,1
-Started At (UTC): 2026-04-17T04:18:42Z
-Finished At (UTC): 2026-04-17T04:18:51Z
-Source Path: /tmp/mt-pso-benchmark-runners/lib/benchmark_main
-JSON: benchmark_report.json
-CSV: compression_results.csv
-OS Version: macOS 14.6.1

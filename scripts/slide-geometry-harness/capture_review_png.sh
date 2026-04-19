@@ -13,6 +13,8 @@ PREFIX="review-capture"
 SCOPE="page"
 SOURCE_URL="http://127.0.0.1:4173/?step=page_09"
 VIRTUAL_TIME_BUDGET_MS=4000
+DEFAULT_VIEWPORT_WIDTH="1280"
+DEFAULT_VIEWPORT_HEIGHT="720"
 
 usage() {
   cat <<'EOF'
@@ -33,10 +35,23 @@ EOF
 resolve_front_edge_viewport() {
   local bounds_raw left top right bottom
 
-  bounds_raw="$(osascript -e 'tell application "Microsoft Edge" to get bounds of front window')"
-  IFS=', ' read -r left top right bottom <<< "$bounds_raw"
+  if bounds_raw="$(osascript -e 'tell application "Microsoft Edge" to get bounds of front window' 2>/dev/null)"; then
+    IFS=', ' read -r left top right bottom <<< "$bounds_raw"
+    if [[ -n "${left:-}" && -n "${top:-}" && -n "${right:-}" && -n "${bottom:-}" ]]; then
+      printf '%s %s\n' "$((right - left))" "$((bottom - top))"
+      return 0
+    fi
+  fi
 
-  printf '%s %s\n' "$((right - left))" "$((bottom - top))"
+  printf '%s %s\n' "$DEFAULT_VIEWPORT_WIDTH" "$DEFAULT_VIEWPORT_HEIGHT"
+}
+
+ensure_source_url_reachable() {
+  if ! curl --silent --show-error --fail --max-time 4 "$SOURCE_URL" >/dev/null; then
+    echo "Source URL is not reachable: $SOURCE_URL" >&2
+    echo "Hint: make sure SlideApp dev server is running (npm --prefix SlideApp run dev)." >&2
+    exit 1
+  fi
 }
 
 build_browser_capture_url() {
@@ -142,6 +157,7 @@ case "$MODE" in
     fi
 
     mkdir -p "$OUTDIR"
+    ensure_source_url_reachable
 
     read -r VIEWPORT_WIDTH VIEWPORT_HEIGHT < <(resolve_front_edge_viewport)
 

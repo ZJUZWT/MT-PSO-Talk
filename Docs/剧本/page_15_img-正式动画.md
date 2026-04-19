@@ -18,7 +18,7 @@
 | 布局分数 | `7.3/10` | 插图页结构稳定。 |
 | Node 分数 | `7.0/10` | 图片为主。 |
 | Edge 分数 | `7.0/10` | 渐变关系为主。 |
-| 动画分数 | `8.2/10` | `15_img -> 15` 为 `in_range`。 |
+| 动画分数 | `待复核` | `2026-04-19` fresh timing audit：`13_img -> 15_img` 为 `in_range`，`15_img -> 15` 为 `too_long`，本次仅修整图显示，未改 step frame。 |
 
 ## 动画剧本
 
@@ -28,7 +28,16 @@
 
 ## Current screenshot
 
-![Current screenshot](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/ignore/review-refresh-20260417/page_15_img.png)
+![Current screenshot](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/ignore/slide-stage-captures/20260419-153030/page15img-whole-image-fixed.png)
+
+- 当前 URL：`http://127.0.0.1:4173/?variant=bus-clean&step=page_15_img`
+- 捕获方式：`headless-stage`
+- 捕获来源记录：`/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/ignore/slide-stage-captures/20260419-153030/page15img-whole-image-fixed.txt`
+- 几何客观事实：
+  - 原图尺寸：`901 x 305`，宽高比约 `2.954`
+  - 旧图片框：`1188 x 648`，宽高比约 `1.833`，配合 `xMidYMid slice` 会必然裁掉左右内容
+  - 新图片框：`1188 x 430`，宽高比约 `2.763`，改为 `xMidYMid meet` 后整图完整显示
+  - 以满宽显示时，图片实际可见高度约 `402px`，上下各留约 `14px` 内边距
 
 ## 三层 Review 总表
 
@@ -53,5 +62,5 @@
 ## 过渡动画剧本与时长审查
 
 - `13_img -> 15_img`：`1.000s`，`in_range`
-- `15_img -> 15`：`1.000s`，`in_range`
-
+- `15_img -> 15`：`1.750s`，`too_long`
+- Fresh audit source：`/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/ignore/transition-audits/page15img-20260419/transition-timing-audit-20260419-153119.md`

@@ -6,6 +6,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 EDGE_BIN="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
 VIEWPORT_WIDTH=""
 VIEWPORT_HEIGHT=""
+DEFAULT_VIEWPORT_WIDTH="1280"
+DEFAULT_VIEWPORT_HEIGHT="720"
 VIRTUAL_TIME_BUDGET_MS=3500
 PREFIX="stage-capture"
 SOURCE_URL="http://127.0.0.1:4173/?step=page_09"
@@ -21,9 +23,31 @@ Defaults:
   --url     http://127.0.0.1:4173/?step=page_09
   --outdir  <repo>/ignore/slide-stage-captures/<timestamp>/
   --prefix  stage-capture
-  --width   current front Edge window width
-  --height  current front Edge window height
+  --width   current front Edge window width (fallback 1280)
+  --height  current front Edge window height (fallback 720)
 EOF
+}
+
+ensure_source_url_reachable() {
+  if ! curl --silent --show-error --fail --max-time 4 "$SOURCE_URL" >/dev/null; then
+    echo "Source URL is not reachable: $SOURCE_URL" >&2
+    echo "Hint: make sure SlideApp dev server is running (npm --prefix SlideApp run dev)." >&2
+    exit 1
+  fi
+}
+
+resolve_front_window_viewport() {
+  local bounds_raw left top right bottom
+
+  if bounds_raw="$(osascript -e 'tell application "Microsoft Edge" to get bounds of front window' 2>/dev/null)"; then
+    IFS=', ' read -r left top right bottom <<< "$bounds_raw"
+    if [[ -n "${left:-}" && -n "${top:-}" && -n "${right:-}" && -n "${bottom:-}" ]]; then
+      printf '%s %s\n' "$((right - left))" "$((bottom - top))"
+      return 0
+    fi
+  fi
+
+  printf '%s %s\n' "$DEFAULT_VIEWPORT_WIDTH" "$DEFAULT_VIEWPORT_HEIGHT"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -71,12 +95,12 @@ if [[ -z "$OUTDIR" ]]; then
 fi
 
 mkdir -p "$OUTDIR"
+ensure_source_url_reachable
 
 if [[ -z "$VIEWPORT_WIDTH" || -z "$VIEWPORT_HEIGHT" ]]; then
-  BOUNDS_RAW="$(osascript -e 'tell application "Microsoft Edge" to get bounds of front window')"
-  IFS=', ' read -r LEFT TOP RIGHT BOTTOM <<< "$BOUNDS_RAW"
-  [[ -z "$VIEWPORT_WIDTH" ]] && VIEWPORT_WIDTH=$((RIGHT - LEFT))
-  [[ -z "$VIEWPORT_HEIGHT" ]] && VIEWPORT_HEIGHT=$((BOTTOM - TOP))
+  read -r AUTO_WIDTH AUTO_HEIGHT < <(resolve_front_window_viewport)
+  [[ -z "$VIEWPORT_WIDTH" ]] && VIEWPORT_WIDTH="$AUTO_WIDTH"
+  [[ -z "$VIEWPORT_HEIGHT" ]] && VIEWPORT_HEIGHT="$AUTO_HEIGHT"
 fi
 
 CAPTURE_URL="$(python3 - "$SOURCE_URL" "$VIEWPORT_WIDTH" "$VIEWPORT_HEIGHT" <<'PY'

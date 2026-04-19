@@ -7,7 +7,7 @@ source "$APP_ROOT/platform/common/result_bundle.sh"
 
 DEFAULT_BINARY="$APP_ROOT/../build/BenchmarkApp/macos/lib/benchmark_main"
 LEGACY_BINARY="$APP_ROOT/../build/benchmark/lib/benchmark_main"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../benchmark_results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../release/results}"
 
 BINARY_PATH="${1:-}"
 if [[ -z "$BINARY_PATH" ]]; then

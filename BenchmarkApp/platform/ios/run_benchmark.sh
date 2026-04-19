@@ -8,7 +8,7 @@ source "$APP_ROOT/platform/common/build_settings.sh"
 source "$SCRIPT_DIR/ios_device_utils.sh"
 
 APP_PATH="${1:-$(benchmark_ios_app_path "$APP_ROOT" device)}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../benchmark_results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../release/results}"
 POLL_INTERVAL_SECONDS="${POLL_INTERVAL_SECONDS:-5}"
 POLL_TIMEOUT_SECONDS="${POLL_TIMEOUT_SECONDS:-900}"
 DEVICE_OVERRIDE="${IOS_DEVICE:-}"

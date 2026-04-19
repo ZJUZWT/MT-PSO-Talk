@@ -1,0 +1,15 @@
+Preparing device 张文韬的iPad...
+23:36:57  Acquired tunnel connection to device.
+23:36:57  Enabling developer disk image services.
+23:36:57  Acquired usage assertion.
+5%... 7%... 8%... 12%... 15%... 22%... 24%... 30%... 32%... 37%... 39%... 42%... 44%... 48%... 51%... 57%... 59%... 60%... 62%... 66%... 68%... 72%... 76%... 80%... 84%... 88%... 92%... 96%... Complete!
+App installed:
+? bundleID: com.swannzhang.psobenchmark
+? installationURL: file:///private/var/containers/Bundle/Application/8296C50E-A807-4748-A0A5-80F193E7A777/PSOBenchmarkApp.app/
+? launchServicesIdentifier: unknown
+? databaseUUID: C2CCB1DC-C335-40A5-A17A-68CE68323243
+? databaseSequenceNumber: 1768
+? options: 
+23:37:00  Acquired tunnel connection to device.
+23:37:00  Enabling developer disk image services.
+23:37:00  Acquired usage assertion.

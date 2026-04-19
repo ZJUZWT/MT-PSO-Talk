@@ -1,0 +1,37 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "install",
+      "app",
+      "--device",
+      "552A97AB-B0C2-446E-A66A-B18C684A76B1",
+      "/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/build/BenchmarkApp/ios-device/platform/ios/Release-iphoneos/PSOBenchmarkApp.app",
+      "--json-output",
+      "/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../benchmark_results/ios/20260418T160315Z/install.json"
+    ],
+    "commandType" : "devicectl.device.install.app",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 2,
+    "outcome" : "success",
+    "version" : "397.30"
+  },
+  "result" : {
+    "deviceIdentifier" : "552A97AB-B0C2-446E-A66A-B18C684A76B1",
+    "installedApplications" : [
+      {
+        "bundleID" : "com.swannzhang.psobenchmark",
+        "databaseSequenceNumber" : 1776,
+        "databaseUUID" : "C2CCB1DC-C335-40A5-A17A-68CE68323243",
+        "installationURL" : "file:///private/var/containers/Bundle/Application/D0272498-076F-438B-B661-40471BE4960F/PSOBenchmarkApp.app/",
+        "launchServicesIdentifier" : "unknown",
+        "options" : {
+
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+Compression Benchmark (256KB payload)
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │       256 KB │    1.00x │           3028 │              969 │      86 MB/s │
+ zstd         │        10 KB │   25.45x │         174192 │             1925 │      26 MB/s │
+ lz4          │        17 KB │   16.07x │           8745 │             1632 │      36 MB/s │
+ zlib         │        12 KB │   21.94x │           8889 │             2262 │      30 MB/s │
+ snappy       │        25 KB │   10.32x │           2246 │             2354 │     111 MB/s │
+ brotli       │        10 KB │   25.93x │         647661 │             2163 │      26 MB/s │
+ oodle_kraken │        14 KB │   21.00x │           4937 │             1651 │      51 MB/s │
+ oodle_leviathan │         9 KB │   27.92x │           5904 │             1682 │      43 MB/s │
+ oodle_mermaid │        18 KB │   15.85x │           5237 │             1687 │      48 MB/s │
+ oodle_selkie │        46 KB │    8.22x │           5434 │             1623 │      46 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+
+Compression Benchmark Summary
+═════════════════════
+Platform: macOS | Device: Mac | SoC: Apple Silicon
+
+Compression: 10 algorithms × 1 payload size(s) = 66 results
+  Best ratio: oodle_leviathan — 31.22x
+  Fastest decompress: noop — 953 μs
+
+JSON written to /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../benchmark_results/macos/20260417T041842Z/benchmark_report.json
+Compression CSV written to /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../benchmark_results/macos/20260417T041842Z/compression_results.csv

@@ -66,13 +66,13 @@ for runner in \
   "$RELEASE_ROOT/scripts/run_ios.sh" \
   "$RELEASE_ROOT/scripts/run_ios.ps1" \
   "$RELEASE_ROOT/scripts/run_windows.ps1"; do
-  if ! rg -q 'benchmark_results' "$runner"; then
-    echo "Expected runner to default to benchmark_results outside release/: $runner"
+  if ! rg -q '\.\./results|\\results' "$runner"; then
+    echo "Expected runner to default to release/results: $runner"
     exit 1
   fi
 
-  if rg -q '\.\./results|\\results' "$runner"; then
-    echo "Runner should not default to release/results: $runner"
+  if rg -q 'benchmark_results' "$runner"; then
+    echo "Runner should not default to benchmark_results anymore: $runner"
     exit 1
   fi
 done

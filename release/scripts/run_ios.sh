@@ -6,7 +6,7 @@ source "$SCRIPT_DIR/common/result_bundle.sh"
 source "$SCRIPT_DIR/ios/ios_device_utils.sh"
 
 APP_PATH="${1:-$SCRIPT_DIR/../packages/ios/PSOBenchmarkApp.app}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../../benchmark_results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../results}"
 POLL_INTERVAL_SECONDS="${POLL_INTERVAL_SECONDS:-5}"
 POLL_TIMEOUT_SECONDS="${POLL_TIMEOUT_SECONDS:-900}"
 DEVICE_OVERRIDE="${IOS_DEVICE:-}"

@@ -7,7 +7,7 @@ source "$APP_ROOT/platform/common/result_bundle.sh"
 
 BINARY=${1:-"$APP_ROOT/../build/BenchmarkApp/android-arm64-v8a/platform/android/pso_benchmark"}
 DEVICE_DIR="${ANDROID_DEVICE_DIR:-/data/local/tmp/pso_benchmark}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../benchmark_results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../release/results}"
 
 if [[ ! -f "$BINARY" ]]; then
   echo "Android benchmark binary not found: $BINARY"

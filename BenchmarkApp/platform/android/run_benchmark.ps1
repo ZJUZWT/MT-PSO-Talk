@@ -52,10 +52,10 @@ if (-not (Test-Path $BinaryPath)) {
 
 if (-not $OutputRoot) {
     if (Test-Path $releaseBinary) {
-        $OutputRoot = Join-Path $scriptDir "..\..\benchmark_results"
+        $OutputRoot = Join-Path $scriptDir "..\..\release\results"
     } else {
         $appRoot = Resolve-Path (Join-Path $scriptDir "..\..")
-        $OutputRoot = Join-Path $appRoot "..\benchmark_results"
+        $OutputRoot = Join-Path $appRoot "..\release\results"
     }
 }
 

@@ -1,0 +1,9 @@
+Platform: macos
+Device: SWANNZHANG-MB0
+Device ID: MacBookPro18,1
+Started At (UTC): 2026-04-18T15:25:56Z
+Finished At (UTC): 2026-04-18T15:26:57Z
+Source Path: /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/release/scripts/../packages/macos/benchmark_main
+JSON: benchmark_report.json
+CSV: compression_results.csv
+OS Version: macOS 14.6.1

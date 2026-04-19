@@ -1,0 +1,69 @@
+{
+  "error" : {
+    "code" : 10002,
+    "domain" : "com.apple.dt.CoreDeviceError",
+    "userInfo" : {
+      "BundleIdentifier" : {
+        "string" : "com.swannzhang.psobenchmark"
+      },
+      "NSLocalizedDescription" : {
+        "string" : "The application failed to launch."
+      },
+      "NSUnderlyingError" : {
+        "error" : {
+          "code" : 1,
+          "domain" : "FBSOpenApplicationServiceErrorDomain",
+          "userInfo" : {
+            "BSErrorCodeDescription" : {
+              "string" : "RequestDenied"
+            },
+            "FBSOpenApplicationRequestID" : {
+              "string" : "0xc369"
+            },
+            "NSLocalizedDescription" : {
+              "string" : "The request to open \"com.swannzhang.psobenchmark\" failed."
+            },
+            "NSLocalizedFailureReason" : {
+              "string" : "The request was denied by service delegate (SBMainWorkspace) for reason: Security (\"Unable to launch com.swannzhang.psobenchmark because it has an invalid code signature, inadequate entitlements or its profile has not been explicitly trusted by the user\")."
+            },
+            "NSUnderlyingError" : {
+              "error" : {
+                "code" : 3,
+                "domain" : "FBSOpenApplicationErrorDomain",
+                "userInfo" : {
+                  "BSErrorCodeDescription" : {
+                    "string" : "Security"
+                  },
+                  "NSLocalizedFailureReason" : {
+                    "string" : "Unable to launch com.swannzhang.psobenchmark because it has an invalid code signature, inadequate entitlements or its profile has not been explicitly trusted by the user."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "process",
+      "launch",
+      "--device",
+      "552A97AB-B0C2-446E-A66A-B18C684A76B1",
+      "--terminate-existing",
+      "com.swannzhang.psobenchmark",
+      "--json-output",
+      "/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../benchmark_results/ios/20260418T160315Z/launch.json"
+    ],
+    "commandType" : "devicectl.device.process.launch",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 2,
+    "outcome" : "failed",
+    "version" : "397.30"
+  }
+}

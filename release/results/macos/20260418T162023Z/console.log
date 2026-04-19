@@ -1,0 +1,156 @@
+Compression Benchmark
+Payload Profile: pso_like | Payload Size: 64KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │        64 KB │    1.00x │             90 │                2 │     698 MB/s │
+ zstd         │         3 KB │   22.36x │           6110 │               34 │     197 MB/s │
+ lz4          │         5 KB │   14.36x │            281 │                4 │     390 MB/s │
+ zlib         │         3 KB │   19.82x │            706 │               63 │     145 MB/s │
+ snappy       │         6 KB │   10.37x │            196 │               21 │     399 MB/s │
+ brotli       │         3 KB │   23.43x │          40500 │               46 │     182 MB/s │
+ oodle_kraken │         4 KB │   19.04x │            253 │               19 │     254 MB/s │
+ oodle_leviathan │         3 KB │   24.85x │           1727 │               18 │     126 MB/s │
+ oodle_mermaid │         5 KB │   12.95x │            203 │               14 │     318 MB/s │
+ oodle_selkie │        12 KB │    7.15x │            260 │               10 │     266 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: pso_like | Payload Size: 256KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │       256 KB │    1.00x │            356 │               10 │     703 MB/s │
+ zstd         │        10 KB │   25.45x │          24829 │               87 │     249 MB/s │
+ lz4          │        17 KB │   16.07x │           1228 │               19 │     358 MB/s │
+ zlib         │        12 KB │   21.94x │           2729 │              239 │     163 MB/s │
+ snappy       │        25 KB │   10.32x │            524 │               75 │     497 MB/s │
+ brotli       │        10 KB │   25.93x │         167217 │              177 │     172 MB/s │
+ oodle_kraken │        14 KB │   21.00x │            967 │               80 │     286 MB/s │
+ oodle_leviathan │         9 KB │   27.92x │           1735 │               85 │     186 MB/s │
+ oodle_mermaid │        18 KB │   15.85x │           1262 │               76 │     230 MB/s │
+ oodle_selkie │        46 KB │    8.22x │            961 │               36 │     284 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: pso_like | Payload Size: 1024KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │      1024 KB │    1.00x │           1450 │               73 │     691 MB/s │
+ zstd         │        39 KB │   26.68x │          73644 │              238 │     257 MB/s │
+ lz4          │        65 KB │   16.34x │           4861 │              115 │     353 MB/s │
+ zlib         │        46 KB │   22.61x │          10510 │              978 │     178 MB/s │
+ snappy       │        99 KB │   10.31x │           1803 │              301 │     555 MB/s │
+ brotli       │        39 KB │   26.94x │         680992 │              745 │     198 MB/s │
+ oodle_kraken │        55 KB │   21.14x │           3718 │              336 │     280 MB/s │
+ oodle_leviathan │        37 KB │   28.24x │           6613 │              241 │     190 MB/s │
+ oodle_mermaid │        72 KB │   16.22x │           3833 │              345 │     282 MB/s │
+ oodle_selkie │       179 KB │    8.30x │           3255 │              197 │     327 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: high_compressibility | Payload Size: 64KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │        64 KB │    1.00x │            939 │               18 │     444 MB/s │
+ zstd         │         7 KB │    9.63x │          12299 │               18 │     237 MB/s │
+ lz4          │         8 KB │    8.44x │            377 │                2 │     359 MB/s │
+ zlib         │         7 KB │    9.15x │           1368 │               71 │     122 MB/s │
+ snappy       │         9 KB │    6.80x │            112 │                7 │     561 MB/s │
+ brotli       │         7 KB │    9.49x │          33659 │               39 │     162 MB/s │
+ oodle_kraken │         6 KB │    9.88x │            276 │                7 │     254 MB/s │
+ oodle_leviathan │         6 KB │   10.01x │           1421 │                9 │     140 MB/s │
+ oodle_mermaid │         7 KB │    9.00x │            270 │                6 │     270 MB/s │
+ oodle_selkie │         8 KB │    7.66x │            212 │                7 │     313 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: high_compressibility | Payload Size: 256KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │       256 KB │    1.00x │            726 │               18 │     556 MB/s │
+ zstd         │        26 KB │    9.73x │          75447 │               39 │     226 MB/s │
+ lz4          │        29 KB │    8.69x │           1504 │               13 │     318 MB/s │
+ zlib         │        28 KB │    9.19x │           5443 │              281 │     134 MB/s │
+ snappy       │        38 KB │    6.80x │            389 │               49 │     643 MB/s │
+ brotli       │        27 KB │    9.57x │         141886 │              134 │     175 MB/s │
+ oodle_kraken │        26 KB │   10.00x │            739 │               22 │     365 MB/s │
+ oodle_leviathan │        25 KB │   10.12x │           1563 │               30 │     212 MB/s │
+ oodle_mermaid │        28 KB │    9.09x │            900 │               24 │     349 MB/s │
+ oodle_selkie │        33 KB │    7.74x │            806 │               27 │     365 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: high_compressibility | Payload Size: 1024KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │      1024 KB │    1.00x │           1448 │              191 │     692 MB/s │
+ zstd         │       106 KB │    9.64x │         191843 │              211 │     229 MB/s │
+ lz4          │       118 KB │    8.70x │           5798 │               82 │     337 MB/s │
+ zlib         │       111 KB │    9.20x │          21223 │             1148 │     138 MB/s │
+ snappy       │       151 KB │    6.80x │           1694 │              199 │     600 MB/s │
+ brotli       │       107 KB │    9.57x │         575238 │              580 │     189 MB/s │
+ oodle_kraken │       103 KB │    9.98x │           3324 │              124 │     339 MB/s │
+ oodle_leviathan │       101 KB │   10.09x │           5756 │              121 │     217 MB/s │
+ oodle_mermaid │       113 KB │    9.04x │           3031 │               90 │     388 MB/s │
+ oodle_selkie │       133 KB │    7.72x │           2801 │              116 │     423 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: low_compressibility | Payload Size: 64KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │        64 KB │    1.00x │             87 │                2 │     717 MB/s │
+ zstd         │        58 KB │    1.10x │           1435 │               14 │     114 MB/s │
+ lz4          │        59 KB │    1.08x │            524 │                5 │     281 MB/s │
+ zlib         │        58 KB │    1.10x │           1807 │              227 │      43 MB/s │
+ snappy       │        59 KB │    1.08x │            139 │                5 │     481 MB/s │
+ brotli       │        58 KB │    1.10x │          50042 │              195 │      79 MB/s │
+ oodle_kraken │        58 KB │    1.10x │            479 │                6 │     197 MB/s │
+ oodle_leviathan │        58 KB │    1.11x │           2165 │               44 │      82 MB/s │
+ oodle_mermaid │        58 KB │    1.10x │            507 │                7 │     157 MB/s │
+ oodle_selkie │        61 KB │    1.05x │            446 │               10 │     263 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: low_compressibility | Payload Size: 256KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │       256 KB │    1.00x │            351 │               22 │     713 MB/s │
+ zstd         │       232 KB │    1.10x │           5405 │               43 │     123 MB/s │
+ lz4          │       236 KB │    1.08x │           2595 │               15 │     265 MB/s │
+ zlib         │       233 KB │    1.10x │           8210 │              907 │      39 MB/s │
+ snappy       │       237 KB │    1.08x │            476 │               50 │     537 MB/s │
+ brotli       │       233 KB │    1.10x │         195636 │             1065 │      77 MB/s │
+ oodle_kraken │       232 KB │    1.10x │           1890 │               28 │     194 MB/s │
+ oodle_leviathan │       231 KB │    1.11x │           4032 │               78 │     101 MB/s │
+ oodle_mermaid │       234 KB │    1.10x │           2075 │               24 │     216 MB/s │
+ oodle_selkie │       245 KB │    1.05x │           1822 │               25 │     289 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+Payload Profile: low_compressibility | Payload Size: 1024KB
+════════════════════════════════════════════════════════════════════════════════════════════
+ Algorithm    │   Compressed │    Ratio │  Compress(μs) │  Decompress(μs) │   Throughput │
+════════════════════════════════════════════════════════════════════════════════════════════
+ noop         │      1024 KB │    1.00x │           2357 │               53 │     453 MB/s │
+ zstd         │       924 KB │    1.11x │          20449 │              181 │     140 MB/s │
+ lz4          │       944 KB │    1.08x │          11288 │              107 │     229 MB/s │
+ zlib         │       933 KB │    1.10x │          33730 │             3679 │      38 MB/s │
+ snappy       │       948 KB │    1.08x │           1971 │              294 │     508 MB/s │
+ brotli       │       933 KB │    1.10x │         612560 │             4377 │      78 MB/s │
+ oodle_kraken │       927 KB │    1.10x │           7926 │              165 │     183 MB/s │
+ oodle_leviathan │       922 KB │    1.11x │          16558 │              141 │     108 MB/s │
+ oodle_mermaid │       935 KB │    1.10x │           7120 │              152 │     212 MB/s │
+ oodle_selkie │       980 KB │    1.05x │           6315 │               89 │     260 MB/s │
+════════════════════════════════════════════════════════════════════════════════════════════
+
+
+Compression Benchmark Summary
+═════════════════════
+Platform: macOS 14.6.1 | Device: MacBookPro18,1 | SoC: Apple M1 Pro
+
+Compression: 10 algorithms × 3 payload profile(s) × 3 payload size(s) × 5 iteration(s) = 990 results
+  Best ratio: zstd — 31.93x
+  Fastest decompress: noop — 0 μs
+
+JSON written to /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../benchmark_results/macos/20260418T162023Z/benchmark_report.json
+Compression CSV written to /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../benchmark_results/macos/20260418T162023Z/compression_results.csv

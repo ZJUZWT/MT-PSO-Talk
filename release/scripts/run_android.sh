@@ -5,7 +5,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 source "$SCRIPT_DIR/common/result_bundle.sh"
 
 BINARY_PATH="${1:-$SCRIPT_DIR/../packages/android/pso_benchmark}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../../benchmark_results}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$SCRIPT_DIR/../results}"
 DEVICE_DIR="${ANDROID_DEVICE_DIR:-/data/local/tmp/pso_benchmark}"
 
 if [[ ! -f "$BINARY_PATH" ]]; then

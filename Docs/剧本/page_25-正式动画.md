@@ -55,3 +55,8 @@
 - `24 -> 25`：`1.183s`，`in_range`
 - `25 -> 26`：`1.183s`，`in_range`
 
+## 2026-04-20 转场复核补记
+
+- 新增复核结论：`page_24 -> page_25` 的中段帧 `2724` 已不再闪回旧 loop-stage。
+- 替换行为：旧的 placeholder handoff 会在交接中段露出 `rec.upipelinecache / stablepc.csv / .scl.csv / .ushaderbytecode`；现在改成相邻占位卡直接 crossfade，旧 stage 持续被 suppress。
+- 当前结果：这一段既不会闪回，也不会中间空白，仍保持策略页文本内容连续。

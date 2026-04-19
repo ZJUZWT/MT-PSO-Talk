@@ -54,4 +54,4 @@
 
 - `18 -> 18_img`：`1.000s`，`in_range`
 - `18_img -> 19`：`1.000s`，`in_range`
-
+- 2026-04-20 transition review：`18_img -> 19` 的出页触发改为跟随 `page_19` 的实际可见度，而不是更早的 reveal；这样中途不会再闪回到底下的旧 loop stage。

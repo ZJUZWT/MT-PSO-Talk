@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "old_strategy_fade",
+      "kind": "fade_out",
+      "description": "策略 4 占位页整体淡出"
+    },
+    {
+      "id": "reading_title_move",
+      "kind": "node_move",
+      "distancePx": 120,
+      "description": "阅读页标题落位"
+    },
+    {
+      "id": "reading_cards_move",
+      "kind": "node_move",
+      "distancePx": 180,
+      "description": "双栏推荐卡进入"
+    },
+    {
+      "id": "reading_page_fade",
+      "kind": "fade_in",
+      "description": "阅读页正文淡入"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 220,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "reading_page_fade_out",
+      "kind": "fade_out",
+      "description": "推荐页整体淡出"
+    },
+    {
+      "id": "quote_block_move",
+      "kind": "node_move",
+      "distancePx": 160,
+      "description": "引句主块进入中心"
+    },
+    {
+      "id": "quote_source_move",
+      "kind": "node_move",
+      "distancePx": 100,
+      "description": "出处与尾注落位"
+    },
+    {
+      "id": "quote_page_fade_in",
+      "kind": "fade_in",
+      "description": "结尾引句淡入"
+    }
+  ]
+}

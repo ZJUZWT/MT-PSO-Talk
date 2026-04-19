@@ -248,6 +248,39 @@ def build_workload_payload(preset: WorkloadPreset) -> dict[str, Any]:
     }
 
 
+def load_workload_override(
+    repo_root: Path,
+    from_step: str,
+    to_step: str,
+) -> tuple[dict[str, Any] | None, str | None]:
+    workload_dir = repo_root / "Docs/剧本/workloads"
+
+    def compact_step_id(step_id: str) -> str:
+        return re.sub(r"^page_(\d+)", r"page\1", step_id)
+
+    candidate_names = [
+        f"{from_step}_to_{to_step}.json",
+        f"{compact_step_id(from_step)}_to_{compact_step_id(to_step)}.json",
+    ]
+    workload_path = next(
+        (workload_dir / candidate for candidate in candidate_names if (workload_dir / candidate).exists()),
+        None,
+    )
+    if workload_path is None:
+        return None, None
+
+    payload = json.loads(workload_path.read_text(encoding="utf-8"))
+    if isinstance(payload, list):
+        payload = {"actions": payload}
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"Invalid workload override json: {workload_path}")
+
+    payload.setdefault("phaseOrder", PHASE_ORDER)
+    payload.setdefault("holdBeforeMs", 120)
+    payload.setdefault("holdAfterMs", 180)
+    return payload, f"file:{workload_path.name}"
+
+
 def run_probe(
     repo_root: Path,
     from_step: str,
@@ -446,8 +479,18 @@ def main() -> None:
     for idx in range(len(sequence) - 1):
         from_step = sequence[idx]
         to_step = sequence[idx + 1]
-        preset = select_preset(from_step, to_step)
-        workload = build_workload_payload(preset)
+        workload_override, override_label = load_workload_override(
+            repo_root,
+            from_step,
+            to_step,
+        )
+        if workload_override is not None:
+            workload = workload_override
+            preset_label = override_label or "override"
+        else:
+            preset = select_preset(from_step, to_step)
+            workload = build_workload_payload(preset)
+            preset_label = preset.name
         probe = run_probe(
             repo_root=repo_root,
             from_step=from_step,
@@ -457,7 +500,7 @@ def main() -> None:
             workload_payload=workload,
         )
         probes.append(probe)
-        presets_used.append(preset.name)
+        presets_used.append(preset_label)
 
     rows, target_step_frames = collect_transition_rows(sequence, probes, presets_used)
 

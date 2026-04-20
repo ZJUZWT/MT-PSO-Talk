@@ -82,3 +82,25 @@
 - `timing_placeholder`：剧本里有时长审计章节，但还是占位；
 - `no_shot`：缺当前截图；
 - 动画异常以 `verdict != in_range` 为准。
+
+## 流程层 Gate（给 agent / hook 用）
+
+如果希望在“开始做”和“准备收尾”这两个阶段都自动进入 harness 流程，可以直接调仓库里的 gate：
+
+1. 分类本次任务：
+   `python3 scripts/slide-geometry-harness/workflow_gate.py classify --prompt "修改 page_31 左边卡片文案" --files SlideApp/src/storyboard-data/pso-storyboard.ts --write-state`
+2. 准备结束时按上一步的 state 执行对应审计：
+   `python3 scripts/slide-geometry-harness/workflow_gate.py stop --state-path .git/slide-geometry-harness-workflow-state.json`
+
+当前分流规则：
+
+- `skip`：不属于 slide/harness 工作
+- `lite`：轻量页面/文案/notes/storyboard 任务，默认跑 `audit_storyboard_sync.py`
+- `full`：几何/动画/时长/剧本 workload 任务，默认跑 `audit_transition_timings.py` + `audit_storyboard_sync.py`
+
+当前仓库也已经接了 Codex repo-local hook：
+
+- `.codex/hooks.json`
+- `UserPromptSubmit` 会调用 `workflow_gate.py codex-user-prompt-submit`
+- `Stop` 会调用 `workflow_gate.py codex-stop`
+- hook 层只负责把 Codex 事件接到 gate；真正的分类规则与审计命令仍以 `workflow_gate.py` 为唯一事实来源

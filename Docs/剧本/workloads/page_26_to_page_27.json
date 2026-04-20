@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 100,
+  "holdAfterMs": 140,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_timing_strategy",
+      "kind": "fade_out",
+      "description": "收集 / 编译解耦页整体淡出"
+    },
+    {
+      "id": "move_parallel_pipeline",
+      "kind": "node_move",
+      "distancePx": 110,
+      "description": "单队列到多 worker 的执行结构进入"
+    },
+    {
+      "id": "move_parallel_notes",
+      "kind": "node_move",
+      "distancePx": 140,
+      "description": "适用特征与注意事项卡片落位"
+    },
+    {
+      "id": "fade_in_parallel_footer",
+      "kind": "fade_in",
+      "description": "并行执行方式收束语句淡入"
+    }
+  ]
+}

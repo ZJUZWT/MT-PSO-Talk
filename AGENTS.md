@@ -80,3 +80,19 @@
   - 若 verdict=`too_long`，需要缩短
   - 通过调整 `SlideApp/src/remotion/embed.ts` 的 step frame 锚点完成，并同步更新相关 tests
 - 页面改完后，必须做一次动画 review，并把结果写回该页剧本（`Docs/剧本/`）。
+
+## 8) 流程层 Harness Gate（建议作为 hook 入口）
+
+- 对视觉 / 页面 / 动画相关任务，优先通过仓库内 gate 先做流程分流，而不是只靠模型自己判断：
+  - 分类：
+    `python3 scripts/slide-geometry-harness/workflow_gate.py classify --prompt "<用户任务>" --files <可能改动的文件...> --write-state`
+  - 收尾：
+    `python3 scripts/slide-geometry-harness/workflow_gate.py stop --state-path .git/slide-geometry-harness-workflow-state.json`
+- gate 会把任务分成三档：
+  - `skip`：不是 slide/harness 相关任务
+  - `lite`：文案、notes、storyboard 数据等轻量页面任务；至少跑 `audit_storyboard_sync.py`
+  - `full`：几何、动画、时长、剧本 workload 等任务；至少跑 `audit_transition_timings.py` + `audit_storyboard_sync.py`
+- Codex 侧当前仓库入口放在 `.codex/hooks.json`：
+  - `UserPromptSubmit` -> `workflow_gate.py codex-user-prompt-submit`
+  - `Stop` -> `workflow_gate.py codex-stop`
+- 不要在不同宿主里复制一份判定逻辑；宿主层只做 hook stdin/stdout 适配，真正分类与审计计划统一留在 `workflow_gate.py`。

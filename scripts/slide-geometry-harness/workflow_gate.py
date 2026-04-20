@@ -136,7 +136,7 @@ def build_mechanical_review_command(level: str) -> str | None:
     if level != "full":
         return None
 
-    return "npm --prefix SlideApp run review:mechanical -- --from page_19"
+    return "npm --silent --prefix SlideApp run review:mechanical -- --from page_19"
 
 
 def build_required_checks(level: str) -> list[str]:

@@ -152,6 +152,7 @@ class WorkflowGateTests(unittest.TestCase):
         command = module.build_mechanical_review_command("full")
 
         self.assertIsNotNone(command)
+        self.assertIn("--silent", command)
         self.assertIn("review:mechanical", command)
 
     def test_blocks_when_mechanical_review_reports_blocker_pages(self):

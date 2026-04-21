@@ -1,0 +1,54 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_evidence_overlay",
+      "kind": "fade_out",
+      "phase": "fade_out",
+      "description": "page_18_img 证据页整体淡出"
+    },
+    {
+      "id": "move_left_band",
+      "kind": "node_move",
+      "phase": "node_motion",
+      "distancePx": 160,
+      "description": "stable.upipelinecache 与 UEPSO 组从左侧建立"
+    },
+    {
+      "id": "move_gpu_memory_disk",
+      "kind": "node_move",
+      "phase": "node_motion",
+      "distancePx": 220,
+      "description": "GPU、内存中 PSO、硬盘中的 PSO 依次落位"
+    },
+    {
+      "id": "grow_main_spine",
+      "kind": "edge_grow",
+      "phase": "edge_motion",
+      "lengthPx": 470,
+      "description": "stable -> UEPSO -> GPU -> 内存中 PSO 主中轴长出"
+    },
+    {
+      "id": "grow_disk_cache_routes",
+      "kind": "edge_grow",
+      "phase": "edge_motion",
+      "lengthPx": 286,
+      "description": "三条本地缓存虚线一起补齐"
+    },
+    {
+      "id": "fade_in_labels",
+      "kind": "fade_in",
+      "phase": "fade_in",
+      "description": "组标题和行内标签淡入"
+    }
+  ]
+}

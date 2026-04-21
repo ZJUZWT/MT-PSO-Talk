@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/scripts/slide-geometry-harness/workflow_gate.py\" codex-user-prompt-submit",
+            "statusMessage": "Classifying slide harness workflow",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/scripts/slide-geometry-harness/workflow_gate.py\" codex-stop",
+            "statusMessage": "Running slide harness audits",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

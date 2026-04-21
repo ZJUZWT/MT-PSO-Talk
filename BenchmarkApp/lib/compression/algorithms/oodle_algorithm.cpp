@@ -2,9 +2,15 @@
 
 #include <cstring>
 #include <stdexcept>
+#include <utility>
+
+#if BENCHMARK_HAS_OODLE
 #include <oodle2.h>
+#endif
 
 namespace benchmark {
+
+#if BENCHMARK_HAS_OODLE
 
 class OodleAlgorithm : public CompressionAlgorithm {
 public:
@@ -13,7 +19,7 @@ public:
         : compressor_(compressor), name_(algo_name), levels_(std::move(levels)) {}
 
     std::string name() const override { return name_; }
-    std::string version() const override { return "2.9.8"; }
+    std::string version() const override { return "2.9.12"; }
 
     CompressedPayload compress(const std::vector<uint8_t>& input,
                                const std::string& level) override {
@@ -147,5 +153,49 @@ std::unique_ptr<CompressionAlgorithm> make_oodle_selkie_algorithm() {
         static_cast<OodleLZ_Compressor>(11), "oodle_selkie",
         std::vector<std::string>{"1", "4"});
 }
+
+#else
+
+class OodleUnavailableAlgorithm : public CompressionAlgorithm {
+public:
+    explicit OodleUnavailableAlgorithm(std::string algorithm_name)
+        : name_(std::move(algorithm_name)) {}
+
+    std::string name() const override { return name_; }
+    std::string version() const override { return "2.9.12"; }
+
+    CompressedPayload compress(const std::vector<uint8_t>&, const std::string&) override {
+        throw std::runtime_error(name_ + " is unavailable in this build");
+    }
+
+    std::vector<uint8_t> decompress(const CompressedPayload&) override {
+        throw std::runtime_error(name_ + " is unavailable in this build");
+    }
+
+    std::vector<std::string> supported_levels() const override {
+        return {"1", "4"};
+    }
+
+private:
+    std::string name_;
+};
+
+std::unique_ptr<CompressionAlgorithm> make_oodle_kraken_algorithm() {
+    return std::make_unique<OodleUnavailableAlgorithm>("oodle_kraken");
+}
+
+std::unique_ptr<CompressionAlgorithm> make_oodle_leviathan_algorithm() {
+    return std::make_unique<OodleUnavailableAlgorithm>("oodle_leviathan");
+}
+
+std::unique_ptr<CompressionAlgorithm> make_oodle_mermaid_algorithm() {
+    return std::make_unique<OodleUnavailableAlgorithm>("oodle_mermaid");
+}
+
+std::unique_ptr<CompressionAlgorithm> make_oodle_selkie_algorithm() {
+    return std::make_unique<OodleUnavailableAlgorithm>("oodle_selkie");
+}
+
+#endif
 
 }  // namespace benchmark

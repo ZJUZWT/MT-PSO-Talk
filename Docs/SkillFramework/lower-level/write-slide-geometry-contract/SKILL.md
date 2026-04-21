@@ -54,6 +54,7 @@ If the contract is being stored as a page script markdown artifact for slide ite
 9. `三层 Review 总表`
 10. `节点剧本与 Review 表`
 11. `边剧本与 Review 表`
+12. `过渡动画剧本与时长审查`（当本页存在上一页过渡时）
 
 If the user gave numbered requirements, preserve the numbering in `Acceptance checklist`.
 
@@ -144,6 +145,22 @@ When the contract is written as a page script markdown file after visual iterati
 
 Do not collapse these three layers into one loose paragraph.
 
+### Transition Timeline Rule
+
+When the page has a previous-step transition, the page script markdown must include a transition section with:
+
+- `from_step -> to_step`
+- frame window and total duration
+- duration verdict (`in_range` / `too_short` / `too_long`)
+- retiming decision and frame delta when adjustment is needed
+- checkpoint table with time/frame and node+edge actions at each checkpoint
+
+Default extraction command:
+
+- `python3 scripts/slide-geometry-harness/probe_transition_timeline.py --from-step <prev_step> --to-step <current_step> --workload-json <workload-json> --emit-markdown`
+
+Use optional `--base-seconds` and `--insert-seconds` to verify "inserted pre-animation must not compress original base duration".
+
 ### Spatial Constraints
 
 Write explicit relative geometry such as:
@@ -166,6 +183,17 @@ Specify:
 - label style
 - any hard visual bans
 
+### Collision Contract Rule
+
+The contract must explicitly declare collision policy before rendering:
+
+- `node-node overlap`: default forbidden; only allowed when declared as container membership
+- `edge-edge crossing`: default forbidden; only allowed when crossing point is a declared junction node
+- `edge penetration`: default forbidden; edges may not pass through unrelated node/pill/label interiors
+- `line-on-line co-lane overlay`: default forbidden; only short declared split/merge handoff segments are allowed
+
+If any exception is required, list it by `id`, with reason and expected visual carrier.
+
 ### Assembly Order
 
 Describe the order to place and connect elements so rendering does not improvise topology.
@@ -181,6 +209,7 @@ When the contract lives in a page script markdown file, treat it as the single p
 - the latest review comments
 
 The screenshot, the three-layer review summary, and both tables must be updated together. Do not let the page image drift away from the written review.
+When transition semantics exist, update the transition timing section in the same loop as screenshot and review tables.
 Each page script manages only its own facts and scores. Do not silently carry scores forward from another page.
 
 This rule applies to both:
@@ -198,13 +227,20 @@ Formal pages are not exempt from screenshot, three-layer review, node tables, ed
 - Do not replace exact geometry language with taste words like "balanced enough".
 - Do not use a screenshot critique as a substitute for the contract.
 - Do not let the rendering step invent missing anchors, bends, or alignments.
+- Do not permit node-node overlap unless the contract explicitly marks it as container membership.
+- Do not permit edge-edge crossing unless the contract explicitly declares a junction node at that position.
+- Do not permit edge penetration through unrelated node/pill/label interiors.
+- Do not permit long line-on-line co-lane overlays unless explicitly declared as split/merge handoff.
 - Do not write node or edge review as loose prose when the page script file is supposed to be auditable; use tables.
 - Do not omit the current screenshot from the page script markdown once visual iteration has started.
 - Do not leave a node or edge out of the review tables just because it currently looks bad.
 - Do not skip the `整体布局 Review` score just because node and edge scores already exist.
 - Do not score only sketch mirror pages while leaving formal animation pages on an older template.
 - Do not mark a node or edge as semantically continuous and then re-create it as an unrelated duplicate render carrier without documenting that break.
+- Do not finalize a page with previous-page transition semantics while omitting the transition timing section.
+- Do not compress original base animation duration when adding inserted pre/mid animation unless user explicitly asks for fixed total duration.
 
 ## Reference
 
 Use [references/contract-template.md](references/contract-template.md) as the default output shape.
+For all harness formulas and thresholds, use [../../higher-level/slide-geometry-harness/references/harness-formula-registry.md](../../higher-level/slide-geometry-harness/references/harness-formula-registry.md) as canonical.

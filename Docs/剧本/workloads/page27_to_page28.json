@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "parallel_page_fade_out",
+      "kind": "fade_out",
+      "description": "并行处理页整体淡出"
+    },
+    {
+      "id": "surface_labels_move",
+      "kind": "node_move",
+      "distancePx": 120,
+      "description": "平台标签与图上方标题落位"
+    },
+    {
+      "id": "surface_images_move",
+      "kind": "node_move",
+      "distancePx": 180,
+      "description": "Android / iOS 对照截图与说明卡进入"
+    },
+    {
+      "id": "surface_page_fade_in",
+      "kind": "fade_in",
+      "description": "平台差异表象页淡入"
+    }
+  ]
+}

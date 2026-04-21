@@ -1,36 +1,58 @@
 #!/bin/bash
-# Run PSO benchmark on Android device
-# Prerequisites: adb connected, NDK cross-compiled binary
+set -euo pipefail
 
-set -e
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+APP_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+source "$APP_ROOT/platform/common/result_bundle.sh"
 
-BINARY=${1:-"BenchmarkApp/build-android/pso_benchmark"}
-DEVICE_DIR="/data/local/tmp/pso_benchmark"
-OUTPUT_DIR="benchmark_results"
+BINARY=${1:-"$APP_ROOT/../build/BenchmarkApp/android-arm64-v8a/platform/android/pso_benchmark"}
+DEVICE_DIR="${ANDROID_DEVICE_DIR:-/data/local/tmp/pso_benchmark}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$APP_ROOT/../release/results}"
 
-echo "=== PSO Benchmark Runner ==="
+if [[ ! -f "$BINARY" ]]; then
+  echo "Android benchmark binary not found: $BINARY"
+  exit 1
+fi
+
+ANDROID_SERIAL_VALUE="${ANDROID_SERIAL:-$(adb devices | awk 'NR > 1 && $2 == "device" { print $1; exit }')}"
+if [[ -z "$ANDROID_SERIAL_VALUE" ]]; then
+  echo "No Android device detected. Connect a device or set ANDROID_SERIAL."
+  exit 1
+fi
+
+ADB=(adb -s "$ANDROID_SERIAL_VALUE")
+DEVICE_NAME=$("${ADB[@]}" shell getprop ro.product.model | tr -d '\r')
+ANDROID_VERSION=$("${ADB[@]}" shell getprop ro.build.version.release | tr -d '\r')
+STARTED_AT=$(benchmark_now_iso_utc)
+RESULT_DIR=$(benchmark_create_result_dir "$OUTPUT_ROOT" "android")
+LOG_PATH="$RESULT_DIR/console.log"
 
 # Create device directory
-adb shell "mkdir -p $DEVICE_DIR"
+"${ADB[@]}" shell "mkdir -p $DEVICE_DIR"
 
-# Push binary and shader assets
 echo "Pushing binary..."
-adb push "$BINARY" "$DEVICE_DIR/pso_benchmark"
-adb shell "chmod +x $DEVICE_DIR/pso_benchmark"
+"${ADB[@]}" push "$BINARY" "$DEVICE_DIR/pso_benchmark" | tee "$LOG_PATH"
+"${ADB[@]}" shell "chmod +x $DEVICE_DIR/pso_benchmark"
 
-# Run benchmark
 echo "Running benchmark..."
-adb shell "cd $DEVICE_DIR && \
-    MESA_SHADER_CACHE_DISABLE=true \
-    ./pso_benchmark --json results.json --csv results.csv" 2>&1 | tee /dev/stderr
+"${ADB[@]}" shell "cd $DEVICE_DIR && ./pso_benchmark --json results.json --csv results.csv" 2>&1 | tee -a "$LOG_PATH"
 
 # Pull results
-mkdir -p "$OUTPUT_DIR"
 echo "Pulling results..."
-adb pull "$DEVICE_DIR/results.json" "$OUTPUT_DIR/"
-adb pull "$DEVICE_DIR/results.csv" "$OUTPUT_DIR/"
+"${ADB[@]}" pull "$DEVICE_DIR/results.json" "$RESULT_DIR/benchmark_report.json" | tee -a "$LOG_PATH"
+"${ADB[@]}" pull "$DEVICE_DIR/results.csv" "$RESULT_DIR/compression_results.csv" | tee -a "$LOG_PATH"
 
-echo ""
-echo "=== Results saved to $OUTPUT_DIR/ ==="
-echo "  JSON: $OUTPUT_DIR/results.json"
-echo "  CSV:  $OUTPUT_DIR/results.csv"
+FINISHED_AT=$(benchmark_now_iso_utc)
+benchmark_write_run_info \
+  "$RESULT_DIR/run_info.txt" \
+  "android" \
+  "$DEVICE_NAME" \
+  "$ANDROID_SERIAL_VALUE" \
+  "$STARTED_AT" \
+  "$FINISHED_AT" \
+  "$BINARY" \
+  "benchmark_report.json" \
+  "compression_results.csv"
+echo "OS Version: Android $ANDROID_VERSION" >> "$RESULT_DIR/run_info.txt"
+
+benchmark_print_run_summary "android" "$DEVICE_NAME" "$STARTED_AT" "$FINISHED_AT" "$RESULT_DIR"

@@ -1,0 +1,9 @@
+Platform: android
+Device: NX721J
+Device ID: 320437234243
+Started At (UTC): 2026-04-18T16:20:25Z
+Finished At (UTC): 2026-04-18T16:23:50Z
+Source Path: /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../build/BenchmarkApp/android-arm64-v8a/platform/android/pso_benchmark
+JSON: benchmark_report.json
+CSV: compression_results.csv
+OS Version: Android 14

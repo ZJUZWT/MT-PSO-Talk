@@ -194,12 +194,13 @@ int main() {
         test_support::expect_true(c11.data.size() <= c1.data.size(), "brotli-11 <= brotli-1 size");
     }
 
+#if BENCHMARK_HAS_OODLE
     // ===== Oodle compression tests =====
     // Test oodle_kraken
     {
         auto algo = benchmark::make_oodle_kraken_algorithm();
         test_support::expect_true(algo->name() == "oodle_kraken", "oodle_kraken name");
-        test_support::expect_true(algo->version() == "2.9.8", "oodle_kraken version");
+        test_support::expect_true(algo->version() == "2.9.12", "oodle_kraken version");
 
         test_roundtrip(*algo, "oodle_kraken-1", pso_payload, "1");
         test_roundtrip(*algo, "oodle_kraken-4", pso_payload, "4");
@@ -212,7 +213,7 @@ int main() {
     {
         auto algo = benchmark::make_oodle_leviathan_algorithm();
         test_support::expect_true(algo->name() == "oodle_leviathan", "oodle_leviathan name");
-        test_support::expect_true(algo->version() == "2.9.8", "oodle_leviathan version");
+        test_support::expect_true(algo->version() == "2.9.12", "oodle_leviathan version");
 
         test_roundtrip(*algo, "oodle_leviathan-1", pso_payload, "1");
         test_roundtrip(*algo, "oodle_leviathan-4", pso_payload, "4");
@@ -225,7 +226,7 @@ int main() {
     {
         auto algo = benchmark::make_oodle_mermaid_algorithm();
         test_support::expect_true(algo->name() == "oodle_mermaid", "oodle_mermaid name");
-        test_support::expect_true(algo->version() == "2.9.8", "oodle_mermaid version");
+        test_support::expect_true(algo->version() == "2.9.12", "oodle_mermaid version");
 
         test_roundtrip(*algo, "oodle_mermaid-1", pso_payload, "1");
         test_roundtrip(*algo, "oodle_mermaid-4", pso_payload, "4");
@@ -238,7 +239,7 @@ int main() {
     {
         auto algo = benchmark::make_oodle_selkie_algorithm();
         test_support::expect_true(algo->name() == "oodle_selkie", "oodle_selkie name");
-        test_support::expect_true(algo->version() == "2.9.8", "oodle_selkie version");
+        test_support::expect_true(algo->version() == "2.9.12", "oodle_selkie version");
 
         test_roundtrip(*algo, "oodle_selkie-1", pso_payload, "1");
         test_roundtrip(*algo, "oodle_selkie-4", pso_payload, "4");
@@ -246,6 +247,13 @@ int main() {
         auto c = algo->compress(pso_payload, "1");
         test_support::expect_true(c.data.size() < pso_payload.size(), "oodle_selkie compresses");
     }
+#else
+    {
+        auto algo = benchmark::make_oodle_kraken_algorithm();
+        test_support::expect_true(algo->name() == "oodle_kraken", "oodle_kraken name");
+        test_support::expect_true(algo->version() == "2.9.12", "oodle_kraken version");
+    }
+#endif
 
     // Test with real PSO payload generator data (toy algorithms)
     {

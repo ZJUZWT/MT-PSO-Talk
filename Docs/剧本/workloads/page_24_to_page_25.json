@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 100,
+  "holdAfterMs": 140,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_resource_shape",
+      "kind": "fade_out",
+      "description": "时空互换页整体淡出"
+    },
+    {
+      "id": "move_storage_lane",
+      "kind": "node_move",
+      "distancePx": 110,
+      "description": "内存 / 外存双区与主交换关系进入"
+    },
+    {
+      "id": "move_storage_cards",
+      "kind": "node_move",
+      "distancePx": 140,
+      "description": "选取逻辑、映射机制、外存载体三张卡落位"
+    },
+    {
+      "id": "fade_in_storage_footer",
+      "kind": "fade_in",
+      "description": "IO 组合方法收束语句淡入"
+    }
+  ]
+}

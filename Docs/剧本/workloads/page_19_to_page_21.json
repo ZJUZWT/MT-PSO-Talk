@@ -1,0 +1,40 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_page19_focus",
+      "kind": "fade_out",
+      "phase": "fade_out",
+      "description": "merged page_19 视觉焦点开始退场"
+    },
+    {
+      "id": "move_page21_title",
+      "kind": "node_move",
+      "phase": "node_motion",
+      "durationMs": 180,
+      "description": "page_21 标题轻量落位，直接承接 merged page_19"
+    },
+    {
+      "id": "grow_page21_reading_flow",
+      "kind": "edge_grow",
+      "phase": "edge_motion",
+      "lengthPx": 237,
+      "description": "压缩判断链的阅读流展开"
+    },
+    {
+      "id": "fade_in_page21_cards",
+      "kind": "fade_in",
+      "phase": "fade_in",
+      "description": "page_21 内容卡淡入"
+    }
+  ]
+}

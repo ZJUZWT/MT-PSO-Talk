@@ -1,5 +1,5 @@
-// Minimal iOS benchmark app
-// Runs benchmarks on launch and displays results in a UITextView
+// Minimal iOS compression benchmark app.
+// Runs compression and decompression benchmarks on launch and displays results.
 
 #import <UIKit/UIKit.h>
 #import <Metal/Metal.h>
@@ -11,6 +11,8 @@
 @interface BenchmarkViewController : UIViewController
 @property (nonatomic, strong) UITextView* textView;
 @property (nonatomic, strong) UIButton* runButton;
+@property (nonatomic, assign) BOOL benchmarkRunning;
+@property (nonatomic, assign) BOOL didAutoStartBenchmark;
 @end
 
 @implementation BenchmarkViewController
@@ -20,7 +22,7 @@
     self.view.backgroundColor = [UIColor systemBackgroundColor];
 
     self.runButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.runButton setTitle:@"Run PSO Benchmark" forState:UIControlStateNormal];
+    [self.runButton setTitle:@"Run Compression Benchmark" forState:UIControlStateNormal];
     self.runButton.titleLabel.font = [UIFont boldSystemFontOfSize:20];
     self.runButton.frame = CGRectMake(20, 60, self.view.bounds.size.width - 40, 50);
     [self.runButton addTarget:self action:@selector(runBenchmark) forControlEvents:UIControlEventTouchUpInside];
@@ -30,16 +32,31 @@
         self.view.bounds.size.width - 40, self.view.bounds.size.height - 140)];
     self.textView.font = [UIFont fontWithName:@"Menlo" size:10];
     self.textView.editable = NO;
-    self.textView.text = @"Tap 'Run' to start benchmark...";
+    self.textView.text = @"Preparing compression and decompression benchmarks...";
     [self.view addSubview:self.textView];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    if (!self.didAutoStartBenchmark) {
+        self.didAutoStartBenchmark = YES;
+        [self runBenchmark];
+    }
+}
+
 - (void)runBenchmark {
+    if (self.benchmarkRunning) {
+        return;
+    }
+
+    self.benchmarkRunning = YES;
     self.textView.text = @"Running benchmark...\n";
     [self.runButton setEnabled:NO];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         benchmark::OrchestratorConfig config;
+        config.enable_graphics = false;
         config.graphics_iterations = 3;
         config.compression_iterations = 5;
 
@@ -47,24 +64,30 @@
         auto report = orchestrator.run(config);
 
         std::string output;
-        output += report.graphics_matrix_text + "\n\n";
         output += report.compression_matrix_text + "\n\n";
         output += report.summary_text + "\n";
 
         // Save JSON to Documents
         NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString* docDir = [paths firstObject];
-        NSString* jsonPath = [docDir stringByAppendingPathComponent:@"pso_results.json"];
+        NSString* jsonPath = [docDir stringByAppendingPathComponent:@"compression_results.json"];
+        NSString* csvPath = [docDir stringByAppendingPathComponent:@"compression_results.csv"];
         std::ofstream f([jsonPath UTF8String]);
         f << report.full_json;
         f.close();
 
+        std::ofstream csvFile([csvPath UTF8String]);
+        csvFile << report.compression_csv;
+        csvFile.close();
+
         output += "\nJSON saved to: " + std::string([jsonPath UTF8String]) + "\n";
+        output += "CSV saved to: " + std::string([csvPath UTF8String]) + "\n";
 
         NSString* resultText = [NSString stringWithUTF8String:output.c_str()];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             self.textView.text = resultText;
+            self.benchmarkRunning = NO;
             [self.runButton setEnabled:YES];
         });
     });

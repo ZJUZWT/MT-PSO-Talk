@@ -10,7 +10,11 @@ add_library(tp_lz4 STATIC
     ${THIRD_PARTY_DIR}/lz4/lz4hc.c
 )
 target_include_directories(tp_lz4 PUBLIC ${THIRD_PARTY_DIR}/lz4)
-target_compile_options(tp_lz4 PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_lz4 PRIVATE /W0)
+else()
+    target_compile_options(tp_lz4 PRIVATE -w)
+endif()
 
 # --- zstd (BSD-3-Clause) ---
 file(GLOB ZSTD_COMMON_SRC ${THIRD_PARTY_DIR}/zstd/common/*.c)
@@ -22,14 +26,27 @@ target_include_directories(tp_zstd
     PRIVATE ${THIRD_PARTY_DIR}/zstd/common
 )
 target_compile_definitions(tp_zstd PRIVATE ZSTD_MULTITHREAD=0 XXH_NAMESPACE=ZSTD_)
-target_compile_options(tp_zstd PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_zstd PRIVATE /W0)
+else()
+    target_compile_options(tp_zstd PRIVATE -w)
+endif()
 
 # --- zlib (Zlib License) ---
 file(GLOB ZLIB_SRC ${THIRD_PARTY_DIR}/zlib/*.c)
 add_library(tp_zlib STATIC ${ZLIB_SRC})
 target_include_directories(tp_zlib PUBLIC ${THIRD_PARTY_DIR}/zlib)
-target_compile_definitions(tp_zlib PRIVATE _LARGEFILE64_SOURCE=1 HAVE_UNISTD_H=1)
-target_compile_options(tp_zlib PRIVATE -w -Wno-error=implicit-function-declaration)
+if(WIN32)
+    # On Windows, don't define _LARGEFILE64_SOURCE to avoid including unistd.h
+    target_compile_definitions(tp_zlib PRIVATE HAVE_UNISTD_H=0)
+else()
+    target_compile_definitions(tp_zlib PRIVATE _LARGEFILE64_SOURCE=1 HAVE_UNISTD_H=1)
+endif()
+if(MSVC)
+    target_compile_options(tp_zlib PRIVATE /W0)
+else()
+    target_compile_options(tp_zlib PRIVATE -w -Wno-error=implicit-function-declaration)
+endif()
 
 # --- snappy (BSD-3-Clause) ---
 add_library(tp_snappy STATIC
@@ -47,7 +64,11 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
 else()
     target_compile_definitions(tp_snappy PRIVATE SNAPPY_HAVE_NEON=0 SNAPPY_HAVE_SSSE3=0)
 endif()
-target_compile_options(tp_snappy PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_snappy PRIVATE /W0)
+else()
+    target_compile_options(tp_snappy PRIVATE -w)
+endif()
 
 # --- brotli (MIT) ---
 file(GLOB BROTLI_COMMON_SRC ${THIRD_PARTY_DIR}/brotli/common/*.c)
@@ -57,11 +78,70 @@ add_library(tp_brotli STATIC ${BROTLI_COMMON_SRC} ${BROTLI_ENC_SRC} ${BROTLI_DEC
 target_include_directories(tp_brotli PUBLIC ${THIRD_PARTY_DIR}/brotli/include)
 # Brotli internal sources include relative paths like "../common/..."
 target_include_directories(tp_brotli PRIVATE ${THIRD_PARTY_DIR}/brotli)
-target_compile_options(tp_brotli PRIVATE -w)
+if(MSVC)
+    target_compile_options(tp_brotli PRIVATE /W0)
+else()
+    target_compile_options(tp_brotli PRIVATE -w)
+endif()
 
-# --- oodle (Proprietary, precompiled from UE SDK) ---
-add_library(tp_oodle STATIC IMPORTED GLOBAL)
-set_target_properties(tp_oodle PROPERTIES
-    IMPORTED_LOCATION ${THIRD_PARTY_DIR}/oodle/lib/Mac/liboo2coremac64.a
-    INTERFACE_INCLUDE_DIRECTORIES ${THIRD_PARTY_DIR}/oodle/include
-)
+# --- oodle (Proprietary, locally supplied from a licensed UE OodleDataCompression SDK) ---
+set(BENCHMARK_OODLE_ROOT "" CACHE PATH
+    "Path to a licensed Oodle 2.9.12 SDK root that contains include/ and lib/")
+
+if(BENCHMARK_OODLE_ROOT)
+    set(_benchmark_oodle_root_hint "${BENCHMARK_OODLE_ROOT}")
+elseif(DEFINED ENV{BENCHMARK_OODLE_ROOT} AND NOT "$ENV{BENCHMARK_OODLE_ROOT}" STREQUAL "")
+    set(_benchmark_oodle_root_hint "$ENV{BENCHMARK_OODLE_ROOT}")
+else()
+    set(_benchmark_oodle_root_hint "${THIRD_PARTY_DIR}/oodle/2.9.12")
+endif()
+
+file(TO_CMAKE_PATH "${_benchmark_oodle_root_hint}" OODLE_ROOT_DIR)
+set(OODLE_INCLUDE_DIR "${OODLE_ROOT_DIR}/include")
+set(OODLE_LIBRARY_PATH "")
+
+if(ANDROID)
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/Android/${ANDROID_ABI}/liboo2coreandroid.a
+    )
+elseif(IOS OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    set(OODLE_IOS_VARIANT liboo2coreios.a)
+    if(CMAKE_OSX_SYSROOT MATCHES "iphonesimulator")
+        set(OODLE_IOS_VARIANT liboo2coreios.sim.a)
+    endif()
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/IOS/${OODLE_IOS_VARIANT}
+    )
+elseif(APPLE)
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/Mac/liboo2coremac64.a
+    )
+elseif(WIN32)
+    set(OODLE_WINDOWS_DIR Win64)
+    set(OODLE_WINDOWS_LIB oo2core_win64.lib)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|arm64|aarch64"
+       OR CMAKE_VS_PLATFORM_NAME MATCHES "ARM64")
+        set(OODLE_WINDOWS_DIR WinArm64)
+        set(OODLE_WINDOWS_LIB oo2core_winuwparm64.lib)
+    endif()
+    set(OODLE_LIBRARY_PATH
+        ${OODLE_ROOT_DIR}/lib/${OODLE_WINDOWS_DIR}/${OODLE_WINDOWS_LIB}
+    )
+endif()
+
+if(OODLE_LIBRARY_PATH
+   AND EXISTS "${OODLE_LIBRARY_PATH}"
+   AND EXISTS "${OODLE_INCLUDE_DIR}/oodle2.h"
+   AND EXISTS "${OODLE_INCLUDE_DIR}/oodle2base.h")
+    add_library(tp_oodle STATIC IMPORTED GLOBAL)
+    set_target_properties(tp_oodle PROPERTIES
+        IMPORTED_LOCATION "${OODLE_LIBRARY_PATH}"
+        INTERFACE_INCLUDE_DIRECTORIES "${OODLE_INCLUDE_DIR}"
+    )
+    message(STATUS "BenchmarkApp: Oodle SDK enabled from ${OODLE_ROOT_DIR}")
+else()
+    message(STATUS
+        "BenchmarkApp: Oodle SDK not found for this platform. "
+        "Set BENCHMARK_OODLE_ROOT (or env BENCHMARK_OODLE_ROOT) to a licensed "
+        "Oodle 2.9.12 SDK root to enable Oodle algorithms.")
+endif()

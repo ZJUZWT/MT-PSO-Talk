@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 220,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "surface_page_fade_out",
+      "kind": "fade_out",
+      "description": "平台差异表象页整体淡出"
+    },
+    {
+      "id": "code_block_move",
+      "kind": "node_move",
+      "distancePx": 160,
+      "description": "两段代码块进入并排布局"
+    },
+    {
+      "id": "attribute_tokens_move",
+      "kind": "node_move",
+      "distancePx": 100,
+      "description": "ATTRIBUTE token 与底部收束条落位"
+    },
+    {
+      "id": "source_page_fade_in",
+      "kind": "fade_in",
+      "description": "平台差异来源页淡入"
+    }
+  ]
+}

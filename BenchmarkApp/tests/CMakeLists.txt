@@ -83,6 +83,17 @@ target_link_libraries(timing_model_test PRIVATE benchmark_graphics)
 
 add_test(NAME timing_model_test COMMAND timing_model_test)
 
+# --- device_info_test ---
+add_executable(device_info_test
+    driver/device_info_test.cpp
+    ${CMAKE_SOURCE_DIR}/lib/driver/common/apple_device_lookup.cpp
+    ${CMAKE_SOURCE_DIR}/lib/driver/common/device_info.cpp
+)
+
+target_include_directories(device_info_test PRIVATE ${LIB_INCLUDE_DIR} ${TEST_INCLUDE_DIR})
+
+add_test(NAME device_info_test COMMAND device_info_test)
+
 # --- graphics_benchmark_test ---
 add_executable(graphics_benchmark_test
     driver/graphics_benchmark_test.cpp
@@ -142,3 +153,46 @@ target_include_directories(orchestrator_test PRIVATE ${LIB_INCLUDE_DIR} ${TEST_I
 target_link_libraries(orchestrator_test PRIVATE benchmark_orchestrator)
 
 add_test(NAME orchestrator_test COMMAND orchestrator_test)
+
+if(UNIX)
+    add_test(
+        NAME cmake_default_build_type_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/cmake_default_build_type_test.sh
+    )
+    add_test(
+        NAME build_settings_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/build_settings_test.sh
+    )
+    add_test(
+        NAME macos_build_script_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/macos_build_script_test.sh
+    )
+    add_test(
+        NAME android_ndk_utils_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/android_ndk_utils_test.sh
+    )
+    add_test(
+        NAME result_bundle_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/result_bundle_test.sh
+    )
+    add_test(
+        NAME ios_device_utils_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/ios_device_utils_test.sh
+    )
+    add_test(
+        NAME ios_configuration_path_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/ios_configuration_path_test.sh
+    )
+    add_test(
+        NAME ios_device_metadata_source_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/ios_device_metadata_source_test.sh
+    )
+    add_test(
+        NAME release_assembly_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/release_assembly_test.sh
+    )
+    add_test(
+        NAME release_assembly_windows_multiconfig_test
+        COMMAND bash ${CMAKE_SOURCE_DIR}/tests/platform/release_assembly_windows_multiconfig_test.sh
+    )
+endif()

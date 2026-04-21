@@ -10,8 +10,14 @@
 namespace benchmark {
 
 struct CompressionBenchmarkConfig {
+    int warmup_iterations = 1;
     int iterations = 5;
     std::vector<int64_t> payload_sizes = {64 * 1024, 256 * 1024, 1024 * 1024};  // 64K, 256K, 1M
+    std::vector<std::string> payload_profiles = {
+        "pso_like",
+        "high_compressibility",
+        "low_compressibility"
+    };
 };
 
 class CompressionBenchmark {
@@ -26,7 +32,9 @@ public:
         const std::string& platform,
         CompressionAlgorithm& algo,
         const std::string& level,
-        const std::vector<uint8_t>& payload);
+        const std::vector<uint8_t>& payload,
+        const std::string& payload_profile = "custom",
+        int iteration_index = 0);
 };
 
 }  // namespace benchmark

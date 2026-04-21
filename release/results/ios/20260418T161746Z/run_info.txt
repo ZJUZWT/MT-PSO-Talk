@@ -1,0 +1,13 @@
+Platform: ios
+Device: 张文韬的iPad
+Device ID: 00008110-00014C523607801E
+Started At (UTC): 2026-04-18T16:17:46Z
+Finished At (UTC): 2026-04-18T16:17:48Z
+Source Path: com.swannzhang.psobenchmark (manual pull)
+JSON: benchmark_report.json
+CSV: compression_results.csv
+Bundle Identifier: com.swannzhang.psobenchmark
+Device Identifier: 552A97AB-B0C2-446E-A66A-B18C684A76B1
+Marketing Name: iPad mini (6th generation)
+Product Type: iPad14,1
+Hardware Model: J310AP

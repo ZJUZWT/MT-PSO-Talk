@@ -78,7 +78,12 @@
 
 // Needed by OS X, among others.
 #ifndef MAP_ANONYMOUS
+#ifdef MAP_ANON
 #define MAP_ANONYMOUS MAP_ANON
+#else
+// Windows doesn't have mmap, define a dummy value
+#define MAP_ANONYMOUS 0
+#endif
 #endif
 
 // The size of an array, if known at compile-time.

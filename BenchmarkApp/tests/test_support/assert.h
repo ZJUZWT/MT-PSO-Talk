@@ -59,6 +59,16 @@ inline void expect_contains(const std::string& haystack, const std::string& need
     }
 }
 
+inline void expect_not_contains(const std::string& haystack,
+                                const std::string& needle,
+                                const std::string& label) {
+    if (haystack.find(needle) != std::string::npos) {
+        std::cerr << "EXPECT_NOT_CONTAINS failed: " << label
+                  << " (needle=\"" << needle << "\" unexpectedly found)\n";
+        ++failure_count();
+    }
+}
+
 inline int finish() {
     return failure_count() == 0 ? 0 : 1;
 }

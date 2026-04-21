@@ -1,0 +1,10 @@
+Release Root: /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../release
+Build Root: /Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/BenchmarkApp/../build/BenchmarkApp
+Build Type: Release
+Apple Configuration: Release
+Windows Configuration: Release
+macos: packages/macos/benchmark_main
+android: packages/android/pso_benchmark
+ios_app: packages/ios/PSOBenchmarkApp.app
+ios_ipa: packages/ios/PSOBenchmarkApp.ipa
+windows: missing

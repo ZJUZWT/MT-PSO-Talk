@@ -62,14 +62,19 @@ std::string to_json(const CompressionResult& result) {
            << "\"os_version\":\"" << escape_json(result.os_version) << "\","
            << "\"version\":\"" << escape_json(result.version) << "\","
            << "\"level\":\"" << escape_json(result.level) << "\","
+           << "\"payload_profile\":\"" << escape_json(result.payload_profile) << "\","
+           << "\"iteration_index\":" << result.iteration_index << ','
            << "\"input_size\":" << result.input_size << ','
            << "\"compressed_size\":" << result.compressed_size << ','
            << "\"compression_ratio\":" << result.compression_ratio << ','
            << "\"compress_us\":" << result.compress_us << ','
            << "\"throughput_mbps\":" << result.throughput_mbps << ','
+           << "\"input_hash\":\"" << escape_json(result.input_hash) << "\","
            << "\"compressed_output_hash\":\"" << escape_json(result.compressed_output_hash) << "\","
            << "\"decompress_us\":" << result.decompress_us << ','
            << "\"decompressed_output_hash\":\"" << escape_json(result.decompressed_output_hash) << "\","
+           << "\"roundtrip_hash_match\":" << (result.roundtrip_hash_match ? "true" : "false") << ','
+           << "\"roundtrip_byte_match\":" << (result.roundtrip_byte_match ? "true" : "false") << ','
            << "\"status\":\"" << escape_json(result.status) << "\""
            << '}';
     return stream.str();

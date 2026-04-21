@@ -1,0 +1,49 @@
+param(
+    [string]$BinaryPath = "",
+    [string]$OutputRoot = ""
+)
+
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+if (-not $BinaryPath) {
+    $BinaryPath = Join-Path $scriptDir "..\packages\windows\compression_benchmark_cli.exe"
+}
+
+if (-not (Test-Path $BinaryPath)) {
+    throw "Windows benchmark binary not found: $BinaryPath"
+}
+
+if (-not $OutputRoot) {
+    $OutputRoot = Join-Path $scriptDir "..\results"
+}
+
+$startedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$dirTimestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
+$resultDir = Join-Path $OutputRoot "windows\$dirTimestamp"
+$null = New-Item -ItemType Directory -Path $resultDir -Force
+
+$jsonPath = Join-Path $resultDir "benchmark_report.json"
+$csvPath = Join-Path $resultDir "compression_results.csv"
+$logPath = Join-Path $resultDir "console.log"
+
+& $BinaryPath --json $jsonPath --csv $csvPath | Tee-Object -FilePath $logPath
+
+$finishedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$runInfoPath = Join-Path $resultDir "run_info.txt"
+@(
+    "Platform: windows"
+    "Device: $env:COMPUTERNAME"
+    "Device ID: $env:COMPUTERNAME"
+    "Started At (UTC): $startedAt"
+    "Finished At (UTC): $finishedAt"
+    "Source Path: $BinaryPath"
+    "JSON: benchmark_report.json"
+    "CSV: compression_results.csv"
+) | Set-Content -Path $runInfoPath
+
+Write-Host "=== Benchmark Complete ==="
+Write-Host "Platform: windows"
+Write-Host "Device: $env:COMPUTERNAME"
+Write-Host "Started At (UTC): $startedAt"
+Write-Host "Finished At (UTC): $finishedAt"
+Write-Host "Results Directory: $resultDir"

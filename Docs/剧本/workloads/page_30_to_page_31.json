@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 100,
+  "holdAfterMs": 140,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_governance_page",
+      "kind": "fade_out",
+      "description": "治理结论页整体淡出"
+    },
+    {
+      "id": "move_harness_chain",
+      "kind": "node_move",
+      "distancePx": 120,
+      "description": "评分链路主列进入"
+    },
+    {
+      "id": "move_harness_formula_card",
+      "kind": "node_move",
+      "distancePx": 140,
+      "description": "公式与硬门槛卡进入"
+    },
+    {
+      "id": "fade_in_harness_footer",
+      "kind": "fade_in",
+      "description": "harness 收束语句淡入"
+    }
+  ]
+}

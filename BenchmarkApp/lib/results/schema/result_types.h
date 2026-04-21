@@ -39,14 +39,19 @@ struct CompressionResult {
     std::string os_version;
     std::string version;
     std::string level;
+    std::string payload_profile = "custom";
+    int iteration_index = 0;
     std::int64_t input_size = 0;
     std::int64_t compressed_size = 0;
     double compression_ratio = 0.0;
     std::int64_t compress_us = 0;
     double throughput_mbps = 0.0;
+    std::string input_hash;
     std::string compressed_output_hash;
     std::int64_t decompress_us = 0;
     std::string decompressed_output_hash;
+    bool roundtrip_hash_match = false;
+    bool roundtrip_byte_match = false;
     std::string status = "passed";
 };
 

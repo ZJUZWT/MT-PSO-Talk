@@ -6,6 +6,8 @@ Thumbs.db
 .worktrees/
 .impeccable.md
 ignore/
+agent.md
+CLAUDE.md
 
 # ============================================================
 # IDE / Editor
@@ -33,6 +35,8 @@ dist/
 __pycache__/
 *.py[cod]
 .generated/
+generated/
+benchmark_results/
 
 # ============================================================
 # C/C++ build artifacts
@@ -89,6 +93,7 @@ Docs/PSO-video-demo-segments/
 Docs/PSO-animation-demo*
 Docs/_anim_test.pptx
 Docs/剧本/.generated-previews/
+Docs/剧本/.snapshots/
 Docs/.archive/
 Docs/superpowers/
 
@@ -105,8 +110,16 @@ test-results/
 coverage/
 
 # ============================================================
+# Scripts (generated)
+# ============================================================
+scripts/check_*.py
+scripts/compare_*.py
+scripts/verify_*.py
+
+# ============================================================
 # Misc temp
 # ============================================================
 *.tmp
 *.temp
 *.log
+buildlog.txt

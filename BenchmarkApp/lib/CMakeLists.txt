@@ -55,8 +55,14 @@ target_link_libraries(benchmark_compression
         tp_zlib
         tp_snappy
         tp_brotli
-        tp_oodle
 )
+
+if(TARGET tp_oodle)
+    target_link_libraries(benchmark_compression PRIVATE tp_oodle)
+    target_compile_definitions(benchmark_compression PUBLIC BENCHMARK_HAS_OODLE=1)
+else()
+    target_compile_definitions(benchmark_compression PUBLIC BENCHMARK_HAS_OODLE=0)
+endif()
 
 # Real GPU backend sources (all compile on all platforms via #if guards)
 set(VULKAN_BACKEND_SRC
@@ -77,15 +83,26 @@ set(METAL_BACKEND_SRC
     driver/metal/metal_backend.mm
 )
 
-# Mark .mm files as ObjC++
-set_source_files_properties(
-    driver/metal/metal_context.mm
-    driver/metal/metal_pipeline.mm
-    driver/metal/metal_backend.mm
-    PROPERTIES LANGUAGE OBJCXX
-)
+if(BENCHMARK_ENABLE_OBJCXX)
+    # Build the real Metal backend as Objective-C++ on Apple platforms.
+    set_source_files_properties(
+        driver/metal/metal_context.mm
+        driver/metal/metal_pipeline.mm
+        driver/metal/metal_backend.mm
+        PROPERTIES LANGUAGE OBJCXX
+    )
+else()
+    # Compile the stubbed non-Apple path as plain C++ so Android/Windows keep linking cleanly.
+    set_source_files_properties(
+        driver/metal/metal_context.mm
+        driver/metal/metal_pipeline.mm
+        driver/metal/metal_backend.mm
+        PROPERTIES LANGUAGE CXX
+    )
+endif()
 
 add_library(benchmark_graphics STATIC
+    driver/common/apple_device_lookup.cpp
     driver/native/native_backend_stub.cpp
     driver/common/timing_model.cpp
     driver/common/backend_factory.cpp

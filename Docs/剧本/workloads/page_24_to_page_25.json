@@ -11,21 +11,20 @@
   ],
   "actions": [
     {
-      "id": "fade_out_resource_shape",
+      "id": "fade_out_package_board",
       "kind": "fade_out",
-      "description": "时空互换页整体淡出"
+      "description": "page24 左侧包体数据板淡出"
     },
     {
-      "id": "move_storage_lane",
+      "id": "move_storage_method_cards",
       "kind": "node_move",
       "distancePx": 110,
-      "description": "内存 / 外存双区与主交换关系进入"
+      "description": "page24 底部方法条展开成 page25 右侧三张方法卡"
     },
     {
-      "id": "move_storage_cards",
-      "kind": "node_move",
-      "distancePx": 140,
-      "description": "选取逻辑、映射机制、外存载体三张卡落位"
+      "id": "fade_in_storage_focus_board",
+      "kind": "fade_in",
+      "description": "page25 左侧存储主图淡入并接管讲述"
     },
     {
       "id": "fade_in_storage_footer",

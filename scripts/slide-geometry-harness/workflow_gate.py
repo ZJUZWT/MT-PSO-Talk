@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -17,6 +18,71 @@ LEVEL_ORDER = {
     "skip": 0,
     "lite": 1,
     "full": 2,
+}
+
+STEP_SEQUENCE = (
+    "page_00",
+    "page_01",
+    "page_02",
+    "page_03",
+    "page_04",
+    "page_04_data",
+    "page_05",
+    "page_06",
+    "page_07",
+    "page_08",
+    "page_09",
+    "page_09_img",
+    "page_10",
+    "page_11",
+    "page_12",
+    "page_13",
+    "page_14",
+    "page_13_img",
+    "page_15_img",
+    "page_15",
+    "page_16",
+    "page_17",
+    "page_18",
+    "page_18_img",
+    "page_19",
+    "page_21",
+    "page_22",
+    "page_24",
+    "page_25",
+    "page_26",
+    "page_27",
+    "page_28",
+    "page_29",
+    "page_30",
+    "page_31",
+    "page_32",
+    "page_33",
+)
+STEP_INDEX = {step_id: index for index, step_id in enumerate(STEP_SEQUENCE)}
+PAGE_TOKEN_RE = re.compile(
+    r"page[\s_-]?(\d{1,2})(?:[\s_-]?(img|data))?",
+    re.IGNORECASE,
+)
+PAGE_SCENE_RE = re.compile(
+    r"Page(\d{2})(?:Scene)?(?:[\s_-]?(img|data))?",
+    re.IGNORECASE,
+)
+DOC_PAGE_RE = re.compile(r"Docs/剧本/(\d{2})-", re.IGNORECASE)
+CHINESE_PAGE_RE = re.compile(r"第\s*([零〇一二两三四五六七八九十\d]+)\s*页")
+CHINESE_DIGITS = {
+    "零": 0,
+    "〇": 0,
+    "一": 1,
+    "二": 2,
+    "两": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
 }
 
 FULL_FILE_PREFIXES = (
@@ -48,6 +114,34 @@ FULL_PROMPT_KEYWORDS = (
     "shared element",
 )
 
+FULL_LAYOUT_HINT_KEYWORDS = (
+    "左右两半",
+    "左右布局",
+    "左边是",
+    "右边是",
+    "左侧是",
+    "右侧是",
+    "上下可以",
+    "上下拉",
+    "拉高",
+    "拉宽",
+    "更宽",
+    "更高",
+    "更大",
+    "位置不够",
+    "字更大",
+)
+
+FULL_SLIDE_SIGNAL_KEYWORDS = (
+    "page",
+    "第",
+    "页",
+    "包体",
+    "内存",
+    "shadercode",
+    "pso",
+)
+
 LITE_PROMPT_KEYWORDS = (
     "左边卡片",
     "左侧卡片",
@@ -71,6 +165,8 @@ class GateDecision:
     prompt: str
     files: list[str]
     created_at: str
+    focus_step_ids: list[str] = field(default_factory=list)
+    mechanical_review_from_step: str | None = None
 
 
 def choose_higher_level(left: str, right: str) -> str:
@@ -81,6 +177,106 @@ def normalize_path(path: str) -> str:
     return path.replace("\\", "/").strip()
 
 
+def canonicalize_step_id(page_number: int, suffix: str | None = None) -> str | None:
+    base_step = f"page_{page_number:02d}"
+    if suffix:
+        candidate = f"{base_step}_{suffix.lower()}"
+        if candidate in STEP_INDEX:
+            return candidate
+    return base_step if base_step in STEP_INDEX else None
+
+
+def parse_chinese_page_number(token: str) -> int | None:
+    normalized = token.strip().replace("兩", "两")
+    if not normalized:
+        return None
+    if normalized.isdigit():
+        return int(normalized)
+    if normalized == "十":
+        return 10
+    if "十" in normalized:
+        tens_raw, ones_raw = normalized.split("十", 1)
+        tens = 1 if tens_raw == "" else CHINESE_DIGITS.get(tens_raw)
+        ones = 0 if ones_raw == "" else CHINESE_DIGITS.get(ones_raw)
+        if tens is None or ones is None:
+            return None
+        return tens * 10 + ones
+
+    value = 0
+    for char in normalized:
+        digit = CHINESE_DIGITS.get(char)
+        if digit is None:
+            return None
+        value = value * 10 + digit
+    return value
+
+
+def sort_step_ids(step_ids: set[str]) -> list[str]:
+    return sorted(step_ids, key=lambda step_id: STEP_INDEX[step_id])
+
+
+def extract_step_ids_from_text(text: str) -> list[str]:
+    step_ids: set[str] = set()
+    for match in PAGE_TOKEN_RE.finditer(text):
+        step_id = canonicalize_step_id(
+            int(match.group(1)),
+            match.group(2),
+        )
+        if step_id:
+            step_ids.add(step_id)
+
+    for match in CHINESE_PAGE_RE.finditer(text):
+        page_number = parse_chinese_page_number(match.group(1))
+        if page_number is None:
+            continue
+        step_id = canonicalize_step_id(page_number)
+        if step_id:
+            step_ids.add(step_id)
+
+    return sort_step_ids(step_ids)
+
+
+def extract_step_ids_from_path(path: str) -> list[str]:
+    step_ids: set[str] = set()
+    for match in PAGE_TOKEN_RE.finditer(path):
+        step_id = canonicalize_step_id(
+            int(match.group(1)),
+            match.group(2),
+        )
+        if step_id:
+            step_ids.add(step_id)
+
+    for match in PAGE_SCENE_RE.finditer(path):
+        step_id = canonicalize_step_id(
+            int(match.group(1)),
+            match.group(2),
+        )
+        if step_id:
+            step_ids.add(step_id)
+
+    doc_match = DOC_PAGE_RE.search(path)
+    if doc_match:
+        page_number = int(doc_match.group(1))
+        lowered = path.lower()
+        suffix = None
+        if "_img" in lowered or "-img" in lowered:
+            suffix = "img"
+        elif "_data" in lowered or "-data" in lowered:
+            suffix = "data"
+        step_id = canonicalize_step_id(page_number, suffix)
+        if step_id:
+            step_ids.add(step_id)
+
+    return sort_step_ids(step_ids)
+
+
+def infer_focus_step_ids(prompt: str, files: list[str]) -> list[str]:
+    step_ids: set[str] = set(extract_step_ids_from_text(prompt))
+    for path in files:
+        step_ids.update(extract_step_ids_from_path(path))
+    return sort_step_ids(step_ids)
+
+
 def classify_prompt_level(prompt: str) -> tuple[str, list[str]]:
     normalized = prompt.lower().strip()
     reasons: list[str] = []
@@ -89,6 +285,19 @@ def classify_prompt_level(prompt: str) -> tuple[str, list[str]]:
         if keyword in normalized:
             reasons.append(f"prompt matched full keyword: {keyword}")
             return "full", reasons
+
+    layout_hits = [
+        keyword for keyword in FULL_LAYOUT_HINT_KEYWORDS if keyword in normalized
+    ]
+    slide_hits = [
+        keyword for keyword in FULL_SLIDE_SIGNAL_KEYWORDS if keyword in normalized
+    ]
+    if layout_hits and slide_hits:
+        reasons.append(
+            "prompt matched full layout+slide signal: "
+            f"layout={','.join(layout_hits[:3])}; slide={','.join(slide_hits[:3])}"
+        )
+        return "full", reasons
 
     for keyword in LITE_PROMPT_KEYWORDS:
         if keyword in normalized:
@@ -132,11 +341,12 @@ def build_stop_plan(level: str, repo_root: Path) -> list[str]:
     ]
 
 
-def build_mechanical_review_command(level: str) -> str | None:
-    if level != "full":
+def build_mechanical_review_command(decision: GateDecision) -> str | None:
+    if decision.level != "full":
         return None
 
-    return "npm --silent --prefix SlideApp run review:mechanical -- --from page_19"
+    from_step = decision.mechanical_review_from_step or "page_19"
+    return f"npm --silent --prefix SlideApp run review:mechanical -- --from {from_step}"
 
 
 def build_required_checks(level: str) -> list[str]:
@@ -160,6 +370,12 @@ def classify_workflow(prompt: str = "", files: list[str] | None = None) -> GateD
     prompt_level, prompt_reasons = classify_prompt_level(prompt)
     file_level, file_reasons = classify_file_level(file_list)
     level = choose_higher_level(prompt_level, file_level)
+    focus_step_ids = infer_focus_step_ids(prompt, file_list)
+    mechanical_review_from_step = None
+    if level == "full":
+        mechanical_review_from_step = (
+            focus_step_ids[0] if focus_step_ids else "page_19"
+        )
 
     reasons = prompt_reasons + file_reasons
     if not reasons:
@@ -175,6 +391,8 @@ def classify_workflow(prompt: str = "", files: list[str] | None = None) -> GateD
         prompt=prompt,
         files=file_list,
         created_at=datetime.now(timezone.utc).isoformat(),
+        focus_step_ids=focus_step_ids,
+        mechanical_review_from_step=mechanical_review_from_step,
     )
 
 
@@ -236,7 +454,7 @@ def build_codex_user_prompt_submit_context(
     if decision.commands:
         lines.append("Required commands:")
         lines.extend(f"- {command}" for command in decision.commands)
-    review_command = build_mechanical_review_command(decision.level)
+    review_command = build_mechanical_review_command(decision)
     if review_command:
         lines.append("Mechanical review command:")
         lines.append(f"- {review_command}")
@@ -311,6 +529,47 @@ def build_mechanical_review_failure_reason(
     return "\n".join(lines)
 
 
+def collect_missing_focus_review_steps(
+    decision: GateDecision,
+    review_summary: dict[str, object] | None,
+) -> list[tuple[str, str]]:
+    if not review_summary:
+        return []
+    if "page_results" not in review_summary:
+        return []
+    focus_steps = set(decision.focus_step_ids or [])
+    if not focus_steps:
+        return []
+
+    page_results = list(review_summary.get("page_results") or [])
+    result_by_step = {
+        str(entry.get("stepId")): entry
+        for entry in page_results
+        if isinstance(entry, dict) and entry.get("stepId")
+    }
+    missing_steps: list[tuple[str, str]] = []
+    for step_id in sort_step_ids(focus_steps):
+        entry = result_by_step.get(step_id)
+        if entry is None:
+            missing_steps.append((step_id, "not_reviewed"))
+            continue
+        if str(entry.get("status")) == "missing_sketch":
+            missing_steps.append((step_id, "missing_sketch"))
+    return missing_steps
+
+
+def build_missing_focus_review_failure_reason(
+    missing_steps: list[tuple[str, str]],
+) -> str:
+    lines = [
+        "Formal-page mechanical review did not produce usable review surfaces for the affected steps.",
+        "Add or repair the missing review surfaces below, rerun the mechanical review summary, and only then finish the turn.",
+    ]
+    for step_id, reason in missing_steps[:5]:
+        lines.append(f"Page {step_id} -> {reason}")
+    return "\n".join(lines)
+
+
 def build_codex_stop_output(
     decision: GateDecision,
     results: list[dict[str, object]],
@@ -340,6 +599,25 @@ def build_codex_stop_output(
 
         if review_summary and bool(review_summary.get("has_blocker_pages")):
             failure_reason = build_mechanical_review_failure_reason(review_summary)
+            if stop_hook_active:
+                return {
+                    "continue": False,
+                    "stopReason": failure_reason,
+                    "systemMessage": failure_reason,
+                }
+            return {
+                "decision": "block",
+                "reason": failure_reason,
+            }
+
+        missing_focus_steps = collect_missing_focus_review_steps(
+            decision,
+            review_summary,
+        )
+        if missing_focus_steps:
+            failure_reason = build_missing_focus_review_failure_reason(
+                missing_focus_steps,
+            )
             if stop_hook_active:
                 return {
                     "continue": False,
@@ -381,7 +659,7 @@ def run_mechanical_review(
     decision: GateDecision,
     repo_root: Path,
 ) -> tuple[dict[str, object] | None, dict[str, object] | None, str | None]:
-    command = build_mechanical_review_command(decision.level)
+    command = build_mechanical_review_command(decision)
     if not command:
         return None, None, None
 
@@ -466,7 +744,7 @@ def stop_command(args: argparse.Namespace) -> int:
                     "level": decision.level,
                     "commands": commands,
                     "mechanical_review_command": build_mechanical_review_command(
-                        decision.level
+                        decision
                     ),
                     "required_checks": decision.required_checks,
                     "state_path": str(state_path),
@@ -482,9 +760,13 @@ def stop_command(args: argparse.Namespace) -> int:
         decision,
         repo_root,
     )
+    missing_focus_steps = collect_missing_focus_review_steps(
+        decision,
+        review_summary,
+    )
     geometry_failed = bool(review_error) or bool(
         review_summary and review_summary.get("has_blocker_pages")
-    )
+    ) or bool(missing_focus_steps)
 
     print(
         json.dumps(
@@ -495,6 +777,7 @@ def stop_command(args: argparse.Namespace) -> int:
                     "result": review_result,
                     "summary": review_summary,
                     "error": review_error,
+                    "missing_focus_steps": missing_focus_steps,
                 },
                 "state_path": str(state_path),
             },
@@ -509,7 +792,13 @@ def codex_user_prompt_submit_command(args: argparse.Namespace) -> int:
     payload = load_codex_hook_input()
     repo_root = resolve_repo_root_from_hook_input(payload)
     prompt = str(payload.get("prompt") or "")
-    decision = classify_workflow(prompt=prompt, files=[])
+    raw_files = payload.get("files") or []
+    files = [
+        normalize_path(path)
+        for path in raw_files
+        if isinstance(path, str)
+    ]
+    decision = classify_workflow(prompt=prompt, files=files)
     state_path = default_state_path(repo_root)
     write_state(state_path, decision)
 

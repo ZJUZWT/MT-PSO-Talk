@@ -18,6 +18,10 @@ REQUIRED_SECTIONS = [
     "## 边剧本与 Review 表",
 ]
 
+IGNORED_DOC_FILENAMES = {
+    "00-剧本与页面对齐审计.md",
+}
+
 PLACEHOLDER_MARKERS = [
     "待补",
     "待刷新",
@@ -167,11 +171,11 @@ def iter_story_docs(script_dir: Path) -> Iterable[DocInfo]:
             continue
         if path.name == "_page-template.md":
             continue
+        if path.name in IGNORED_DOC_FILENAMES:
+            continue
         if "草图镜像" in path.name:
             continue
         if "后续优化方向备注草案" in path.name:
-            continue
-        if path.name.startswith("00-"):
             continue
         yield parse_doc(path)
 

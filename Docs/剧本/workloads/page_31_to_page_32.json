@@ -16,10 +16,10 @@
       "description": "harness 说明页整体淡出"
     },
     {
-      "id": "move_reading_columns",
+      "id": "move_culture_card",
       "kind": "node_move",
       "distancePx": 140,
-      "description": "工程延伸与书 / 视频双栏进入"
+      "description": "书 / 视频推荐卡进入"
     },
     {
       "id": "move_reading_games",
@@ -30,7 +30,7 @@
     {
       "id": "fade_in_reading_links",
       "kind": "fade_in",
-      "description": "推荐条目淡入"
+      "description": "书 / 视频与游戏条目淡入"
     }
   ]
 }

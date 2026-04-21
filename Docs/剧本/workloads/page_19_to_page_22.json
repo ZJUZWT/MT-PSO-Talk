@@ -1,6 +1,6 @@
 {
-  "holdBeforeMs": 80,
-  "holdAfterMs": 80,
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
   "phaseOrder": [
     "hold_before",
     "fade_out",
@@ -11,25 +11,29 @@
   ],
   "actions": [
     {
-      "id": "fade_out_player_page",
+      "id": "fade_out_page19_focus",
       "kind": "fade_out",
-      "description": "玩家视角页整体淡出"
+      "phase": "fade_out",
+      "description": "merged page_19 主图与 note 区整体退场"
     },
     {
       "id": "move_page22_summary_board",
       "kind": "node_move",
-      "distancePx": 96,
-      "description": "page_22 的对象 / 方法 summary 板落位"
+      "phase": "node_motion",
+      "distancePx": 140,
+      "description": "page_22 的对象/方法 summary 板直接接管主叙事"
     },
     {
       "id": "grow_page22_reading_flow",
       "kind": "edge_grow",
-      "lengthPx": 152,
-      "description": "从左主卡进入右侧三卡的阅读流建立"
+      "phase": "edge_motion",
+      "lengthPx": 244,
+      "description": "左主卡到右侧三卡的阅读流建立"
     },
     {
       "id": "fade_in_page22_cards",
       "kind": "fade_in",
+      "phase": "fade_in",
       "description": "page_22 内容卡淡入"
     }
   ]

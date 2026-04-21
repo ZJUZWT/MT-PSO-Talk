@@ -1,7 +1,7 @@
 # 插图过渡页：`18_img`
 
 > 文件类型：`正式动画页`
-> Step / Sketch：`18_img` / `-`
+> Step / Sketch：`page_18_img` / `formal-page18-img`
 > 上一页：`18`
 > 下一页：`19`
 

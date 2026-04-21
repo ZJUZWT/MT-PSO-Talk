@@ -11,26 +11,20 @@
   ],
   "actions": [
     {
-      "id": "fade_out_source_page",
+      "id": "fade_out_governance_evidence",
       "kind": "fade_out",
-      "description": "代码根因页整体淡出"
+      "description": "page29 的治理证据合页整体淡出"
     },
     {
-      "id": "move_governance_images",
+      "id": "move_pso_reading_card",
       "kind": "node_move",
-      "distancePx": 110,
-      "description": "两张 IA / RenderDoc 证据图进入"
+      "distancePx": 160,
+      "description": "page30 的独立 PSO 阅读卡落位"
     },
     {
-      "id": "move_governance_conclusion",
-      "kind": "node_move",
-      "distancePx": 140,
-      "description": "治理结论卡与治理维度 token 落位"
-    },
-    {
-      "id": "fade_in_governance_footer",
+      "id": "fade_in_pso_links",
       "kind": "fade_in",
-      "description": "前置治理结论收束语句淡入"
+      "description": "page30 的四条工程资料链接淡入"
     }
   ]
 }

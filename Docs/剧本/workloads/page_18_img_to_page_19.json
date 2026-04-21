@@ -28,14 +28,14 @@
       "kind": "node_move",
       "phase": "node_motion",
       "distancePx": 220,
-      "description": "GPU、内存中 PSO、硬盘中的 PSO 依次落位"
+      "description": "顶部 GPU 横排、GfxPSO 与硬盘中的 PSO 依次落位"
     },
     {
       "id": "grow_main_spine",
       "kind": "edge_grow",
       "phase": "edge_motion",
-      "lengthPx": 470,
-      "description": "stable -> UEPSO -> GPU -> 内存中 PSO 主中轴长出"
+      "lengthPx": 588,
+      "description": "stable -> GfxPSO 主轴长出，并补上 GfxPSO -> GPU 的上行箭头"
     },
     {
       "id": "grow_disk_cache_routes",

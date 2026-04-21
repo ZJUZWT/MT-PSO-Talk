@@ -1,9 +1,13 @@
 {
   "holdBeforeMs": 120,
-  "holdAfterMs": 180,
+  "holdAfterMs": 140,
   "phaseOrder": [
     "hold_before",
     "fade_out",
+    "callback_node_motion",
+    "callback_edge_motion",
+    "callback_hold",
+    "callback_shift_out",
     "node_motion",
     "edge_motion",
     "fade_in",
@@ -14,27 +18,61 @@
       "id": "fade_out_page19_focus",
       "kind": "fade_out",
       "phase": "fade_out",
-      "description": "merged page_19 视觉焦点开始退场"
+      "description": "merged page_19 的复杂预编译主图整体淡出"
     },
     {
-      "id": "move_page21_title",
+      "id": "restore_page18_callback_stage",
+      "kind": "node_move",
+      "phase": "callback_node_motion",
+      "distancePx": 222,
+      "description": "镜头完整回到包含 cook / rec / stable 蓝色闭环的 page_18 主舞台"
+    },
+    {
+      "id": "grow_page18_callback_loop",
+      "kind": "edge_grow",
+      "phase": "callback_edge_motion",
+      "lengthPx": 827,
+      "description": "page_18 的蓝色 cook / rec / stable 主线与两条落到手机的结果线重新长回"
+    },
+    {
+      "id": "hold_restored_page18_stage",
+      "kind": "node_move",
+      "phase": "callback_hold",
+      "durationMs": 320,
+      "description": "完整还原后的旧舞台停一拍，让观众确认蓝色闭环已经回来"
+    },
+    {
+      "id": "shift_out_page18_callback_stage",
+      "kind": "node_move",
+      "phase": "callback_shift_out",
+      "distancePx": 294,
+      "description": "完整还原的 page_18 主舞台整体左移并退场"
+    },
+    {
+      "id": "fade_out_page18_callback_stage",
+      "kind": "fade_out",
+      "phase": "callback_shift_out",
+      "description": "旧舞台在左移退场过程中同步淡出"
+    },
+    {
+      "id": "move_page21_player_phone",
       "kind": "node_move",
       "phase": "node_motion",
-      "durationMs": 180,
-      "description": "page_21 标题轻量落位，直接承接 merged page_19"
+      "distancePx": 284,
+      "description": "玩家手机左移放大，进入最终玩家视角"
     },
     {
-      "id": "grow_page21_reading_flow",
+      "id": "grow_page21_asset_routes",
       "kind": "edge_grow",
       "phase": "edge_motion",
-      "lengthPx": 237,
-      "description": "压缩判断链的阅读流展开"
+      "lengthPx": 442,
+      "description": "stable.upipelinecache 与 ShaderLibrary 指向手机的两条输入线建立"
     },
     {
-      "id": "fade_in_page21_cards",
+      "id": "fade_in_page21_player_view",
       "kind": "fade_in",
       "phase": "fade_in",
-      "description": "page_21 内容卡淡入"
+      "description": "page_21 的玩家视角页整体淡入"
     }
   ]
 }

@@ -1,0 +1,71 @@
+{
+  "holdBeforeMs": 300,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_data_table",
+      "kind": "fade_out",
+      "description": "数据表整体淡出"
+    },
+    {
+      "id": "fade_in_replay_world",
+      "kind": "fade_in",
+      "description": "第四页主世界回显后进入第五页回放"
+    },
+    {
+      "id": "move_material_into_asset_lane",
+      "kind": "node_move",
+      "distancePx": 184,
+      "description": "ShaderCode 语义收回到 Material 资产位"
+    },
+    {
+      "id": "move_cooked_into_upper_right_slot",
+      "kind": "node_move",
+      "distancePx": 26,
+      "description": "Cooked ShaderCode 落到右上资产产物位"
+    },
+    {
+      "id": "move_mesh_into_left_asset_slot",
+      "kind": "node_move",
+      "distancePx": 46,
+      "description": "Mesh 落到左侧输入资产位"
+    },
+    {
+      "id": "grow_material_to_cooked",
+      "kind": "edge_grow",
+      "lengthPx": 242,
+      "description": "Material -> Cooked 主链建立"
+    },
+    {
+      "id": "grow_cooked_to_binary",
+      "kind": "edge_grow",
+      "lengthPx": 70,
+      "description": "Cooked -> Binary 主链建立"
+    },
+    {
+      "id": "grow_binary_to_gpu",
+      "kind": "edge_grow",
+      "lengthPx": 68,
+      "description": "Binary -> GPU 主链建立"
+    },
+    {
+      "id": "fade_in_ue_pso_note",
+      "kind": "fade_in",
+      "description": "右上角 UE PSO / Graphics 缩略结构淡入"
+    },
+    {
+      "id": "grow_cooked_to_ue_pso_note",
+      "kind": "edge_grow",
+      "lengthPx": 86,
+      "description": "CookedShaderCode 指向 UE PSO 缩略结构的说明性虚线"
+    }
+  ]
+}

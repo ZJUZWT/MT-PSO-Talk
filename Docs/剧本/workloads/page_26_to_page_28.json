@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_compile_acceleration",
+      "kind": "fade_out",
+      "description": "page26 的集合收缩与并行吞吐图整体淡出"
+    },
+    {
+      "id": "move_platform_samples",
+      "kind": "node_move",
+      "distancePx": 120,
+      "description": "page28 左侧样本图与输入布局证据进入"
+    },
+    {
+      "id": "move_pso_state_card",
+      "kind": "node_move",
+      "distancePx": 180,
+      "description": "page28 右侧 PSO = Shader + State 结构卡落位"
+    },
+    {
+      "id": "fade_in_platform_footer",
+      "kind": "fade_in",
+      "description": "平台差异收束句淡入"
+    }
+  ]
+}

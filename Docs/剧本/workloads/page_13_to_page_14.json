@@ -1,0 +1,53 @@
+{
+  "holdBeforeMs": 120,
+  "holdAfterMs": 220,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_page13_main_stage",
+      "kind": "fade_out",
+      "description": "page13 主舞台缩退成 memory plate"
+    },
+    {
+      "id": "move_page14_explanation_board",
+      "kind": "node_move",
+      "distancePx": 96,
+      "description": "page14 解释板整体浮入落位"
+    },
+    {
+      "id": "grow_ue_to_gfx_relation",
+      "kind": "edge_grow",
+      "lengthPx": 24,
+      "description": "UE PSO -> Gfx PSO 的 create / resolve 关系显现"
+    },
+    {
+      "id": "grow_gfx_to_gpu_relation",
+      "kind": "edge_grow",
+      "lengthPx": 46,
+      "description": "Gfx PSO -> GPU 的 bind / use 关系显现"
+    },
+    {
+      "id": "grow_ue_to_rec_relation",
+      "kind": "edge_grow",
+      "lengthPx": 66,
+      "description": "UE PSO -> .rec.upipelinecache 的 record / save 关系显现"
+    },
+    {
+      "id": "fade_in_page14_boxes",
+      "kind": "fade_in",
+      "description": "UE PSO / Gfx PSO / rec 三个盒子淡入"
+    },
+    {
+      "id": "fade_in_page14_notes",
+      "kind": "fade_in",
+      "description": "底部层级说明和 API 差异说明淡入"
+    }
+  ]
+}

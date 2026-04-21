@@ -13,24 +13,24 @@
     {
       "id": "fade_out_bridge_summary",
       "kind": "fade_out",
-      "description": "桥接页整体淡出"
+      "description": "理解页 summary 整体淡出"
     },
     {
-      "id": "move_compression_table",
+      "id": "move_package_board",
       "kind": "node_move",
-      "distancePx": 110,
-      "description": "压缩实测表格与左侧信息区进入"
+      "distancePx": 132,
+      "description": "左侧包体数据板整体落位"
     },
     {
-      "id": "move_strategy_cards",
+      "id": "move_memory_board",
       "kind": "node_move",
-      "distancePx": 140,
-      "description": "右侧三张策略卡落位"
+      "distancePx": 168,
+      "description": "右侧内存 / 外存主图与底部方法条整体落位"
     },
     {
-      "id": "fade_in_tradeoff_footer",
+      "id": "fade_in_package_memory_footer",
       "kind": "fade_in",
-      "description": "底部收束语句淡入"
+      "description": "双栏 footer 淡入"
     }
   ]
 }

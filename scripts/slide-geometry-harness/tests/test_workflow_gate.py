@@ -59,6 +59,32 @@ class WorkflowGateTests(unittest.TestCase):
         self.assertEqual(decision.level, "skip")
         self.assertEqual(decision.commands, [])
 
+    def test_classifies_chinese_page_layout_feedback_as_full_without_file_hints(self):
+        module = load_workflow_gate_module()
+
+        prompts = [
+            "page 24，感觉也可以修改成page 26的那种左右两半方式。主要我感觉page25上面的那个左边的图很好",
+            "你不要在正式的图里，放一些随意的文本。。。左边是包体，展示压缩的数据，右边是内存，展示现在左边的内容加上，然后上下可以拉高啊，你位置不够可以全部拉高",
+            "包体和内存的字更大一点，上下可以更宽啊？包体你要说明是对shadercode的压缩，内存你要说明PSO在UE里面有这样的策略LRU+mmap",
+        ]
+
+        for prompt in prompts:
+            with self.subTest(prompt=prompt):
+                decision = module.classify_workflow(
+                    prompt=prompt,
+                    files=[],
+                )
+
+                self.assertEqual(decision.level, "full")
+                self.assertIn(
+                    "Run transition timing audit before claiming done.",
+                    decision.required_checks,
+                )
+                self.assertIn(
+                    "Run formal-page mechanical review summary before claiming done.",
+                    decision.required_checks,
+                )
+
     def test_persists_state_and_builds_stop_plan(self):
         module = load_workflow_gate_module()
 
@@ -149,11 +175,31 @@ class WorkflowGateTests(unittest.TestCase):
     def test_builds_mechanical_review_command_for_full_work(self):
         module = load_workflow_gate_module()
 
-        command = module.build_mechanical_review_command("full")
+        decision = module.classify_workflow(
+            prompt="调整 page_31 的动画 timing",
+            files=["Docs/剧本/31-第三十一页-正式动画.md"],
+        )
+        command = module.build_mechanical_review_command(decision)
 
         self.assertIsNotNone(command)
         self.assertIn("--silent", command)
         self.assertIn("review:mechanical", command)
+        self.assertIn("--from page_31", command)
+
+    def test_builds_mechanical_review_command_from_earliest_affected_step(self):
+        module = load_workflow_gate_module()
+
+        decision = module.classify_workflow(
+            prompt="page 02 左上 PSO 卡和 GPU 重叠了",
+            files=["SlideApp/src/remotion/pages/Page02Scene.tsx"],
+        )
+
+        self.assertEqual(decision.mechanical_review_from_step, "page_02")
+        self.assertEqual(decision.focus_step_ids, ["page_02"])
+        self.assertIn(
+            "--from page_02",
+            module.build_mechanical_review_command(decision),
+        )
 
     def test_blocks_when_mechanical_review_reports_blocker_pages(self):
         module = load_workflow_gate_module()
@@ -186,6 +232,69 @@ class WorkflowGateTests(unittest.TestCase):
         self.assertIn("page_31", response["reason"])
         self.assertIn("formal", response["reason"])
         self.assertIn("Open the layout before critic pass", response["reason"])
+
+    def test_blocks_when_focus_step_is_missing_review_surface(self):
+        module = load_workflow_gate_module()
+
+        decision = module.classify_workflow(
+            prompt="page 02 左上 PSO 卡和 GPU 重叠了",
+            files=["SlideApp/src/remotion/pages/Page02Scene.tsx"],
+        )
+        response = module.build_codex_stop_output(
+            decision,
+            [],
+            stop_hook_active=False,
+            review_summary={
+                "has_blocker_pages": False,
+                "blocker_pages": [],
+                "page_results": [
+                    {
+                        "stepId": "page_02",
+                        "status": "missing_sketch",
+                    }
+                ],
+            },
+        )
+
+        self.assertEqual(response["decision"], "block")
+        self.assertIn("page_02", response["reason"])
+        self.assertIn("missing_sketch", response["reason"])
+
+    def test_does_not_block_on_missing_review_surface_outside_focus_steps(self):
+        module = load_workflow_gate_module()
+
+        decision = module.classify_workflow(
+            prompt="page 02 左上 PSO 卡和 GPU 重叠了",
+            files=["SlideApp/src/remotion/pages/Page02Scene.tsx"],
+        )
+        response = module.build_codex_stop_output(
+            decision,
+            [],
+            stop_hook_active=False,
+            review_summary={
+                "has_blocker_pages": False,
+                "blocker_pages": [],
+                "page_results": [
+                    {
+                        "stepId": "page_02",
+                        "status": "ok",
+                        "reviewSource": "formal",
+                        "sketchId": "formal-page02",
+                        "mechanicalScore": "7.4/10",
+                        "verdict": "Clean",
+                        "blockerOpen": False,
+                        "topFixes": [],
+                        "threeLayerReview": {},
+                    },
+                    {
+                        "stepId": "page_03",
+                        "status": "missing_sketch",
+                    }
+                ],
+            },
+        )
+
+        self.assertTrue(response["continue"])
 
     def test_allows_continue_when_audits_pass_and_mechanical_review_is_clean(self):
         module = load_workflow_gate_module()

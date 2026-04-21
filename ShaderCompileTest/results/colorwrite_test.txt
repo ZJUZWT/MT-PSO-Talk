@@ -1,0 +1,165 @@
+
+================================================================
+  PSO Shader Compile Optimization Benchmark
+  Test: Cross-stage DCE via colorWriteMask = 0
+  Draw calls per test: 100 (fixed)
+  Vertices per draw: 6144 (32x32 grid)
+  Shader loopCount: 10, 100, 500, 5000 (variable)
+================================================================
+
+=== PHASE 0: Baseline (empty shader, normal colorWriteMask) ===
+
+  [Vulkan Baseline] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Baseline pipeline created (empty shader, normal colorWriteMask)
+  [Vulkan Baseline] GPU Time: 0.0670 ms  OK
+  [OpenGL Baseline] Running...
+  [OpenGL Baseline] GPU Time: 0.0553 ms  OK
+
+=== PHASE 1: Heavy shader + colorWriteMask=0 ===
+
+--- loopCount = 10 ---
+  [Vulkan] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+  [Vulkan] GPU Time: 0.0653 ms  OK
+  [OpenGL] Running...
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+  [OpenGL] GPU Time: 0.0614 ms  OK
+
+--- loopCount = 100 ---
+  [Vulkan] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+  [Vulkan] GPU Time: 0.0657 ms  OK
+  [OpenGL] Running...
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+  [OpenGL] GPU Time: 0.5857 ms  OK
+
+--- loopCount = 500 ---
+  [Vulkan] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+  [Vulkan] GPU Time: 0.0634 ms  OK
+  [OpenGL] Running...
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+  [OpenGL] GPU Time: 3.2594 ms  OK
+
+--- loopCount = 5000 ---
+  [Vulkan] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+  [Vulkan] GPU Time: 0.0645 ms  OK
+  [OpenGL] Running...
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+  [OpenGL] GPU Time: 32.0594 ms  OK
+
+=== PHASE 2: Heavy shader + colorWriteMask=RGBA (full write) ===
+
+--- loopCount = 10 ---
+  [Vulkan CW] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = RGBA (full write)
+  [Vulkan CW] GPU Time: 0.0801 ms  OK
+  [OpenGL CW] Running...
+[OpenGL ColorWrite] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+  [OpenGL CW] GPU Time: 0.0696 ms  OK
+
+--- loopCount = 100 ---
+  [Vulkan CW] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = RGBA (full write)
+  [Vulkan CW] GPU Time: 0.5989 ms  OK
+  [OpenGL CW] Running...
+[OpenGL ColorWrite] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+  [OpenGL CW] GPU Time: 0.5857 ms  OK
+
+--- loopCount = 500 ---
+  [Vulkan CW] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = RGBA (full write)
+  [Vulkan CW] GPU Time: 10.2213 ms  OK
+  [OpenGL CW] Running...
+[OpenGL ColorWrite] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+  [OpenGL CW] GPU Time: 7.2684 ms  OK
+
+--- loopCount = 5000 ---
+  [Vulkan CW] Running...
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = RGBA (full write)
+  [Vulkan CW] GPU Time: 59.1658 ms  OK
+  [OpenGL CW] Running...
+[OpenGL ColorWrite] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+  [OpenGL CW] GPU Time: 52.7411 ms  OK
+
+
+================================================================
+  Summary: Vulkan PSO vs OpenGL â€?GPU Time (ms)
+  Draw calls: 100 | Vertices/draw: 6144
+================================================================
+
+  --- Baseline (empty shader, normal colorWriteMask) ---
+  Baseline            0.0670        0.0553       (ref)
+
+  --- Phase 1: Heavy shader + colorWriteMask=0 (DCE test) ---
+  LoopCount      Vulkan (ms)   OpenGL (ms)       GL/VK
+  ----------------------------------------------------
+  10                  0.0653        0.0614      0.94x
+  100                 0.0657        0.5857      8.91x
+  500                 0.0634        3.2594     51.42x
+  5000                0.0645       32.0594    496.71x
+  ----------------------------------------------------
+
+  --- Phase 2: Heavy shader + colorWriteMask=RGBA (full write) ---
+  LoopCount      Vulkan (ms)   OpenGL (ms)       GL/VK
+  ----------------------------------------------------
+  10                  0.0801        0.0696      0.87x
+  100                 0.5989        0.5857      0.98x
+  500                10.2213        7.2684      0.71x
+  5000               59.1658       52.7411      0.89x
+  ----------------------------------------------------
+
+  --- Cross-Phase Comparison (colorWriteMask=0 vs RGBA) ---
+  LoopCount        VK mask=0  VK mask=RGBA     GL mask=0  GL mask=RGBA
+  --------------------------------------------------------------------
+  10                  0.0653        0.0801        0.0614        0.0696
+  100                 0.0657        0.5989        0.5857        0.5857
+  500                 0.0634       10.2213        3.2594        7.2684
+  5000                0.0645       59.1658       32.0594       52.7411
+  --------------------------------------------------------------------
+
+  Analysis (Phase 1 â€?colorWriteMask=0):
+    Vulkan Baseline (empty shader):      0.0670 ms
+    OpenGL Baseline (empty shader):      0.0553 ms
+    OpenGL GPU time growth (10 -> 5000): 521.8x
+    Vulkan GPU time growth (10 -> 5000): 1.0x
+
+    Vulkan heavy(5000) mask=0 / baseline: 0.96x
+    -> Vulkan PSO DCE eliminated the heavy loop entirely!
+    OpenGL heavy(5000) mask=0 / baseline: 579.78x
+    -> OpenGL still executes the heavy loop (no cross-stage DCE)
+
+  Analysis (Phase 2 â€?colorWriteMask=RGBA):
+    Vulkan GPU time growth (10 -> 5000): 739.0x
+    OpenGL GPU time growth (10 -> 5000): 757.4x
+    Vulkan mask=RGBA / mask=0 at loop=5000: 916.7x
+    -> HUGE gap! Vulkan PSO DCE saved 99.9% GPU time!
+    OpenGL mask=RGBA / mask=0 at loop=5000: 1.6x
+
+  >> CONCLUSION:
+     Vulkan PSO cross-stage DCE is PROVEN:
+       - Vulkan mask=0 is dramatically faster than mask=RGBA
+         (compiler eliminated dead code when output is unused)
+       - OpenGL mask=0 is similar to mask=RGBA
+         (runtime state cannot trigger compile-time DCE)
+
+================================================================
+

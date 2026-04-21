@@ -1,0 +1,126 @@
+﻿================================================================
+  PSO Shader Compile Optimization Benchmark (Android)
+  Test: Cross-stage DCE via colorWriteMask = 0
+  Draw calls per test: 100 (fixed)
+  Vertices per draw: 6144 (32x32 grid)
+  Shader loopCount: 10, 100, 500, 5000 (variable)
+================================================================
+
+=== PHASE 0: Baseline (empty shader, normal colorWriteMask) ===
+
+  [Vulkan Baseline] Running...
+  [Vulkan Baseline] GPU Time: 0.9411 ms  OK
+  [GLES Baseline]   Running...
+  [GLES Baseline]   GPU Time: 0.9293 ms  OK
+
+=== PHASE 1: Heavy shader + colorWriteMask=0 ===
+
+--- loopCount = 10 ---
+  [Vulkan] Running...
+  [Vulkan] GPU Time: 3.3054 ms  OK
+  [GLES]   Running...
+  [GLES]   GPU Time: 3.3199 ms  OK
+
+--- loopCount = 100 ---
+  [Vulkan] Running...
+  [Vulkan] GPU Time: 31.5071 ms  OK
+  [GLES]   Running...
+  [GLES]   GPU Time: 31.5994 ms  OK
+
+--- loopCount = 500 ---
+  [Vulkan] Running...
+  [Vulkan] GPU Time: 79.9745 ms  OK
+  [GLES]   Running...
+  [GLES]   GPU Time: 40.2727 ms  OK
+
+--- loopCount = 5000 ---
+  [Vulkan] Running...
+  [Vulkan] GPU Time: 400.7728 ms  OK
+  [GLES]   Running...
+  [GLES]   GPU Time: 402.2887 ms  OK
+
+=== PHASE 2: Heavy shader + colorWriteMask=RGBA (full write) ===
+
+--- loopCount = 10 ---
+  [Vulkan CW] Running...
+  [Vulkan CW] GPU Time: 0.8471 ms  OK
+  [GLES CW]   Running...
+  [GLES CW]   GPU Time: 0.8522 ms  OK
+
+--- loopCount = 100 ---
+  [Vulkan CW] Running...
+  [Vulkan CW] GPU Time: 8.0639 ms  OK
+  [GLES CW]   Running...
+  [GLES CW]   GPU Time: 8.0947 ms  OK
+
+--- loopCount = 500 ---
+  [Vulkan CW] Running...
+  [Vulkan CW] GPU Time: 40.1079 ms  OK
+  [GLES CW]   Running...
+  [GLES CW]   GPU Time: 40.2744 ms  OK
+
+--- loopCount = 5000 ---
+  [Vulkan CW] Running...
+  [Vulkan CW] GPU Time: 400.7216 ms  OK
+  [GLES CW]   Running...
+  [GLES CW]   GPU Time: 402.2779 ms  OK
+
+
+================================================================
+  Summary: Vulkan PSO vs GLES - GPU Time (ms)
+  Draw calls: 100 | Vertices/draw: 6144
+================================================================
+
+  --- Baseline (empty shader, normal colorWriteMask) ---
+  Baseline            0.9411        0.9293       (ref)
+
+  --- Phase 1: Heavy shader + colorWriteMask=0 (DCE test) ---
+  LoopCount      Vulkan (ms)     GLES (ms)       GL/VK
+  ----------------------------------------------------
+  10                  3.3054        3.3199      1.00x
+  100                31.5071       31.5994      1.00x
+  500                79.9745       40.2727      0.50x
+  5000              400.7728      402.2887      1.00x
+  ----------------------------------------------------
+
+  --- Phase 2: Heavy shader + colorWriteMask=RGBA (full write) ---
+  LoopCount      Vulkan (ms)     GLES (ms)       GL/VK
+  ----------------------------------------------------
+  10                  0.8471        0.8522      1.01x
+  100                 8.0639        8.0947      1.00x
+  500                40.1079       40.2744      1.00x
+  5000              400.7216      402.2779      1.00x
+  ----------------------------------------------------
+
+  --- Cross-Phase Comparison (mask=0 vs RGBA) ---
+  LoopCount        VK mask=0  VK mask=RGBA     GL mask=0  GL mask=RGBA
+  --------------------------------------------------------------------
+  10                  3.3054        0.8471        3.3199        0.8522
+  100                31.5071        8.0639       31.5994        8.0947
+  500                79.9745       40.1079       40.2727       40.2744
+  5000              400.7728      400.7216      402.2887      402.2779
+  --------------------------------------------------------------------
+
+  Analysis (Phase 1 - colorWriteMask=0):
+    Vulkan Baseline (empty shader):      0.9411 ms
+    GLES Baseline (empty shader):        0.9293 ms
+    GLES GPU time growth (10 -> 5000):   121.2x
+    Vulkan GPU time growth (10 -> 5000): 121.2x
+
+    Vulkan heavy(5000) mask=0 / baseline: 425.83x
+    GLES heavy(5000) mask=0 / baseline:   432.91x
+    -> GLES still executes the heavy loop (no cross-stage DCE)
+
+  Analysis (Phase 2 - colorWriteMask=RGBA):
+    Vulkan GPU time growth (10 -> 5000): 473.0x
+    GLES GPU time growth (10 -> 5000):   472.1x
+    Vulkan mask=RGBA / mask=0 at loop=5000: 1.0x
+    GLES mask=RGBA / mask=0 at loop=5000:   1.0x
+    -> GLES shows similar time with/without mask
+       (confirms: GLES cannot DCE based on runtime state)
+
+  >> CONCLUSION:
+     Results are inconclusive. The mobile GPU driver may be
+     doing hardware-level optimization in both cases.
+
+================================================================

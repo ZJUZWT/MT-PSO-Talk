@@ -1,19 +1,88 @@
-.worktrees/
+# ============================================================
+# General
+# ============================================================
 .DS_Store
+Thumbs.db
+.worktrees/
 .impeccable.md
+ignore/
 agent.md
 CLAUDE.md
+
+# ============================================================
+# IDE / Editor
+# ============================================================
+.vscode/
+.idea/
+.vs/
+*.suo
+*.user
+*.sln.docstates
+.codex-preview/
+.superpowers/
+.claude/
+
+# ============================================================
+# Node / JS
+# ============================================================
 node_modules/
 dist/
-build/
-coverage/
 .cache/
+
+# ============================================================
+# Python
+# ============================================================
 __pycache__/
 *.py[cod]
 .generated/
 generated/
 benchmark_results/
-ignore/
+
+# ============================================================
+# C/C++ build artifacts
+# ============================================================
+build/
+out/
+bin/
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.exe
+*.so
+*.dylib
+*.pdb
+*.ilk
+*.exp
+
+# ============================================================
+# SPIR-V compiled shaders (regenerated from .vert/.frag)
+# ============================================================
+*.spv
+
+# ============================================================
+# Android / Gradle
+# ============================================================
+.gradle/
+.cxx/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+**/app/build/
+# Keep gradle-wrapper.properties, ignore the binary jar
+**/gradle/wrapper/gradle-wrapper.jar
+
+# ============================================================
+# ShaderCompileTest – temp test output
+# ============================================================
+ShaderCompileTest/test_run.txt
+
+# ============================================================
+# Docs – generated media (large files)
+# ============================================================
 Docs/PSO-video-demo.mp4
 Docs/PSO-video-demo.gif
 Docs/PSO-video-demo-contact-sheet.png
@@ -26,12 +95,31 @@ Docs/_anim_test.pptx
 Docs/剧本/.generated-previews/
 Docs/剧本/.snapshots/
 Docs/.archive/
-.codex-preview/
-.superpowers/
-.claude/
-test-results/
 Docs/superpowers/
-buildlog.txt
+
+# ============================================================
+# BenchmarkApp – proprietary / large deps
+# ============================================================
+BenchmarkApp/third_party/oodle/
+BenchmarkApp/third_party/mesa/build/
+
+# ============================================================
+# Test results / coverage
+# ============================================================
+test-results/
+coverage/
+
+# ============================================================
+# Scripts (generated)
+# ============================================================
 scripts/check_*.py
 scripts/compare_*.py
 scripts/verify_*.py
+
+# ============================================================
+# Misc temp
+# ============================================================
+*.tmp
+*.temp
+*.log
+buildlog.txt

@@ -19,7 +19,7 @@
       "id": "move_dual_mask_board",
       "kind": "node_move",
       "distancePx": 132,
-      "description": "UsageMask 事件链与 A / A+B 对比板进入"
+      "description": "UsageMask 事件链与 A / B+C 对比板进入"
     },
     {
       "id": "move_compile_throughput_cards",

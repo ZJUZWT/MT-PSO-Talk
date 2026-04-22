@@ -16,21 +16,21 @@
       "description": "page30 的 PSO 延伸阅读页整体淡出"
     },
     {
-      "id": "move_harness_loop",
+      "id": "move_harness_ring",
       "kind": "node_move",
-      "distancePx": 150,
-      "description": "page31 左侧自动回环进入"
+      "distancePx": 176,
+      "description": "page31 的单大圆环与四个主节点一起落位"
     },
     {
-      "id": "move_harness_helper_card",
+      "id": "move_ring_helpers",
       "kind": "node_move",
-      "distancePx": 132,
-      "description": "hook / workflow_gate / Edge probe 辅助卡落位"
+      "distancePx": 148,
+      "description": "workflow gate / front probe / browser capture / blind critics 与停继续 token 贴边补入"
     },
     {
-      "id": "fade_in_harness_footer",
+      "id": "fade_in_loop_copy",
       "kind": "fade_in",
-      "description": "page31 底部回写总结淡入"
+      "description": "page31 圆环中心题眼淡入"
     }
   ]
 }

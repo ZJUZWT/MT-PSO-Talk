@@ -26,6 +26,10 @@
 | --- | --- | --- | --- | --- |
 | 1 | `0.00s - 1.00s` | 插图过渡到主图。 | 图片 / 主图背景 | 保持统一背景，不闪回主图。 |
 
+## 当前涉及文件
+
+- `.rec.upipelinecache`
+
 ## Current screenshot
 
 ![Current screenshot](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/ignore/slide-stage-captures/20260419-153030/page15img-whole-image-fixed.png)

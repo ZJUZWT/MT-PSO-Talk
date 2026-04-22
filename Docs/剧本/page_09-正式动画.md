@@ -27,6 +27,11 @@
 | --- | --- | --- | --- | --- |
 | 1 | `0.00s - 2.20s` | SharedCode 问题页收束并准备进入 page10 回答页。 | SharedCode 相关结构 | 作为 page10 回答前的前置页。 |
 
+## 当前口播事实
+
+- `Shared模式下ShaderCode由全局资产持有，含全局索引，Material共享`
+- 高亮语义：`全局资产`、`全局索引`、`共享`
+
 ## Current screenshot
 
 ![Current screenshot](/Users/swannzhang/Workspace/AIProjects/MT-PSO-Talk/ignore/review-refresh-20260417/page_09.png)

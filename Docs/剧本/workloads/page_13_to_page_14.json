@@ -24,13 +24,13 @@
     {
       "id": "grow_ue_to_gfx_relation",
       "kind": "edge_grow",
-      "lengthPx": 24,
+      "lengthPx": 176,
       "description": "UE PSO -> Gfx PSO 的 create / resolve 关系显现"
     },
     {
       "id": "grow_gfx_to_gpu_relation",
       "kind": "edge_grow",
-      "lengthPx": 46,
+      "lengthPx": 166,
       "description": "Gfx PSO -> GPU 的 bind / use 关系显现"
     },
     {

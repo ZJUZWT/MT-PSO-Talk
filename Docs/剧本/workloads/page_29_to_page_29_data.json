@@ -1,0 +1,36 @@
+{
+  "holdBeforeMs": 100,
+  "holdAfterMs": 180,
+  "phaseOrder": [
+    "hold_before",
+    "fade_out",
+    "node_motion",
+    "edge_motion",
+    "fade_in",
+    "hold_after"
+  ],
+  "actions": [
+    {
+      "id": "fade_out_governance_source",
+      "kind": "fade_out",
+      "description": "page29 的治理证据合页整体淡出"
+    },
+    {
+      "id": "move_platform_tables",
+      "kind": "node_move",
+      "distancePx": 180,
+      "description": "page29_data 的代码卡、state 卡与双平台极值表进入"
+    },
+    {
+      "id": "move_footer_note",
+      "kind": "node_move",
+      "distancePx": 120,
+      "description": "page29_data 的脚注总结条落位"
+    },
+    {
+      "id": "fade_in_driver_surface",
+      "kind": "fade_in",
+      "description": "page29_data 的代码、state 与表格文本淡入"
+    }
+  ]
+}

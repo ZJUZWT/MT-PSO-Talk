@@ -1,6 +1,6 @@
 {
-  "holdBeforeMs": 100,
-  "holdAfterMs": 140,
+  "holdBeforeMs": 120,
+  "holdAfterMs": 180,
   "phaseOrder": [
     "hold_before",
     "fade_out",
@@ -13,24 +13,30 @@
     {
       "id": "fade_out_harness_page",
       "kind": "fade_out",
-      "description": "harness 说明页整体淡出"
+      "description": "page31 的大圆环 harness 页整体淡出"
     },
     {
-      "id": "move_culture_card",
+      "id": "move_bridge_title",
       "kind": "node_move",
-      "distancePx": 140,
-      "description": "书 / 视频推荐卡进入"
+      "distancePx": 156,
+      "description": "反馈系统题眼进入中心视线"
     },
     {
-      "id": "move_reading_games",
+      "id": "move_abstraction_pills",
       "kind": "node_move",
-      "distancePx": 120,
-      "description": "推荐游戏横向卡进入"
+      "distancePx": 148,
+      "description": "harness / loss + back propagation / feedback system 竖向 pill 组整体落位"
     },
     {
-      "id": "fade_in_reading_links",
+      "id": "move_function_skeleton",
+      "kind": "node_move",
+      "distancePx": 172,
+      "description": "Input -> f(x) -> Output 骨架在下半区成立"
+    },
+    {
+      "id": "fade_in_bridge_footer",
       "kind": "fade_in",
-      "description": "书 / 视频与游戏条目淡入"
+      "description": "橙色收束句淡入"
     }
   ]
 }

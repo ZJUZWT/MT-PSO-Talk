@@ -19,7 +19,7 @@
       "id": "move_quote_block",
       "kind": "node_move",
       "distancePx": 640,
-      "description": "《逍遥游》引句主块拉开并进入终页中心"
+      "description": "4 行引句主块拉开并进入终页中心"
     },
     {
       "id": "move_link_groups",

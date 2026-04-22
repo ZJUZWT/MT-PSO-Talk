@@ -25,7 +25,7 @@
       "id": "move_abstraction_pills",
       "kind": "node_move",
       "distancePx": 148,
-      "description": "harness / loss + back propagation / feedback system 竖向 pill 组整体落位"
+      "description": "harness / loss + back propagation / feedback system 圆弧 pill 组整体落位"
     },
     {
       "id": "move_function_skeleton",

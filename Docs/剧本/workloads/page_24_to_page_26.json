@@ -25,7 +25,7 @@
       "id": "move_compile_throughput_cards",
       "kind": "node_move",
       "distancePx": 168,
-      "description": "page26 右侧并行吞吐说明卡落位"
+      "description": "page26 右侧并行层级方法卡落位"
     },
     {
       "id": "fade_in_compile_footer",

@@ -1,0 +1,422 @@
+# PSO Shader Compile Optimization Benchmark
+
+> **Test:** Cross-stage Dead Code Elimination (DCE) via `colorWriteMask`
+> **Date:** 2026-04-21
+
+---
+
+## 1. Test Methodology
+
+### 1.1 Experiment Goal
+
+Prove that Vulkan's **Pipeline State Object (PSO)** architecture enables the GPU shader compiler to perform more aggressive **cross-stage Dead Code Elimination (DCE)** than OpenGL, by exploiting compile-time knowledge of the full render state (specifically `colorWriteMask`).
+
+### 1.2 Core Idea
+
+- Write a Vertex Shader (VS) with an intentionally **heavy computation loop** (`sin`/`cos`/`exp`/`log`, N iterations), and pass the result to Fragment Shader (FS).
+- Set `colorWriteMask = 0` (no color output written to framebuffer).
+
+**In Vulkan:**
+
+The PSO compiler sees `colorWriteMask=0` at pipeline creation time. It can reason backwards:
+
+1. FS output is never written → FS is dead code → **delete FS**
+2. FS doesn't read `heavyColor` → VS output is dead → **delete VS loop**
+
+> ✅ Result: The entire heavy loop is eliminated at compile time.
+
+**In OpenGL:**
+
+`glLinkProgram()` compiles VS+FS **without** knowing `colorWriteMask`. `glColorMask(false)` is set at draw time, **AFTER** compilation. The compiler cannot eliminate the loop → GPU executes it fully.
+
+> ❌ Result: The loop runs in full on the GPU.
+
+### 1.3 Anti-Optimization Measures
+
+To prevent the compiler from optimizing away the loop through other means:
+
+- `loopCount` is a **runtime push_constant/uniform** (not a compile-time constant)
+- Initial accumulator depends on **vertex position** (per-vertex varying)
+- Each iteration **depends on the previous** (data dependency chain)
+
+### 1.4 Test Matrix
+
+| Test Group | Shader | colorWriteMask | Purpose |
+|---|---|---|---|
+| Baseline | Empty | RGBA (on) | Reference: pipeline overhead |
+| Phase 1 (DCE trap) | Heavy | 0 (off) | Test DCE |
+| Phase 2 (control) | Heavy | RGBA (on) | Actual GPU compute |
+
+- **loopCount:** 10, 100, 500, 5000
+- **Draw calls per test:** 100 (fixed)
+- **Vertices per draw:** 6144 (32×32 grid = 2048 triangles)
+- **Render target:** 64×64 offscreen
+
+### 1.5 Timing Method
+
+| Platform | Method |
+|---|---|
+| Vulkan | `vkCmdWriteTimestamp` (TOP_OF_PIPE → BOTTOM_OF_PIPE) |
+| OpenGL | `GL_TIME_ELAPSED` query |
+| Android | `GL_EXT_disjoint_timer_query` (with CPU fallback) |
+
+All measurements are **pure GPU time**, excluding CPU overhead. A warm-up pass is executed before each timed pass.
+
+---
+
+## 2. Shader Code
+
+### 2.1 Heavy Vertex Shader (Vulkan GLSL 450)
+
+```glsl
+#version 450
+
+layout(location = 0) in vec3 inPos;
+layout(location = 0) out vec4 heavyColor;
+
+layout(push_constant) uniform PushConstants {
+    int   loopCount;   // runtime parameter (e.g. 5000)
+    float seed;        // runtime seed
+} pc;
+
+void main() {
+    gl_Position = vec4(inPos, 1.0);
+
+    // Seed from vertex position (per-vertex varying)
+    vec4 acc = vec4(inPos, 1.0) * pc.seed;
+
+    // Heavy loop – each iteration depends on the previous
+    for (int i = 0; i < pc.loopCount; i++) {
+        acc = sin(acc) * cos(acc)
+            + exp(acc * 0.01) - log(abs(acc) + 1.0);
+    }
+
+    heavyColor = acc;
+}
+```
+
+### 2.2 Heavy Fragment Shader (Vulkan GLSL 450)
+
+```glsl
+#version 450
+
+layout(location = 0) in vec4 heavyColor;
+layout(location = 0) out vec4 outColor;
+
+void main() {
+    outColor = heavyColor;   // Simply output the VS result
+}
+```
+
+### 2.3 Baseline Vertex Shader (empty – no computation)
+
+```glsl
+#version 450
+
+layout(location = 0) in vec3 inPos;
+layout(location = 0) out vec4 baseColor;
+
+layout(push_constant) uniform PushConstants {
+    int   loopCount;   // unused
+    float seed;        // unused
+} pc;
+
+void main() {
+    gl_Position = vec4(inPos, 1.0);
+    baseColor = vec4(0.5, 0.5, 0.5, 1.0);  // constant color
+}
+```
+
+### 2.4 Baseline Fragment Shader
+
+```glsl
+#version 450
+
+layout(location = 0) in vec4 baseColor;
+layout(location = 0) out vec4 outColor;
+
+void main() {
+    outColor = baseColor;
+}
+```
+
+---
+
+## 3. Key Implementation Code
+
+### 3.1 Vulkan PSO Creation – `colorWriteMask = 0` (the DCE trap)
+
+The critical difference: `colorWriteMask` is **baked into the PSO** at pipeline creation time, **BEFORE** any draw call is issued.
+
+```cpp
+// *** THIS IS THE KEY: colorWriteMask = 0 ***
+// The Vulkan compiler sees this at PSO creation time and can
+// perform aggressive cross-stage dead code elimination.
+VkPipelineColorBlendAttachmentState blendAtt{};
+blendAtt.colorWriteMask = 0;  // <── THE TRAP: no color output!
+blendAtt.blendEnable    = VK_FALSE;
+
+// ... (full pipeline state: VS, FS, vertex input, rasterizer, etc.)
+
+VkGraphicsPipelineCreateInfo pipeCI{...};
+pipeCI.pColorBlendState = &blend;  // includes colorWriteMask=0
+vkCreateGraphicsPipelines(device, cache, 1, &pipeCI, nullptr, &pipeline);
+```
+
+### 3.2 Vulkan PSO Creation – `colorWriteMask = RGBA` (control group)
+
+Same shader code, but `colorWriteMask` is fully enabled. The compiler **CANNOT** eliminate the loop because the output **IS** used.
+
+```cpp
+VkPipelineColorBlendAttachmentState blendAtt{};
+blendAtt.colorWriteMask = VK_COLOR_COMPONENT_R_BIT
+                        | VK_COLOR_COMPONENT_G_BIT
+                        | VK_COLOR_COMPONENT_B_BIT
+                        | VK_COLOR_COMPONENT_A_BIT;
+blendAtt.blendEnable    = VK_FALSE;
+```
+
+### 3.3 OpenGL – `glColorMask` at draw time (too late for DCE)
+
+OpenGL compiles the shader **FIRST**, then sets `colorMask` at draw time. The compiler has **no knowledge** of `colorMask` during compilation.
+
+```cpp
+// Step 1: Compile shader (no knowledge of colorMask)
+GLuint vs   = compileShader(GL_VERTEX_SHADER, vertSrc);
+GLuint fs   = compileShader(GL_FRAGMENT_SHADER, fragSrc);
+GLuint prog = linkProgram(vs, fs);
+// At this point, the heavy loop is compiled into GPU machine code.
+
+// Step 2: Set colorMask at draw time (TOO LATE for DCE!)
+glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+// GPU executes the full heavy loop, then discards the output at ROP.
+```
+
+### 3.4 GPU Timing – Vulkan
+
+```cpp
+vkCmdWriteTimestamp(cmdBuf, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                    queryPool, 0);  // START
+
+vkCmdBeginRenderPass(...);
+vkCmdBindPipeline(...);
+for (int i = 0; i < 100; i++) {
+    vkCmdDraw(cmdBuf, 6144, 1, 0, 0);
+}
+vkCmdEndRenderPass(...);
+
+vkCmdWriteTimestamp(cmdBuf, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                    queryPool, 1);  // END
+
+// GPU time = (timestamp[1] - timestamp[0]) * timestampPeriod
+```
+
+### 3.5 GPU Timing – OpenGL
+
+```cpp
+glBeginQuery(GL_TIME_ELAPSED, timerQuery);
+
+for (int i = 0; i < 100; i++) {
+    glDrawArrays(GL_TRIANGLES, 0, 6144);
+}
+
+glEndQuery(GL_TIME_ELAPSED);
+glFinish();
+
+GLuint64 elapsed;
+glGetQueryObjectui64v(timerQuery, GL_QUERY_RESULT, &elapsed);
+// GPU time = elapsed / 1e6 (nanoseconds to milliseconds)
+```
+
+---
+
+## 4. Test Parameters
+
+| Parameter | Value |
+|---|---|
+| Draw calls per test | 100 (fixed) |
+| Vertices per draw | 6144 (32×32 grid = 2048 triangles) |
+| Shader loopCount | 10, 100, 500, 5000 (variable) |
+| Render target | 64×64 offscreen |
+| Timing method | GPU timestamp queries (Vulkan / GL_TIME_ELAPSED) |
+
+---
+
+## 5. Results – Desktop (Windows)
+
+> **GPU:** NVIDIA GeForce RTX 3080
+> **Driver:** NVIDIA 551.86
+> **API:** Vulkan 1.1 / OpenGL 4.3
+
+### Baseline (empty shader, normal colorWriteMask)
+
+| | Vulkan (ms) | OpenGL (ms) |
+|---|---|---|
+| Baseline | 0.0670 | 0.0553 |
+
+### Phase 1: Heavy shader + `colorWriteMask = 0` (DCE trap)
+
+| LoopCount | Vulkan (ms) | OpenGL (ms) | GL / VK |
+|---|---|---|---|
+| 10 | 0.0653 | 0.0614 | 0.94x |
+| 100 | 0.0657 | 0.5857 | **8.91x** |
+| 500 | 0.0634 | 3.2594 | **51.42x** |
+| **5000** | **0.0645** | **32.0594** | **496.71x** 🚀 |
+
+### Phase 2: Heavy shader + `colorWriteMask = RGBA` (full write)
+
+| LoopCount | Vulkan (ms) | OpenGL (ms) | GL / VK |
+|---|---|---|---|
+| 10 | 0.0801 | 0.0696 | 0.87x |
+| 100 | 0.5989 | 0.5857 | 0.98x |
+| 500 | 10.2213 | 7.2684 | 0.71x |
+| 5000 | 59.1658 | 52.7411 | 0.89x |
+
+### Cross-Phase Comparison (`mask=0` vs `mask=RGBA`)
+
+| LoopCount | VK mask=0 | VK mask=RGBA | GL mask=0 | GL mask=RGBA |
+|---|---|---|---|---|
+| 10 | 0.0653 | 0.0801 | 0.0614 | 0.0696 |
+| 100 | 0.0657 | 0.5989 | 0.5857 | 0.5857 |
+| 500 | 0.0634 | 10.2213 | 3.2594 | 7.2684 |
+| 5000 | 0.0645 | 59.1658 | 32.0594 | 52.7411 |
+
+### Desktop Analysis
+
+| Metric | Value | Interpretation |
+|---|---|---|
+| VK GPU time growth (loop 10→5000, mask=0) | **1.0x** (FLAT!) | ✅ DCE eliminated the loop |
+| GL GPU time growth (loop 10→5000, mask=0) | 521.8x (linear) | ❌ Loop still runs |
+| VK heavy(5000) mask=0 / baseline | **0.96x** | ✅ Same as empty shader! |
+| GL heavy(5000) mask=0 / baseline | 579.78x | ❌ Loop still runs |
+| VK mask=RGBA / mask=0 at loop=5000 | **916.7x** | ✅ 99.9% GPU time saved |
+| GL mask=RGBA / mask=0 at loop=5000 | 1.6x | ❌ No DCE possible |
+
+> **Desktop Conclusion:** ✅ Vulkan PSO cross-stage DCE is **PROVEN** on NVIDIA RTX 3080.
+> - Vulkan `mask=0` runs at baseline speed regardless of loop count.
+> - OpenGL `mask=0` still executes the full heavy computation.
+> - When forced to compute (`mask=RGBA`), both APIs perform similarly.
+
+---
+
+## 6. Results – Android (Mobile)
+
+> **Device:** nubia NX721J (Red Magic)
+> **GPU:** Qualcomm Adreno (Snapdragon 8 Gen 3)
+> **API:** Vulkan 1.x / OpenGL ES 3.2
+
+### Baseline (empty shader, normal colorWriteMask)
+
+| | Vulkan (ms) | GLES (ms) |
+|---|---|---|
+| Baseline | 0.9411 | 0.9293 |
+
+### Phase 1: Heavy shader + `colorWriteMask = 0` (DCE trap)
+
+| LoopCount | Vulkan (ms) | GLES (ms) | GL / VK |
+|---|---|---|---|
+| 10 | 3.3054 | 3.3199 | 1.00x |
+| 100 | 31.5071 | 31.5994 | 1.00x |
+| 500 | 79.9745 | 40.2727 | 0.50x |
+| 5000 | 400.7728 | 402.2887 | 1.00x |
+
+### Phase 2: Heavy shader + `colorWriteMask = RGBA` (full write)
+
+| LoopCount | Vulkan (ms) | GLES (ms) | GL / VK |
+|---|---|---|---|
+| 10 | 0.8471 | 0.8522 | 1.01x |
+| 100 | 8.0639 | 8.0947 | 1.00x |
+| 500 | 40.1079 | 40.2744 | 1.00x |
+| 5000 | 400.7216 | 402.2779 | 1.00x |
+
+### Cross-Phase Comparison (`mask=0` vs `mask=RGBA`)
+
+| LoopCount | VK mask=0 | VK mask=RGBA | GL mask=0 | GL mask=RGBA |
+|---|---|---|---|---|
+| 10 | 3.3054 | 0.8471 | 3.3199 | 0.8522 |
+| 100 | 31.5071 | 8.0639 | 31.5994 | 8.0947 |
+| 500 | 79.9745 | 40.1079 | 40.2727 | 40.2744 |
+| 5000 | 400.7728 | 400.7216 | 402.2887 | 402.278 |
+
+### Android Analysis
+
+| Metric | Value | Interpretation |
+|---|---|---|
+| VK GPU time growth (loop 10→5000, mask=0) | 121.2x (linear) | ❌ Loop still runs |
+| GLES GPU time growth (loop 10→5000, mask=0) | 121.2x (linear) | ❌ Loop still runs |
+| VK heavy(5000) mask=0 / baseline | 425.83x | ❌ Loop still runs |
+| GLES heavy(5000) mask=0 / baseline | 432.91x | ❌ Loop still runs |
+| VK mask=RGBA / mask=0 at loop=5000 | 1.0x | ❌ No DCE |
+| GLES mask=RGBA / mask=0 at loop=5000 | 1.0x | ❌ No DCE |
+
+### ⚠️ Android Anomaly
+
+`mask=0` is **SLOWER** than `mask=RGBA` at low loop counts:
+
+| LoopCount | VK mask=0 | VK mask=RGBA | Ratio |
+|---|---|---|---|
+| 10 | 3.31 ms | 0.85 ms | **3.9x slower!** |
+| 100 | 31.5 ms | 8.06 ms | **3.9x slower!** |
+
+> Possible cause: Adreno driver adds synchronization overhead when `colorWriteMask=0`, or triggers a less optimal shader variant.
+
+> **Android Conclusion:** ❌ Neither Vulkan nor GLES performs cross-stage DCE on Adreno GPU.
+> - Both APIs execute the heavy loop regardless of `colorWriteMask`.
+> - Mobile GPU drivers prioritize compile speed over optimization depth.
+> - The PSO architecture provides the **POSSIBILITY** for DCE, but the Adreno driver does not implement this optimization.
+
+---
+
+## 7. Overall Comparison – Desktop vs Mobile
+
+### Key Metric: Vulkan `mask=0` at `loopCount=5000`
+
+| Platform | GPU Time | vs Baseline | DCE Effective? |
+|---|---|---|---|
+| PC (RTX 3080) | 0.0645 ms | 0.96x | ✅ **YES** (100% DCE) |
+| Android (Adreno) | 400.77 ms | 425.83x | ❌ NO |
+
+### Key Metric: `mask=RGBA` / `mask=0` ratio at `loopCount=5000`
+
+| Platform | Vulkan | OpenGL/GLES | Interpretation |
+|---|---|---|---|
+| PC (RTX 3080) | **916.7x** | 1.6x | VK DCE ✅ / GL no ❌ |
+| Android (Adreno) | 1.0x | 1.0x | Neither DCE ❌ |
+
+### Key Metric: Vulkan vs OpenGL/GLES at `mask=RGBA` (actual compute)
+
+| Platform | Vulkan (ms) | GL/GLES (ms) | Ratio |
+|---|---|---|---|
+| PC (loop=5000) | 59.17 | 52.74 | GL 0.89x (similar) |
+| Android (loop=5000) | 400.72 | 402.28 | GL 1.00x (same) |
+
+---
+
+## 8. Final Conclusions
+
+### 1. NVIDIA Desktop Driver (RTX 3080) ✅
+
+- Vulkan PSO cross-stage DCE is **EXTREMELY effective**.
+- When `colorWriteMask=0`, the compiler eliminates the **ENTIRE** heavy vertex shader computation (5000 iterations of `sin`/`cos`/`exp`/`log`).
+- GPU time stays at baseline level (~0.065ms) **regardless of loop count**.
+- OpenGL **CANNOT** do this because it compiles shaders before knowing the render state (`colorMask` is set at draw time, not link time).
+
+### 2. Qualcomm Adreno Mobile Driver (nubia Red Magic) ❌
+
+- Neither Vulkan nor GLES performs cross-stage DCE.
+- Both APIs execute the full computation regardless of `colorWriteMask`.
+- Mobile drivers prioritize **fast PSO compilation** over deep optimization.
+- The PSO architecture **ENABLES** the optimization, but the driver must implement it – Adreno currently does not.
+
+### 3. Control Group Validation ✅
+
+- When forced to actually compute (`mask=RGBA`), Vulkan and OpenGL/GLES perform **nearly identically** on both platforms.
+- This confirms the DCE test is measuring **compiler optimization**, NOT inherent API performance differences.
+
+### 4. Key Takeaway
+
+> - **PSO is an ARCHITECTURE** that provides "full knowledge" to the compiler.
+> - Whether the compiler **USES** that knowledge depends on the **driver vendor**.
+> - NVIDIA's desktop driver is the gold standard for aggressive PSO optimization.
+> - Mobile GPU vendors have room for improvement in this area.

@@ -1,0 +1,246 @@
+================================================================
+  PSO Shader Compile Benchmark Report
+  Date: 周二 2026/04/21 17:31:14.69
+  Iterations: 500
+================================================================
+
+================================================================ 
+ DESKTOP (Windows) RESULTS 
+================================================================ 
+ 
+
+================================================================
+  PSO Shader Compile Optimization Benchmark
+  Test: Cross-stage DCE via colorWriteMask = 0
+  Draw calls per test: 500
+================================================================
+
+--- Running Vulkan benchmark ---
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+
+--- Running OpenGL benchmark ---
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+
+
+================================================================
+  PSO Dead-Code-Elimination Benchmark Results
+================================================================
+
+[Vulkan (PSO with colorWriteMask=0)]
+  Backend:    Vulkan
+  Test Case:  ColorWriteMask=0 (PSO DCE test)
+  GPU Time:   0.0135 ms
+  Draw Calls: 500
+  Iterations: 500
+  Status:     OK
+
+[OpenGL (glColorMask(0,0,0,0) at draw time)]
+  Backend:    OpenGL
+  Test Case:  glColorMask(0,0,0,0) (runtime state)
+  GPU Time:   0.0061 ms
+  Draw Calls: 500
+  Iterations: 500
+  Status:     OK
+
+----------------------------------------------------------------
+  Speedup (GL / VK): 0.45x
+
+  >> CONCLUSION: Minimal difference detected.
+     Your GL driver may be doing JIT recompilation,
+     or the GPU has hardware-level color-mask culling.
+================================================================
+
+ 
+================================================================ 
+ DESKTOP ITERATION SWEEP 
+================================================================ 
+ 
+--- 100 draw calls --- 
+
+================================================================
+  PSO Shader Compile Optimization Benchmark
+  Test: Cross-stage DCE via colorWriteMask = 0
+  Draw calls per test: 100
+================================================================
+
+--- Running Vulkan benchmark ---
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+
+--- Running OpenGL benchmark ---
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+
+
+================================================================
+  PSO Dead-Code-Elimination Benchmark Results
+================================================================
+
+[Vulkan (PSO with colorWriteMask=0)]
+  Backend:    Vulkan
+  Test Case:  ColorWriteMask=0 (PSO DCE test)
+  GPU Time:   0.0084 ms
+  Draw Calls: 100
+  Iterations: 100
+  Status:     OK
+
+[OpenGL (glColorMask(0,0,0,0) at draw time)]
+  Backend:    OpenGL
+  Test Case:  glColorMask(0,0,0,0) (runtime state)
+  GPU Time:   0.0031 ms
+  Draw Calls: 100
+  Iterations: 100
+  Status:     OK
+
+----------------------------------------------------------------
+  Speedup (GL / VK): 0.37x
+
+  >> CONCLUSION: Minimal difference detected.
+     Your GL driver may be doing JIT recompilation,
+     or the GPU has hardware-level color-mask culling.
+================================================================
+
+ 
+--- 500 draw calls --- 
+
+================================================================
+  PSO Shader Compile Optimization Benchmark
+  Test: Cross-stage DCE via colorWriteMask = 0
+  Draw calls per test: 500
+================================================================
+
+--- Running Vulkan benchmark ---
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+
+--- Running OpenGL benchmark ---
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+
+
+================================================================
+  PSO Dead-Code-Elimination Benchmark Results
+================================================================
+
+[Vulkan (PSO with colorWriteMask=0)]
+  Backend:    Vulkan
+  Test Case:  ColorWriteMask=0 (PSO DCE test)
+  GPU Time:   0.0144 ms
+  Draw Calls: 500
+  Iterations: 500
+  Status:     OK
+
+[OpenGL (glColorMask(0,0,0,0) at draw time)]
+  Backend:    OpenGL
+  Test Case:  glColorMask(0,0,0,0) (runtime state)
+  GPU Time:   0.0072 ms
+  Draw Calls: 500
+  Iterations: 500
+  Status:     OK
+
+----------------------------------------------------------------
+  Speedup (GL / VK): 0.50x
+
+  >> CONCLUSION: Minimal difference detected.
+     Your GL driver may be doing JIT recompilation,
+     or the GPU has hardware-level color-mask culling.
+================================================================
+
+ 
+--- 1000 draw calls --- 
+
+================================================================
+  PSO Shader Compile Optimization Benchmark
+  Test: Cross-stage DCE via colorWriteMask = 0
+  Draw calls per test: 1000
+================================================================
+
+--- Running Vulkan benchmark ---
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+
+--- Running OpenGL benchmark ---
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+
+
+================================================================
+  PSO Dead-Code-Elimination Benchmark Results
+================================================================
+
+[Vulkan (PSO with colorWriteMask=0)]
+  Backend:    Vulkan
+  Test Case:  ColorWriteMask=0 (PSO DCE test)
+  GPU Time:   0.0188 ms
+  Draw Calls: 1000
+  Iterations: 1000
+  Status:     OK
+
+[OpenGL (glColorMask(0,0,0,0) at draw time)]
+  Backend:    OpenGL
+  Test Case:  glColorMask(0,0,0,0) (runtime state)
+  GPU Time:   0.0113 ms
+  Draw Calls: 1000
+  Iterations: 1000
+  Status:     OK
+
+----------------------------------------------------------------
+  Speedup (GL / VK): 0.60x
+
+  >> CONCLUSION: Minimal difference detected.
+     Your GL driver may be doing JIT recompilation,
+     or the GPU has hardware-level color-mask culling.
+================================================================
+
+ 
+--- 5000 draw calls --- 
+
+================================================================
+  PSO Shader Compile Optimization Benchmark
+  Test: Cross-stage DCE via colorWriteMask = 0
+  Draw calls per test: 5000
+================================================================
+
+--- Running Vulkan benchmark ---
+[Vulkan] Using device: NVIDIA GeForce RTX 3080
+[Vulkan] Pipeline created with colorWriteMask = 0
+
+--- Running OpenGL benchmark ---
+[OpenGL] Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[OpenGL] Version:  4.3.0 NVIDIA 551.86
+[OpenGL] Program linked (shader compiled WITHOUT knowledge of ColorMask)
+
+
+================================================================
+  PSO Dead-Code-Elimination Benchmark Results
+================================================================
+
+[Vulkan (PSO with colorWriteMask=0)]
+  Backend:    Vulkan
+  Test Case:  ColorWriteMask=0 (PSO DCE test)
+  GPU Time:   0.0597 ms
+  Draw Calls: 5000
+  Iterations: 5000
+  Status:     OK
+
+[OpenGL (glColorMask(0,0,0,0) at draw time)]
+  Backend:    OpenGL
+  Test Case:  glColorMask(0,0,0,0) (runtime state)
+  GPU Time:   0.1853 ms
+  Draw Calls: 5000
+  Iterations: 5000
+  Status:     OK
+
+----------------------------------------------------------------
+  Speedup (GL / VK): 3.11x
+
+  >> CONCLUSION: Vulkan shows moderate improvement.
+     The driver may have performed partial optimization.
+================================================================
+
